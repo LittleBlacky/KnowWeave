@@ -1,0 +1,19 @@
+# Local reference projects. Do not commit copied upstream code.
+DeepParseX/
+DeepParseXWeb/
+../DeepParseX/
+../DeepParseXWeb/
+
+# Runtime and editor noise
+.env
+.env.*
+!.env.example
+node_modules/
+__pycache__/
+.venv/
+venv/
+.pytest_cache/
+.next/
+dist/
+build/
+
