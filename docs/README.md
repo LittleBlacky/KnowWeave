@@ -9,7 +9,7 @@
 | `01-product-spec.md` | v0.9 | 产品定位、用户角色、核心概念、MVP 范围和验收标准 |
 | `02-knowledge-lifecycle-spec.md` | v0.7 | 上传、解析、分块、检索、沉淀、评估的生命周期管理 |
 | `03-system-architecture-spec.md` | v0.6 | 系统架构、模块边界、技术选型、数据流和扩展策略 |
-| `04-data-model-spec.md` | v0.3 | 核心数据实体、关系、状态、索引、软删除、source span 定位和 Wiki Revision |
+| `04-data-model-spec.md` | v0.4 | 核心数据实体、关系、状态、索引、软删除、source span 定位和 Wiki Revision |
 
 1. `01-product-spec.md`
    - 定义 KnowWeave 的产品定位、用户角色、核心概念、MVP 范围和验收标准。

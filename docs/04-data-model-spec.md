@@ -1,6 +1,6 @@
 # KnowWeave 数据模型规格说明书
 
-版本：v0.3
+版本：v0.4
 日期：2026-05-23
 状态：草案
 关联文档：`docs/01-product-spec.md`、`docs/02-knowledge-lifecycle-spec.md`、`docs/03-system-architecture-spec.md`
@@ -159,7 +159,7 @@ erDiagram
 - `chunks` 是检索、引用和知识治理的证据片段。
 - `knowledge_units` 是人工可治理的知识点。
 - `wiki_pages` 是长期沉淀的结构化页面。
-- `wiki_revisions` 保存 Wiki 历史快照，P1 启用版本对比和回滚。
+- `wiki_revisions` 保存 Wiki 历史快照，MVP 预留，P1 启用版本对比和回滚。
 - `retrieved_contexts` 保存 RAG 召回过程，支撑反馈与评测闭环。
 - `tags` 通过 `tag_bindings` 绑定到文件、Knowledge Unit 和 Wiki Page。该关系是多态绑定，ER 图中不强制画出每一条目标外键。
 
@@ -216,6 +216,11 @@ flowchart TD
 
 - MVP 可以在业务表中记录 `status`、`error_message` 和 `created_at`。
 - P1 引入后台任务后，再增加 `jobs` 或 `task_runs`，记录 parsing、chunking、indexing、wiki_generation、evaluation 等任务。
+
+评测运行：
+
+- MVP 保存 `evaluation_samples` 和用户反馈即可。
+- P1 如果需要批量运行评测集、计算准确率和召回率，再引入 `evaluation_runs` 和 `evaluation_results`。
 
 解析资产：
 
@@ -551,7 +556,6 @@ P1 预留：
 | `trust_level` | integer | 否 | 可信等级，可选 |
 | `applicable_scope` | text | 否 | 适用范围 |
 | `created_from` | text | 是 | chunk、chat、wiki、manual |
-| `source_file_deleted` | boolean | 是 | 来源文件是否失效 |
 | `search_text` | text | 是 | 全文检索文本 |
 | `metadata` | jsonb | 是 | 扩展信息 |
 | `created_at` | timestamptz | 是 | 创建时间 |
@@ -564,6 +568,7 @@ P1 预留：
 - AI 生成的 Knowledge Unit 默认不得直接进入 `verified`。
 - `verified` 状态应记录确认时间和确认人，MVP 可先只记录时间。
 - `archived` 默认不参与问答召回。
+- Knowledge Unit 的来源可用性由 `knowledge_unit_sources.source_available` 和关联文件状态计算，不在本表冗余保存。
 
 索引：
 
@@ -622,7 +627,6 @@ P1 预留：
 | `content_markdown` | text | 是 | Markdown 正文 |
 | `source_file_id` | uuid | 否 | Document Wiki 的文件 ID |
 | `generation_prompt_version` | text | 否 | 生成模板版本 |
-| `source_file_deleted` | boolean | 是 | 来源文件是否失效 |
 | `search_text` | text | 是 | 全文检索文本 |
 | `metadata` | jsonb | 是 | 扩展信息 |
 | `created_at` | timestamptz | 是 | 创建时间 |
@@ -635,6 +639,7 @@ P1 预留：
 - Wiki 关键结论必须通过 citation 或 wiki_page_units 追溯来源。
 - AI 生成 Wiki 默认是 `draft` 或 `pending_review`。
 - MVP 可只保存当前 `content_markdown`，P1 启用 Wiki Revision 历史、版本对比和回滚。
+- Document Wiki 的来源文件可用性由 `source_file_id` 关联的文件状态计算，不在本表冗余保存。
 
 索引：
 
@@ -728,6 +733,10 @@ P1 预留：
 - `target_type + target_id` 表示引用挂载对象。
 - 文件软删除后 citation 不删除，但展示时提示来源不可用。
 - MVP 可以不强制外键到多态 target，但业务层必须校验 target 存在。
+- 每条 citation 至少应包含一种来源：`chunk_id`、`knowledge_unit_id`、`source_span_id` 或人工来源 metadata。
+- `target_type = chat_message` 时，推荐至少包含 `chunk_id` 或 `source_span_id`，保证回答可回溯到原文证据。
+- `target_type = wiki_page` 时，可以引用 `knowledge_unit_id` 或 `chunk_id`；关键结论不得只有无来源文本。
+- `target_type = knowledge_unit` 时，推荐优先通过 `knowledge_unit_sources` 维护来源，`citations` 可用于统一展示。
 
 索引：
 
@@ -786,6 +795,7 @@ P1 预留：
 | 字段 | 类型 | MVP | 说明 |
 | --- | --- | --- | --- |
 | `id` | uuid | 是 | 召回记录 ID |
+| `retrieval_run_id` | uuid | 是 | 一次检索或问答召回的分组 ID |
 | `chat_message_id` | uuid | 否 | 关联 assistant 消息 |
 | `query_text` | text | 是 | 查询文本 |
 | `result_type` | text | 是 | chunk、knowledge_unit、wiki_page、file |
@@ -799,12 +809,14 @@ P1 预留：
 
 约束：
 
+- 同一次搜索或问答召回产生的多条结果必须共享同一个 `retrieval_run_id`。
 - MVP `retrieval_strategy` 主要为 `keyword`。
 - `used_in_answer` 可用于计算引用覆盖和召回质量。
 
 索引：
 
 - `idx_retrieved_contexts_message_id`
+- `idx_retrieved_contexts_run_id`
 - `idx_retrieved_contexts_result`
 
 ### 6.16 feedback
@@ -1085,7 +1097,6 @@ MVP 必须落地：
 - `knowledge_units`
 - `knowledge_unit_sources`
 - `wiki_pages`
-- `wiki_revisions`，字段预留，P1 启用版本对比和回滚。
 - `wiki_page_units`
 - `citations`
 - `chat_sessions`
@@ -1099,7 +1110,10 @@ MVP 必须落地：
 MVP 可预留但不必完整实现：
 
 - `timeline_blocks`
+- `wiki_revisions`
 - `model_provider_configs`
+- `evaluation_runs`
+- `evaluation_results`
 - embedding 字段和 pgvector 索引
 
 ## 11. 后续文档衔接
