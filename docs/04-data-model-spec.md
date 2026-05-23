@@ -161,6 +161,7 @@ erDiagram
 - `wiki_pages` 是长期沉淀的结构化页面。
 - `wiki_revisions` 保存 Wiki 历史快照，P1 启用版本对比和回滚。
 - `retrieved_contexts` 保存 RAG 召回过程，支撑反馈与评测闭环。
+- `tags` 通过 `tag_bindings` 绑定到文件、Knowledge Unit 和 Wiki Page。该关系是多态绑定，ER 图中不强制画出每一条目标外键。
 
 ### 4.2 数据流关系图
 
@@ -893,6 +894,9 @@ P1 预留：
 约束：
 
 - `tag_id + target_type + target_id` 应唯一。
+- MVP 支持 `target_type` 为 `file`、`knowledge_unit`、`wiki_page`。
+- `tag_bindings.target_id` 是多态目标 ID，业务层必须根据 `target_type` 校验目标对象存在。
+- MVP 不建议给 chunk 打标签，chunk 优先使用 `chunk_type`、`status`、`quality_signals` 和 `source_spans` 治理；后续如有需要可扩展 `target_type = chunk`。
 
 ### 6.20 model_provider_configs
 
