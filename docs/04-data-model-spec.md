@@ -1,6 +1,6 @@
 # KnowWeave 数据模型规格说明书
 
-版本：v0.2
+版本：v0.3
 日期：2026-05-23
 状态：草案
 关联文档：`docs/01-product-spec.md`、`docs/02-knowledge-lifecycle-spec.md`、`docs/03-system-architecture-spec.md`
@@ -92,7 +92,6 @@ MVP 核心实体：
 knowledge_files
   -> parse_results
       -> document_blocks
-      -> timeline_blocks
           -> chunks
               -> source_spans
               -> knowledge_unit_sources
@@ -111,14 +110,121 @@ wiki_pages
   -> wiki_revisions
 ```
 
+P2 预留链路：
+
+```text
+knowledge_files(audio/video)
+  -> parse_results
+      -> timeline_blocks
+          -> chunks(transcript/mixed)
+              -> source_spans(time range)
+```
+
 辅助实体：
 
 ```text
 tags
 tag_bindings
 model_provider_configs
-wiki_revisions
 ```
+
+### 4.1 MVP ER 图
+
+```mermaid
+erDiagram
+  knowledge_files ||--o{ parse_results : has
+  parse_results ||--o{ document_blocks : produces
+  document_blocks ||--o{ chunks : chunked_into
+  chunks ||--o{ source_spans : located_by
+  chunks ||--o{ knowledge_unit_sources : supports
+  knowledge_units ||--o{ knowledge_unit_sources : cites
+  knowledge_units ||--o{ wiki_page_units : organized_into
+  wiki_pages ||--o{ wiki_page_units : contains
+  wiki_pages ||--o{ wiki_revisions : versioned_by
+  wiki_pages ||--o{ citations : cited_by
+  chunks ||--o{ citations : cited_as
+  knowledge_units ||--o{ citations : cited_as
+  chat_sessions ||--o{ chat_messages : contains
+  chat_messages ||--o{ retrieved_contexts : retrieved
+  chat_messages ||--o{ citations : cites
+  chat_messages ||--o{ feedback : receives
+  feedback ||--o{ evaluation_samples : can_create
+  tags ||--o{ tag_bindings : binds
+```
+
+说明：
+
+- `knowledge_files` 是原始事实源。
+- `document_blocks` 是解析中间层，负责保留文档结构。
+- `chunks` 是检索、引用和知识治理的证据片段。
+- `knowledge_units` 是人工可治理的知识点。
+- `wiki_pages` 是长期沉淀的结构化页面。
+- `wiki_revisions` 保存 Wiki 历史快照，P1 启用版本对比和回滚。
+- `retrieved_contexts` 保存 RAG 召回过程，支撑反馈与评测闭环。
+
+### 4.2 数据流关系图
+
+```mermaid
+flowchart TD
+  File["knowledge_files"]
+  Parse["parse_results"]
+  Block["document_blocks"]
+  Chunk["chunks"]
+  Span["source_spans"]
+  KU["knowledge_units"]
+  Wiki["wiki_pages"]
+  Revision["wiki_revisions"]
+  Chat["chat_messages"]
+  Retrieved["retrieved_contexts"]
+  Feedback["feedback"]
+  Eval["evaluation_samples"]
+
+  File --> Parse --> Block --> Chunk
+  Chunk --> Span
+  Chunk --> KU --> Wiki
+  Wiki --> Revision
+  Chunk --> Retrieved
+  KU --> Retrieved
+  Wiki --> Retrieved
+  Retrieved --> Chat --> Feedback --> Eval
+  Feedback --> KU
+  Feedback --> Wiki
+```
+
+这张图表达两个闭环：
+
+- Ingestion Loop：文件进入系统后，经过解析、分块、知识单元整理，最终沉淀为 Wiki。
+- Usage Feedback Loop：用户问答产生召回、回答和反馈，反馈可以继续沉淀为评测样本、知识单元或 Wiki 修订。
+
+### 4.3 暂不落表但需预留的对象
+
+以下对象对产品长期形态重要，但 MVP 可以先不单独建表，避免数据模型过重。
+
+用户与权限：
+
+- MVP 可采用单用户或默认系统用户。
+- `created_by`、`updated_by`、`verified_by` 等字段先预留。
+- P1/P2 再引入 `users`、`roles`、`permissions`。
+
+目录树：
+
+- MVP 可以用 `knowledge_files.directory_path` 表达轻量目录。
+- 如果后续需要拖拽排序、层级权限、目录统计，再引入 `directories` 表。
+
+任务系统：
+
+- MVP 可以在业务表中记录 `status`、`error_message` 和 `created_at`。
+- P1 引入后台任务后，再增加 `jobs` 或 `task_runs`，记录 parsing、chunking、indexing、wiki_generation、evaluation 等任务。
+
+解析资产：
+
+- MVP 可用 `document_blocks.asset_ref` 和 `metadata` 记录图片、表格、公式、附件占位。
+- P1/P2 如需管理抽取图片、表格文件、OCR 结果、关键帧，再引入 `extracted_assets`。
+
+Wiki 双链与知识网络：
+
+- MVP 可通过 `wiki_page_units`、`citations` 和 `tag_bindings` 支撑基础关联。
+- P1/P2 如需类 Obsidian 的页面内链、反链、知识图谱，再引入 `wiki_links` 或 `knowledge_edges`。
 
 ## 5. 枚举值
 
