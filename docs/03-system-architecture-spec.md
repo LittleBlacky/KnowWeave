@@ -1,6 +1,6 @@
 # KnowWeave 系统架构规格说明书
 
-版本：v0.5
+版本：v0.6
 日期：2026-05-23  
 状态：草案  
 关联文档：`docs/01-product-spec.md`、`docs/02-knowledge-lifecycle-spec.md`
@@ -640,15 +640,43 @@ MVP 可先实现：
 - 编辑 Wiki 页面。
 - 管理 Wiki 状态。
 - 关联 Knowledge Unit 和引用来源。
+- 管理 Wiki 页面修订版本，MVP 预留，P1 启用对比和回滚。
 
 MVP：
 
 - 单文件 Document Wiki。
+- Wiki Markdown 正文保存在数据库中。
+- 预留 Wiki Revision 表结构。
 
 P1：
 
 - Topic Wiki。
 - FAQ Wiki。
+- Wiki Revision 历史、版本对比和回滚。
+
+### 7.8.1 Wiki Revision Service
+
+Wiki Revision Service 用于管理 Wiki 页面的历史版本，保留 AI 生成、人工编辑、重新生成和确认发布的过程。
+
+职责：
+
+- 在 Wiki Page 创建、编辑、重新生成或确认时保存 Markdown 快照。
+- 保存 revision_number、change_summary、edit_source 和 citation_snapshot。
+- 支持查看两个版本之间的文本差异。
+- 支持从指定 revision 恢复当前 Wiki 内容。
+- 记录恢复操作本身，避免历史被覆盖。
+
+MVP 边界：
+
+- 不强制实现版本对比和回滚 UI。
+- 数据模型预留 `wiki_revisions`。
+- Wiki Page 当前正文仍保存在 `content_markdown` 中。
+
+P1 边界：
+
+- 支持查看 Wiki 版本差异。
+- 支持从历史 revision 恢复 Wiki 内容。
+- 支持显示 AI 生成版本与人工编辑版本的差异。
 
 ### 7.9 Chat Service
 
@@ -819,6 +847,7 @@ Chat Record
 - SourceSpan
 - KnowledgeUnit
 - WikiPage
+- WikiRevision
 - Citation
 - Tag
 - ModelProviderConfig
