@@ -1,0 +1,763 @@
+# KnowWeave 系统架构规格说明书
+
+版本：v0.1  
+日期：2026-05-23  
+状态：草案  
+关联文档：`docs/01-product-spec.md`、`docs/02-knowledge-lifecycle-spec.md`
+
+## 1. 文档目标
+
+本文定义 KnowWeave 的系统架构、模块边界、技术选型、数据流和扩展策略。它将产品规格中的“LLM Wiki 知识库管理平台”和生命周期规格中的“上传、解析、分块、检索、沉淀、评估”落到可实现的工程结构。
+
+本文回答以下问题：
+
+- MVP 使用什么技术栈。
+- 前端、后端、存储和 AI Provider 如何分层。
+- 各核心模块的职责边界是什么。
+- 文档处理、问答、反馈、Wiki 生成如何流动。
+- 哪些能力 MVP 实现，哪些只保留扩展点。
+- 如何参考 DeepParseX 的架构思想，但不复用其代码。
+
+## 2. 架构原则
+
+### 2.1 小而完整
+
+MVP 优先完成端到端闭环，而不是追求企业级全量能力。系统应先支持本地或单机部署，保证演示稳定。
+
+### 2.2 模块清晰
+
+上传、解析、分块、索引、检索、问答、知识单元、Wiki、反馈评估应拆成独立模块，避免业务逻辑全部堆在 API 层。
+
+### 2.3 AI 可替换
+
+LLM、Embedding、OCR、ASR 等能力必须通过 Provider 抽象接入，不在业务代码里绑定具体厂商。
+
+### 2.4 原文可追溯
+
+所有 chunk、Knowledge Unit、Wiki 和 Answer Citation 都必须能回溯到原始文件或人工来源。架构中必须保留 source span。
+
+### 2.5 扩展先留口，MVP 不过度实现
+
+表格、图片、公式、代码、音视频等多类型内容在架构上预留 parser 和 typed chunk，但 MVP 主要实现文本处理。
+
+## 3. 总体架构
+
+MVP 采用前后端分离架构：
+
+```text
+Web App
+  -> API Server
+      -> Application Services
+          -> Document Pipeline
+          -> Knowledge Curation
+          -> Search and Chat
+          -> Wiki Generation
+          -> Evaluation
+      -> Database
+      -> File Storage
+      -> AI Providers
+```
+
+推荐逻辑分层：
+
+```text
+Frontend Layer
+API Layer
+Service Layer
+Domain Layer
+Infrastructure Layer
+Provider Layer
+```
+
+## 4. MVP 技术选型
+
+### 4.1 前端
+
+推荐：
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- lucide-react
+
+理由：
+
+- 适合快速构建管理台。
+- 与当前参考前端技术栈接近，学习成本低。
+- 支持文档管理、列表、详情、编辑器、问答界面等复杂交互。
+
+### 4.2 后端
+
+推荐：
+
+- FastAPI
+- Python 3.11+
+- SQLAlchemy
+- Pydantic
+
+理由：
+
+- 适合文件解析、AI Provider 调用和 API 开发。
+- Python 生态有较多 PDF、DOCX、Markdown、Embedding、LLM SDK。
+- 与参考项目后端风格接近，但可以从零实现更小的模块。
+
+### 4.3 数据库
+
+MVP 推荐：
+
+- PostgreSQL
+- pgvector
+
+可选本地简化方案：
+
+- SQLite，仅用于极简离线 Demo，不作为主推方案。
+
+理由：
+
+- KnowWeave 的核心对象包含文件、Document Block、Timeline Block、Chunk、Source Span、Knowledge Unit、Wiki、Feedback、Evaluation Sample，关系模型较强，PostgreSQL 更适合承载。
+- 项目后续需要向量检索，直接使用 pgvector 可以减少从 SQLite 迁移的成本。
+- PostgreSQL full text search 可以支持基础关键词检索，pgvector 可以支持语义检索。
+- MVP 可以先只使用 PostgreSQL 关系表和全文检索，Embedding 字段和向量索引可先预留或部分启用。
+
+### 4.4 文件存储
+
+MVP 推荐：
+
+- 本地文件系统
+
+P1 可升级：
+
+- MinIO
+- S3 compatible storage
+
+设计要求：
+
+- 原始文件和解析资产分开存储。
+- 文件记录保存 storage_path。
+- 不在数据库中直接保存大文件二进制。
+
+### 4.5 AI Provider
+
+MVP 推荐：
+
+- Qwen / DashScope Chat Model
+- Qwen / DashScope Embedding Model
+- Qwen / DashScope Rerank Model，可选
+
+Provider 需要支持：
+
+- chat completion
+- structured generation
+- embedding
+- rerank，可选
+- vision understanding，占位
+- audio / video understanding，占位
+
+环境变量：
+
+- `QWEN_API_KEY`
+- `QWEN_BASE_URL`
+- `QWEN_CHAT_MODEL`
+- `QWEN_EMBEDDING_MODEL`
+- `QWEN_RERANK_MODEL`
+- `QWEN_VL_MODEL`
+- `QWEN_OMNI_MODEL`
+
+初始模型族建议：
+
+- 文本生成：Qwen Chat 系列，用于问答、知识单元生成、Wiki 草稿生成。
+- Embedding：Qwen Embedding 系列，用于 chunk、Knowledge Unit、Wiki 的向量表示。
+- Rerank：Qwen Rerank 系列，用于检索结果重排。
+- Vision：Qwen VL 系列，用于后续图片、图表、扫描页理解。
+- Omni / Audio：Qwen Omni 或音频理解系列，用于后续音视频转写、理解和时间轴摘要。
+
+约束：
+
+- MVP 代码只依赖 `LLMProvider`、`EmbeddingProvider`、`RerankProvider` 等抽象，不直接依赖具体 Qwen SDK 类型。
+- 如果 Qwen API 提供 OpenAI-compatible 调用方式，优先复用通用 OpenAI-compatible client；否则通过 DashScope client 实现 Qwen Provider。
+- 模型名称必须通过环境变量配置，不写死在业务代码中。
+- Qwen 是默认模型族，不是唯一模型族。后续用户应能通过 Web 界面配置和切换不同用途的模型。
+
+### 4.6 模型配置与选择
+
+KnowWeave 需要支持用户在 Web 界面中配置 LLM Provider 和模型用途。MVP 可以先使用环境变量配置默认 Qwen 模型，P1 开始提供模型配置页面。
+
+模型用途：
+
+- chat：知识库问答。
+- generation：知识单元生成、Wiki 草稿生成。
+- embedding：chunk、Knowledge Unit、Wiki 向量化。
+- rerank：检索结果重排。
+- vision：图片、图表、扫描页理解。
+- audio：音视频转写和理解。
+
+配置项：
+
+- provider_name：供应商名称，例如 qwen、openai_compatible、local。
+- provider_type：chat、embedding、rerank、vision、audio。
+- base_url。
+- api_key，必须加密存储或通过环境变量引用。
+- model_name。
+- enabled。
+- is_default。
+- timeout_seconds。
+- max_tokens。
+- temperature，适用于生成类模型。
+
+用户操作：
+
+- 新增模型 Provider。
+- 测试 Provider 连通性。
+- 为不同用途选择默认模型。
+- 启用或停用 Provider。
+- 查看模型调用失败原因。
+
+运行规则：
+
+- 系统启动时读取环境变量生成默认 Qwen Provider。
+- 如果数据库中存在用户配置，则优先使用用户配置。
+- 每一种用途必须最多只有一个默认 Provider。
+- Provider 切换不应影响已有知识数据的可读性。
+- Embedding 模型切换后，应标记受影响索引需要重新生成。
+
+MVP/P1 边界：
+
+- MVP：使用环境变量配置 Qwen 默认模型。
+- P1：提供 Web 模型配置页面，支持 OpenAI-compatible Provider。
+- P2：支持本地模型、Ollama、vLLM、自部署 embedding 和多 Provider fallback。
+
+### 4.7 LLM 应用框架
+
+MVP 不直接引入 LlamaIndex、LangChain 或 LangGraph 作为核心依赖。
+
+原因：
+
+- KnowWeave 的核心差异是 chunk 可视化治理、source span、知识单元确认、Wiki 沉淀和反馈评估闭环，需要保持核心 pipeline 可解释、可控。
+- 直接使用框架默认 RAG pipeline 容易隐藏分块、检索、上下文组织和评估细节。
+- MVP 阶段 FastAPI Service + Provider 抽象足以完成端到端闭环。
+
+预留 Adapter：
+
+- LlamaIndexAdapter：后续用于增强 reader、index、query engine 和复杂 RAG。
+- LangChainAdapter：后续用于复用特定 loader、splitter、retriever 或 tool 生态。
+- LangGraphWorkflowAdapter：后续用于多步骤 Agent、人工审核流和长期状态工作流。
+
+约束：
+
+- Core Domain 不依赖这些框架的数据结构。
+- Application Services 通过 Adapter 调用外部框架。
+- 引入框架时不得绕过 Chunk、SourceSpan、KnowledgeUnit 和 Feedback 等核心模型。
+
+## 5. 前端架构
+
+### 5.1 页面模块
+
+MVP 页面：
+
+- Dashboard：生命周期控制台。
+- Files：文件列表。
+- File Detail：文件详情、解析结果、chunk 列表入口。
+- Upload：文件上传。
+- Chunks：chunk 管理视图。
+- Knowledge Units：知识单元列表与详情。
+- Wiki Pages：Wiki 列表与详情。
+- Search：搜索结果页。
+- Chat：知识库问答页。
+- Evaluation：反馈和评测样本管理，MVP 可合并到 Dashboard。
+
+### 5.2 前端状态边界
+
+前端只负责：
+
+- 展示服务端状态。
+- 收集用户操作。
+- 管理局部交互状态。
+- 预览文件、chunk、Wiki 和回答引用。
+
+前端不负责：
+
+- 直接解析文件。
+- 直接调用 LLM。
+- 自行计算知识库指标。
+- 自行决定检索上下文。
+
+### 5.3 Chunk 管理界面
+
+Chunk 管理界面应支持：
+
+- 按文件、状态、类型、质量信号筛选。
+- 查看 chunk 内容、source span、父子关系。
+- 查看原文定位，PDF 至少跳页或文本块。
+- 编辑 edited_content。
+- 标记 verified、ignored、needs_review。
+- 查看关联 Knowledge Unit 和 Wiki。
+
+### 5.4 Wiki 编辑界面
+
+MVP 可以先使用 Markdown 编辑器或 textarea。
+
+功能：
+
+- 查看 Wiki 标题、摘要、正文。
+- 查看关联 Knowledge Unit。
+- 查看引用来源。
+- 编辑内容。
+- 重新生成 AI 草稿。
+- 标记 draft、verified、archived。
+
+## 6. 后端模块划分
+
+### 6.1 API Layer
+
+职责：
+
+- 接收 HTTP 请求。
+- 参数校验。
+- 调用 Service。
+- 返回统一响应。
+
+API 不应直接包含复杂业务逻辑。
+
+建议路由：
+
+```text
+/api/files
+/api/parsing
+/api/chunks
+/api/knowledge-units
+/api/wiki-pages
+/api/search
+/api/chat
+/api/feedback
+/api/evaluation
+/api/settings
+```
+
+### 6.2 File Service
+
+职责：
+
+- 文件上传。
+- 文件元数据管理。
+- 文件状态维护。
+- 原始文件存储路径管理。
+- 重复文件检测。
+
+不负责：
+
+- 解析文件内容。
+- 生成 chunk。
+- 调用 LLM。
+
+### 6.3 Parsing Service
+
+职责：
+
+- 根据容器类型选择 parser。
+- 生成 Document Blocks。
+- 生成 Timeline Blocks，占位。
+- 生成 asset placeholders。
+- 记录解析版本、警告和错误。
+
+MVP Parser：
+
+- txt parser
+- markdown parser
+- pdf text parser
+- docx text parser
+
+预留 Parser：
+
+- table parser
+- image parser
+- formula parser
+- code parser
+- media parser
+
+### 6.4 Chunk Service
+
+职责：
+
+- 根据 Document Blocks 或 Timeline Blocks 生成 typed chunks。
+- 支持 fixed_size、paragraph、heading、hybrid、parent_child 策略。
+- 维护 source spans。
+- 维护父子 chunk 关系。
+- 计算 chunk 质量信号。
+- 支持 chunk 编辑、忽略、确认和重新分块。
+
+不负责：
+
+- 问答生成。
+- Wiki 页面生成。
+
+### 6.5 Index Service
+
+职责：
+
+- 维护可检索索引。
+- 对文件、chunk、Knowledge Unit、Wiki Page 建立关键词索引。
+- 后续支持 embedding 索引。
+
+MVP：
+
+- PostgreSQL full text search。
+- 基础 SQL 过滤和排序。
+
+P1：
+
+- pgvector 语义检索。
+- hybrid search：全文检索 + 向量检索 + 状态/标签过滤。
+
+### 6.6 Search Service
+
+职责：
+
+- 接收查询。
+- 应用过滤条件。
+- 调用 Index Service。
+- 返回统一 Search Result。
+- 支持检索对象：file、chunk、knowledge_unit、wiki_page。
+- 支持命中 child chunk 后扩展 parent chunk 上下文。
+
+### 6.7 Knowledge Unit Service
+
+职责：
+
+- 从 chunk 创建候选知识单元。
+- 从问答记录创建知识单元。
+- 手动创建知识单元。
+- 编辑、合并、拆分、废弃知识单元。
+- 维护标签、状态、引用来源。
+
+MVP 可先实现：
+
+- 创建。
+- 编辑。
+- 状态流转。
+- 引用维护。
+
+合并和拆分可在 P1 实现。
+
+### 6.8 Wiki Service
+
+职责：
+
+- 生成 Document Wiki。
+- 编辑 Wiki 页面。
+- 管理 Wiki 状态。
+- 关联 Knowledge Unit 和引用来源。
+
+MVP：
+
+- 单文件 Document Wiki。
+
+P1：
+
+- Topic Wiki。
+- FAQ Wiki。
+
+### 6.9 Chat Service
+
+职责：
+
+- 接收用户问题。
+- 调用 Search Service 获取上下文。
+- 组织 prompt。
+- 调用 LLM Provider。
+- 返回答案和 citation。
+- 保存问答记录、retrieved_chunks、feedback 入口。
+
+规则：
+
+- 优先召回 verified Knowledge Unit。
+- 其次召回 Wiki Page。
+- 最后召回 raw chunk。
+- 无依据时明确说明无法回答。
+
+### 6.10 Feedback and Evaluation Service
+
+职责：
+
+- 保存搜索反馈。
+- 保存问答反馈。
+- 将问答记录标记为评测样本候选。
+- 维护 Evaluation Sample。
+- 统计基础指标。
+
+MVP：
+
+- 反馈保存。
+- 问答记录保存。
+- 评测样本候选标记。
+- 基础指标统计。
+
+P1：
+
+- 运行评测集。
+- 计算 precision、recall、answer_accuracy、citation_precision。
+
+### 6.11 Provider Layer
+
+Provider 抽象：
+
+```text
+LLMProvider
+EmbeddingProvider
+RerankProvider
+VisionProvider
+OCRProvider
+ASRProvider
+StorageProvider
+```
+
+MVP 实现：
+
+- QwenLLMProvider
+- QwenEmbeddingProvider
+- QwenRerankProvider，可选
+- LocalFileStorageProvider
+
+占位实现：
+
+- VisionProvider
+- OCRProvider
+- ASRProvider
+
+兼容实现：
+
+- OpenAICompatibleLLMProvider，可作为 Qwen 兼容调用或后续替换其他模型厂商的适配器。
+- OpenAICompatibleEmbeddingProvider，可作为 Qwen 兼容调用或后续替换其他 embedding 厂商的适配器。
+
+## 7. 数据流
+
+### 7.1 文件导入流
+
+```text
+Upload File
+-> File Service
+-> File Storage
+-> File Record
+-> Parsing Service
+-> Document Blocks / Timeline Blocks
+-> Chunk Service
+-> Typed Chunks
+-> Index Service
+```
+
+MVP 可以同步处理小文件。解析时间较长时，应记录状态并允许前端轮询。
+
+### 7.2 知识沉淀流
+
+```text
+Chunk
+-> Knowledge Unit Service
+-> Draft Knowledge Unit
+-> User Review
+-> Verified Knowledge Unit
+-> Wiki Service
+-> Wiki Page
+```
+
+### 7.3 问答流
+
+```text
+Question
+-> Chat Service
+-> Search Service
+-> Retrieved Context
+-> LLM Provider
+-> Answer + Citations
+-> Chat Record
+-> Feedback
+```
+
+### 7.4 反馈评估流
+
+```text
+Chat Record
+-> User Feedback
+-> Evaluation Sample Candidate
+-> Manual Review
+-> Evaluation Dataset
+-> Metrics
+-> Optimization Task
+```
+
+## 8. 数据存储边界
+
+本文不定义完整表结构，但架构上需要以下数据实体：
+
+- File
+- ParseResult
+- DocumentBlock
+- TimelineBlock
+- Chunk
+- SourceSpan
+- KnowledgeUnit
+- WikiPage
+- Citation
+- Tag
+- ChatSession
+- ChatMessage
+- RetrievedContext
+- Feedback
+- EvaluationSample
+
+具体字段在 `docs/04-data-model-spec.md` 中定义。
+
+## 9. 同步与异步任务
+
+### 9.1 MVP 策略
+
+MVP 可采用同步执行 + 状态记录：
+
+- 小文件上传后立即解析。
+- 用户触发重新解析时同步执行。
+- Wiki 生成和问答同步等待 LLM 返回。
+
+### 9.2 P1 策略
+
+引入后台任务队列：
+
+- parsing job
+- chunking job
+- indexing job
+- wiki generation job
+- evaluation job
+
+可选技术：
+
+- FastAPI BackgroundTasks
+- Celery
+- RQ
+- Dramatiq
+
+MVP 不强制引入 Celery，避免部署复杂。
+
+## 10. LLM 与 Prompt 边界
+
+LLM 只负责生成候选内容，不直接写入 verified 状态。
+
+LLM 可用于：
+
+- 生成文件摘要。
+- 生成候选标签。
+- 从 chunk 生成候选 Knowledge Unit。
+- 生成 Document Wiki 草稿。
+- 基于检索上下文回答问题。
+- 从问答记录生成评测样本候选。
+
+LLM 不应：
+
+- 删除原始文件。
+- 自动确认知识。
+- 在无引用来源时生成确定性知识。
+- 绕过 Search Service 自行决定上下文。
+
+## 11. DeepParseX 参考边界
+
+DeepParseX 可参考的架构思想：
+
+- 文档上传和管理模块。
+- 文档解析、chunk、搜索、问答的业务链路。
+- 后端分层思想。
+- AI Service 和业务 Service 分离。
+- 知识图谱、实体抽取作为后续扩展方向。
+
+KnowWeave 不复用：
+
+- DeepParseX 源代码。
+- DeepParseX 数据模型。
+- DeepParseX API 路由。
+- DeepParseX 前端页面。
+- DeepParseX 部署脚本。
+
+KnowWeave 的差异：
+
+- 更小的 MVP 范围。
+- 明确引入 LLM Wiki。
+- 强调人工知识治理。
+- 强调 chunk 可视化编辑和 source span。
+- 强调问答反馈沉淀为评测数据集。
+
+## 12. MVP 实现边界
+
+### 12.1 P0 必须实现
+
+- 文件上传和文件列表。
+- txt、md、pdf、docx 基础文本解析。
+- Document Blocks 基础生成。
+- text chunk 生成。
+- source span 基础定位。
+- chunk 列表、编辑、忽略、确认。
+- 关键词搜索。
+- Knowledge Unit 创建、编辑、状态管理。
+- Document Wiki 生成和编辑。
+- 知识库问答和 citation。
+- 问答记录、retrieved chunks、feedback 保存。
+- 文档索引和基础统计。
+
+### 12.2 P1 尽量实现
+
+- 父子分块可视化。
+- Topic Wiki。
+- FAQ Wiki。
+- Embedding Provider。
+- pgvector 语义检索。
+- 评测样本管理。
+- chunk 质量评分。
+- PDF bbox 高亮。
+
+### 12.3 P2 后续扩展
+
+- 表格结构化解析。
+- 图片 OCR 和图像描述。
+- 公式识别。
+- 代码块语言识别。
+- 音视频 ASR。
+- 多人审核流。
+- MinIO。
+- 知识图谱。
+
+## 13. 非功能要求
+
+### 13.1 可配置
+
+LLM、Embedding、存储路径、上传大小、分块参数应通过配置管理。
+
+### 13.2 可观察
+
+关键操作应记录状态：
+
+- upload status
+- parse status
+- chunk status
+- wiki generation status
+- chat status
+- feedback status
+
+### 13.3 可恢复
+
+解析失败、分块失败、Wiki 生成失败时，用户可以查看错误并重试。
+
+### 13.4 可迁移
+
+MVP 使用 PostgreSQL + pgvector 和本地文件系统。数据模型应避免绑定本地文件系统实现，便于后续迁移到对象存储。
+
+## 14. 后续文档衔接
+
+本架构文档完成后，建议继续产出：
+
+1. `docs/04-data-model-spec.md`
+   - 定义 File、Chunk、SourceSpan、KnowledgeUnit、Wiki、Feedback、EvaluationSample 等表结构。
+
+2. `docs/05-ingestion-spec.md`
+   - 定义上传、解析、Document Block、Timeline Block、chunking、source span 的接口和流程。
+
+3. `docs/06-llm-wiki-spec.md`
+   - 定义 Document Wiki、Topic Wiki、FAQ Wiki 的生成模板和引用规范。
+
+4. `docs/07-search-and-chat-spec.md`
+   - 定义检索、上下文组织、问答引用和反馈沉淀。

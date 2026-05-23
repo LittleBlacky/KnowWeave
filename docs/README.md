@@ -12,6 +12,10 @@
    - 定义知识从上传、解析、分块、检索、沉淀到评估的完整生命周期。
    - 回答“用户如何对知识处理过程进行细粒度管理，以及系统如何形成闭环”。
 
+3. `03-system-architecture-spec.md`
+   - 定义 KnowWeave 的系统架构、模块边界、技术选型、数据流和扩展策略。
+   - 回答“前端、后端、存储、AI Provider 和各业务模块如何协作”。
+
 ## 文档边界
 
 - 产品规格文档保持高层、稳定，不展开过多技术实现细节。
@@ -22,11 +26,9 @@
 
 建议后续继续补充：
 
-1. `03-system-architecture-spec.md`：系统架构与模块边界。
-2. `04-data-model-spec.md`：数据模型与表结构。
-3. `05-ingestion-spec.md`：文件上传、解析与 chunk 切分实现细节。
-4. `06-llm-wiki-spec.md`：Wiki 生成规则、页面结构与引用规范。
-5. `07-search-and-chat-spec.md`：搜索、RAG 问答与引用返回格式。
-6. `08-frontend-spec.md`：页面、交互、状态和演示流程。
-7. `09-acceptance-test-spec.md`：验收用例和演示检查清单。
-
+1. `04-data-model-spec.md`：数据模型与表结构。
+2. `05-ingestion-spec.md`：文件上传、解析与 chunk 切分实现细节。
+3. `06-llm-wiki-spec.md`：Wiki 生成规则、页面结构与引用规范。
+4. `07-search-and-chat-spec.md`：搜索、RAG 问答与引用返回格式。
+5. `08-frontend-spec.md`：页面、交互、状态和演示流程。
+6. `09-acceptance-test-spec.md`：验收用例和演示检查清单。
