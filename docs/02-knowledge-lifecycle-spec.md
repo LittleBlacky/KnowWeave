@@ -1,6 +1,6 @@
 # KnowWeave 知识生命周期细粒度管理规格说明书
 
-版本：v0.2  
+版本：v0.3  
 日期：2026-05-23  
 状态：草案  
 关联文档：`docs/01-product-spec.md`
@@ -62,8 +62,14 @@ KnowWeave 的知识生命周期分为六个阶段：
 推荐主流程：
 
 ```text
-File -> Document Blocks -> Typed Chunks -> Index -> Answer -> Feedback -> Dataset -> Knowledge Unit -> Wiki Page -> Evaluation -> Curation
+Ingestion Loop:
+File -> Document Blocks / Timeline Blocks -> Typed Chunks -> Index -> Knowledge Unit -> Wiki Page
+
+Usage Feedback Loop:
+Question -> Retrieved Chunks -> Answer -> Feedback -> Evaluation Sample -> Metric -> Optimization Task -> Knowledge Curation
 ```
+
+其中，Knowledge Unit 和 Wiki Page 既可以在首次导入后由 chunk 生成，也可以在用户问答和反馈后继续沉淀更新。KnowWeave 的核心不是单向流水线，而是导入治理与使用反馈共同驱动的闭环。
 
 ### 4.1 多类型内容扩展点
 
@@ -560,11 +566,50 @@ Document Block
 - 用户可以将一个父块下的多个子块合并成知识单元。
 - 如果父块被废弃，其子块默认不参与检索。
 
-### 7.7 MVP 验收
+### 7.7 Chunk 质量信号
+
+系统应为 chunk 提供质量提示，帮助用户发现需要编辑、忽略、合并或重新分块的内容。质量信号默认只作为提示，不应自动删除 chunk。
+
+MVP 支持以下质量信号：
+
+- empty_content：内容为空或接近为空。
+- too_short：长度过短，缺少可独立理解的信息。
+- too_long：长度过长，可能包含多个主题。
+- duplicate：与其他 chunk 高度重复。
+- broken_sentence：句子或语义被截断。
+- header_footer：疑似页眉、页脚、页码、版权声明。
+- low_info_density：信息密度低，例如目录、装饰性文本。
+- bad_ocr：存在明显 OCR 乱码或异常字符。
+- missing_source_span：缺少原文定位信息。
+- mixed_unparsed：包含表格、图片、公式等内容但尚未结构化解析。
+- negative_feedback：曾参与问答或检索，但收到用户负反馈。
+
+质量分级建议：
+
+- normal：质量正常，可参与检索和沉淀。
+- needs_review：建议人工检查。
+- low_quality：低质量，默认降低检索优先级。
+- suggest_ignore：建议忽略，需用户确认后才排除。
+
+低质量判定来源：
+
+- 规则检测，例如长度、重复率、乱码比例、来源缺失。
+- 用户反馈，例如搜索不相关、答案错误、引用错误。
+- 评测结果，例如长期召回但不支持标准答案。
+
+治理规则：
+
+- 用户可以查看质量信号和原因。
+- 用户可以编辑 chunk 后重新计算质量信号。
+- 用户可以手动覆盖质量状态。
+- 已忽略 chunk 默认不参与检索、问答和知识单元生成。
+
+### 7.8 MVP 验收
 
 - 用户可以查看 chunk 列表。
 - chunk 列表中可以展示 chunk 类型。
 - chunk 列表中可以展示父子关系，MVP 可先展示 parent_chunk_id。
+- chunk 列表中可以展示质量信号。
 - 用户可以手动编辑 chunk 内容。
 - 用户可以将 chunk 标记为忽略。
 - 用户可以调整分块参数并重新分块。
@@ -573,7 +618,7 @@ Document Block
 - transcript chunk 可以追溯到原媒体文件的时间范围。
 - 对检测到但暂未深度解析的表格、图片或公式，系统可以保留占位记录，而不是直接丢弃。
 
-### 7.8 非文本内容分块预留策略
+### 7.9 非文本内容分块预留策略
 
 MVP 阶段仅要求保留扩展点，不要求完整多模态理解。
 
