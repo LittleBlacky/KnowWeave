@@ -1,0 +1,18 @@
+[
+  {
+    "name": "全部任务",
+    "type": "grid"
+  },
+  {
+    "name": "按状态看板",
+    "type": "kanban"
+  },
+  {
+    "name": "P0 MVP",
+    "type": "grid"
+  },
+  {
+    "name": "路线图",
+    "type": "gantt"
+  }
+]

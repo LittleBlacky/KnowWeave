@@ -1,0 +1,71 @@
+[
+  {
+    "name": "任务名称",
+    "type": "text"
+  },
+  {
+    "name": "阶段",
+    "type": "select",
+    "options": [
+      { "name": "P0", "hue": "Red", "lightness": "Light" },
+      { "name": "P1", "hue": "Blue", "lightness": "Light" },
+      { "name": "P2", "hue": "Purple", "lightness": "Light" }
+    ]
+  },
+  {
+    "name": "状态",
+    "type": "select",
+    "options": [
+      { "name": "待开始", "hue": "Gray", "lightness": "Light" },
+      { "name": "进行中", "hue": "Orange", "lightness": "Light" },
+      { "name": "已完成", "hue": "Green", "lightness": "Light" },
+      { "name": "阻塞", "hue": "Red", "lightness": "Light" }
+    ]
+  },
+  {
+    "name": "模块",
+    "type": "select",
+    "options": [
+      { "name": "文档" },
+      { "name": "数据库" },
+      { "name": "文件管理" },
+      { "name": "Ingestion" },
+      { "name": "Chunk治理" },
+      { "name": "Search" },
+      { "name": "LLM" },
+      { "name": "Wiki" },
+      { "name": "Chat" },
+      { "name": "Evaluation" },
+      { "name": "Demo" }
+    ]
+  },
+  {
+    "name": "优先级",
+    "type": "select",
+    "options": [
+      { "name": "Must", "hue": "Red", "lightness": "Light" },
+      { "name": "Should", "hue": "Orange", "lightness": "Light" },
+      { "name": "Could", "hue": "Blue", "lightness": "Light" }
+    ]
+  },
+  {
+    "name": "产出",
+    "type": "text"
+  },
+  {
+    "name": "依赖",
+    "type": "text"
+  },
+  {
+    "name": "验收信号",
+    "type": "text"
+  },
+  {
+    "name": "风险",
+    "type": "text"
+  },
+  {
+    "name": "备注",
+    "type": "text"
+  }
+]

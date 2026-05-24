@@ -8,11 +8,17 @@
 
 | 文档 | 当前版本 | 职责 |
 | --- | --- | --- |
+| `00-project-dashboard.md` | v0.1 | 项目定位、生命周期、架构边界、路线图、任务拆分和评估指标的可视化入口 |
 | `01-product-spec.md` | v1.0 | 产品定位、用户角色、核心概念、MVP 范围和验收标准 |
 | `02-knowledge-lifecycle-spec.md` | v1.0 | 上传、解析、分块、检索、沉淀、评估的生命周期管理 |
 | `03-system-architecture-spec.md` | v0.7 | 系统架构、模块边界、技术选型、数据流和扩展策略 |
 | `04-data-model-spec.md` | v0.6 | 核心数据实体、关系、状态、索引、软删除、source span 定位和 Wiki Revision |
 | `05-ingestion-spec.md` | v0.3 | 文件上传、解析、Document Block、chunking、source span 和重新处理 |
+| `06-llm-wiki-spec.md` | v0.1 | LLM Wiki 生成、页面结构、引用、状态、修订历史和反馈闭环 |
+
+0. `00-project-dashboard.md`
+   - 用图、表、路线图和任务拆分说明 KnowWeave 的整体定位。
+   - 回答“评审或新成员如何在 5 分钟内看懂项目”。
 
 1. `01-product-spec.md`
    - 定义 KnowWeave 的产品定位、用户角色、核心概念、MVP 范围和验收标准。
@@ -34,6 +40,10 @@
    - 定义文件上传、解析、Document Block 生成、chunking、source span 写入和重新处理。
    - 回答“原始文件如何稳定进入 KnowWeave，并变成可检索、可引用、可治理的 chunk”。
 
+6. `06-llm-wiki-spec.md`
+   - 定义 Document Wiki、Topic Wiki、FAQ Wiki 的页面结构、生成流程、引用规则、状态流转和修订历史。
+   - 回答“KnowWeave 如何把 RAG 的临时上下文沉淀为长期可维护的 LLM Wiki”。
+
 ## 文档边界
 
 - 产品规格文档保持高层、稳定，不展开过多技术实现细节。
@@ -44,7 +54,6 @@
 
 建议后续继续补充：
 
-1. `06-llm-wiki-spec.md`：Wiki 生成规则、页面结构、修订历史与引用规范。
-2. `07-search-and-chat-spec.md`：搜索、RAG 问答与引用返回格式。
-3. `08-frontend-spec.md`：页面、交互、状态和演示流程。
-4. `09-acceptance-test-spec.md`：验收用例和演示检查清单。
+1. `07-search-and-chat-spec.md`：搜索、RAG 问答与引用返回格式。
+2. `08-frontend-spec.md`：页面、交互、状态和演示流程。
+3. `09-acceptance-test-spec.md`：验收用例和演示检查清单。
