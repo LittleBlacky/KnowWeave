@@ -15,7 +15,7 @@
 | `04-data-model-spec.md` | v0.6 | 核心数据实体、关系、状态、索引、软删除、source span 定位和 Wiki Revision |
 | `05-ingestion-spec.md` | v0.3 | 文件上传、解析、Document Block、chunking、source span 和重新处理 |
 | `06-llm-wiki-spec.md` | v0.1 | LLM Wiki 生成、页面结构、引用、状态、修订历史和反馈闭环 |
-| `07-search-and-chat-spec.md` | v0.1 | 搜索、RAG 问答、上下文组织、SSE 流式输出、引用和反馈评估闭环 |
+| `07-search-and-chat-spec.md` | v0.2 | 搜索、RAG 问答、上下文组织、SSE 流式输出、引用和反馈评估闭环 |
 | `08-frontend-spec.md` | v0.1 | 页面信息架构、chunk 治理 UI、Source Viewer、Chat/Wiki/Search 交互和流式 Markdown 渲染 |
 
 0. `00-project-dashboard.md`
