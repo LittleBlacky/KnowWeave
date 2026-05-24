@@ -1,6 +1,6 @@
 # KnowWeave 知识生命周期细粒度管理规格说明书
 
-版本：v1.0
+版本：v1.1
 日期：2026-05-23  
 状态：草案  
 关联文档：`docs/01-product-spec.md`
@@ -493,11 +493,11 @@ MVP 可分级实现：
 ### 7.2 用户操作
 
 - 查看自动分块结果。
-- 选择分块策略，例如按标题、按段落、按固定长度、混合策略、父子分块策略。
+- 选择分块策略，例如按标题、按段落、按固定长度、混合策略；P1 后可选择父子分块策略。
 - 查看 chunk 类型，例如 text、table、image、formula、code、mixed。
 - 调整 chunk 最大长度。
 - 调整 chunk 重叠长度。
-- 调整父块和子块的长度参数。
+- P1 调整父块和子块的长度参数。
 - 手动合并相邻 chunk，P1 支持。
 - 手动拆分过长 chunk，P1 支持。
 - 查看父块与子块的关联关系。
@@ -512,8 +512,8 @@ MVP 可分级实现：
 - 记录 chunk 与原始文件位置的映射。
 - 记录 chunk 与 Document Block 的映射。
 - 记录 transcript chunk 与 Timeline Block 的映射。
-- 支持父子分块：父块保留较完整语义上下文，子块用于精确检索。
-- 记录 parent_chunk_id 和 child_chunk_ids。
+- 预留父子分块结构：MVP 记录 `parent_chunk_id` 字段并允许调试展示，完整父子分块生成放入 P1。
+- P1 支持父块保留较完整语义上下文、子块用于精确检索，并可通过 `parent_chunk_id` 反查子块集合。
 - 计算 chunk 字符数或 token 数。
 - 自动识别过短、过长、重复或疑似噪音 chunk。
 - 为非文本内容生成占位 chunk，MVP 可先生成 summary 为空的占位对象。
@@ -538,11 +538,15 @@ Chunk 的正式状态使用 `chunk_status`：
 
 MVP 支持以下参数：
 
-- strategy：paragraph、heading、fixed_size、hybrid、parent_child。
+- strategy：paragraph、heading、fixed_size、hybrid。
 - max_chars：单个 chunk 最大字符数。
 - overlap_chars：相邻 chunk 重叠字符数。
 - min_chars：过短 chunk 阈值。
 - include_headings：是否将标题带入 chunk。
+
+P1 支持以下父子分块参数：
+
+- parent_child.enabled：是否启用父子 chunk 生成。
 - parent_max_chars：父块最大字符数。
 - child_max_chars：子块最大字符数。
 - child_overlap_chars：子块重叠字符数。
@@ -551,6 +555,8 @@ MVP 支持以下参数：
 ### 7.6 父子分块策略
 
 父子分块用于同时满足“检索精度”和“上下文完整度”。系统先生成较大的 parent chunk，再在 parent chunk 内生成更小的 child chunk。检索阶段优先索引和召回 child chunk，问答阶段根据 child chunk 找回 parent chunk 或相邻上下文。
+
+优先级：该策略属于 P1 完整实现范围。MVP 仅在数据模型和界面调试信息中预留 `parent_chunk_id`，不要求生成完整 parent/child chunk 树，也不要求在检索阶段执行 child 命中后的 parent 上下文扩展。
 
 推荐结构：
 

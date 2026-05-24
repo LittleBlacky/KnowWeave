@@ -1,6 +1,6 @@
 # KnowWeave 数据模型规格说明书
 
-版本：v0.6
+版本：v0.7
 日期：2026-05-23
 状态：草案
 关联文档：`docs/01-product-spec.md`、`docs/02-knowledge-lifecycle-spec.md`、`docs/03-system-architecture-spec.md`
@@ -1133,7 +1133,7 @@ MVP 可预留但不必完整实现：
 
 ## 11. 后续文档衔接
 
-本文完成后，建议继续产出：
+本文已被以下专题 Spec 承接：
 
 1. `docs/05-ingestion-spec.md`
    - 定义文件上传、解析、Document Block 生成、chunking、source span 写入和重新分块接口。
@@ -1146,3 +1146,11 @@ MVP 可预留但不必完整实现：
 
 4. `docs/08-frontend-spec.md`
    - 定义 chunk 编辑、原文定位、Wiki 编辑、流式 Markdown 渲染和评测反馈交互。
+
+5. `docs/09-acceptance-test-spec.md`
+   - 定义数据完整性、source span、retrieval_run_id、soft delete、citation 和 feedback 的验收检查。
+
+下一步继续拆分：
+
+1. `docs/10-evaluation-spec.md`
+   - 定义 evaluation datasets、evaluation_runs、evaluation_results、指标计算和回归评估。

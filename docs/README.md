@@ -9,10 +9,10 @@
 | 文档 | 当前版本 | 职责 |
 | --- | --- | --- |
 | `00-project-dashboard.md` | v0.3 | 项目定位、生命周期、架构边界、路线图、任务拆分和评估指标的可视化入口 |
-| `01-product-spec.md` | v1.0 | 产品定位、用户角色、核心概念、MVP 范围和验收标准 |
-| `02-knowledge-lifecycle-spec.md` | v1.0 | 上传、解析、分块、检索、沉淀、评估的生命周期管理 |
-| `03-system-architecture-spec.md` | v0.7 | 系统架构、模块边界、技术选型、数据流和扩展策略 |
-| `04-data-model-spec.md` | v0.6 | 核心数据实体、关系、状态、索引、软删除、source span 定位和 Wiki Revision |
+| `01-product-spec.md` | v1.1 | 产品定位、用户角色、核心概念、MVP 范围和验收标准 |
+| `02-knowledge-lifecycle-spec.md` | v1.1 | 上传、解析、分块、检索、沉淀、评估的生命周期管理 |
+| `03-system-architecture-spec.md` | v0.8 | 系统架构、模块边界、技术选型、数据流和扩展策略 |
+| `04-data-model-spec.md` | v0.7 | 核心数据实体、关系、状态、索引、软删除、source span 定位和 Wiki Revision |
 | `05-ingestion-spec.md` | v0.3 | 文件上传、解析、Document Block、chunking、source span 和重新处理 |
 | `06-llm-wiki-spec.md` | v0.1 | LLM Wiki 生成、页面结构、引用、状态、修订历史和反馈闭环 |
 | `07-search-and-chat-spec.md` | v0.3 | 搜索、RAG 问答、上下文组织、SSE 流式输出、引用和反馈评估闭环 |
