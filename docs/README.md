@@ -15,6 +15,7 @@
 | `04-data-model-spec.md` | v0.6 | 核心数据实体、关系、状态、索引、软删除、source span 定位和 Wiki Revision |
 | `05-ingestion-spec.md` | v0.3 | 文件上传、解析、Document Block、chunking、source span 和重新处理 |
 | `06-llm-wiki-spec.md` | v0.1 | LLM Wiki 生成、页面结构、引用、状态、修订历史和反馈闭环 |
+| `07-search-and-chat-spec.md` | v0.1 | 搜索、RAG 问答、上下文组织、SSE 流式输出、引用和反馈评估闭环 |
 
 0. `00-project-dashboard.md`
    - 用图、表、路线图和任务拆分说明 KnowWeave 的整体定位。
@@ -44,16 +45,20 @@
    - 定义 Document Wiki、Topic Wiki、FAQ Wiki 的页面结构、生成流程、引用规则、状态流转和修订历史。
    - 回答“KnowWeave 如何把 RAG 的临时上下文沉淀为长期可维护的 LLM Wiki”。
 
+7. `07-search-and-chat-spec.md`
+   - 定义 Search Result、RAG 上下文组织、SSE 协议、Citation 返回格式、Feedback 和 Evaluation Sample 沉淀。
+   - 回答“KnowWeave 如何把检索、问答、引用和反馈连接成可评估的知识消费闭环”。
+
 ## 文档边界
 
 - 产品规格文档保持高层、稳定，不展开过多技术实现细节。
 - 生命周期规格文档负责描述业务过程、用户操作和扩展方向，但不直接定义数据库表结构或 API 字段细节。
-- 本阶段文档可以包含必要的 API 草案和验收场景；详细 API、前端交互和完整验收用例仍应继续拆分为独立 Spec。
+- 本阶段文档可以包含必要的 API 草案和验收场景；已完成搜索与问答 API 初稿，前端交互、完整验收用例和评测运行仍应继续拆分为独立 Spec。
 
 ## 后续计划
 
 建议后续继续补充：
 
-1. `07-search-and-chat-spec.md`：搜索、RAG 问答与引用返回格式。
-2. `08-frontend-spec.md`：页面、交互、状态和演示流程。
-3. `09-acceptance-test-spec.md`：验收用例和演示检查清单。
+1. `08-frontend-spec.md`：页面、交互、状态和演示流程。
+2. `09-acceptance-test-spec.md`：验收用例和演示检查清单。
+3. `10-evaluation-spec.md`：评测集、评测运行、指标计算和回归评估。

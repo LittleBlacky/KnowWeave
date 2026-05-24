@@ -365,6 +365,9 @@ flowchart TD
   D1 --&gt; D6["06 LLM Wiki 规格"]
   D3 --&gt; D6
   D4 --&gt; D6
+  D3 --&gt; D7["07 搜索与问答规格"]
+  D4 --&gt; D7
+  D6 --&gt; D7
 </whiteboard>
 
 <table>
@@ -381,6 +384,7 @@ flowchart TD
     <tr><td>表结构、关系、状态和扩展对象</td><td>04 数据模型</td></tr>
     <tr><td>文件解析、分块、source span</td><td>05 Ingestion 规格</td></tr>
     <tr><td>LLM Wiki 生成、编辑、引用、revision</td><td>06 LLM Wiki 规格</td></tr>
+    <tr><td>搜索、RAG 问答、流式回答、引用和反馈</td><td>07 搜索与问答规格</td></tr>
   </tbody>
 </table>
 

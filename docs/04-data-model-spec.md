@@ -843,7 +843,7 @@ P1 预留：
 | 字段 | 类型 | MVP | 说明 |
 | --- | --- | --- | --- |
 | `id` | uuid | 是 | 反馈 ID |
-| `target_type` | text | 是 | chat_message、retrieved_context、wiki_page、chunk |
+| `target_type` | text | 是 | chat_message、retrieved_context、citation、wiki_page、chunk |
 | `target_id` | uuid | 是 | 目标对象 ID |
 | `feedback_type` | text | 是 | feedback_type |
 | `comment` | text | 否 | 用户说明 |

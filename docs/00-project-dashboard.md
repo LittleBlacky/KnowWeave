@@ -252,6 +252,9 @@ flowchart TD
   D1 --> D6["06 LLM Wiki 规格"]
   D3 --> D6
   D4 --> D6
+  D3 --> D7["07 搜索与问答规格"]
+  D4 --> D7
+  D6 --> D7
 ```
 
 | 想了解什么 | 先读哪份 |
@@ -262,10 +265,11 @@ flowchart TD
 | 表结构、关系、状态和扩展对象 | `04-data-model-spec.md` |
 | 文件解析、分块、source span | `05-ingestion-spec.md` |
 | LLM Wiki 生成、编辑、引用、revision | `06-llm-wiki-spec.md` |
+| 搜索、RAG 问答、流式回答、引用和反馈 | `07-search-and-chat-spec.md` |
 
 ## 17. 下一步
 
 1. 将本驾驶舱同步到飞书 `KnowWeave` 文件夹，作为协作入口。
 2. 在飞书中为核心流程创建可视化画板。
 3. 创建或维护任务/迭代多维表格，按 P0/P1/P2 管理开发状态。
-4. 继续拆分 `07-api-spec.md`、`08-frontend-interaction-spec.md`、`09-acceptance-test-spec.md`。
+4. 继续拆分 `08-frontend-spec.md`、`09-acceptance-test-spec.md`、`10-evaluation-spec.md`。
