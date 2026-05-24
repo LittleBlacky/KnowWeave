@@ -8,7 +8,7 @@
 
 | 文档 | 当前版本 | 职责 |
 | --- | --- | --- |
-| `00-project-dashboard.md` | v0.1 | 项目定位、生命周期、架构边界、路线图、任务拆分和评估指标的可视化入口 |
+| `00-project-dashboard.md` | v0.2 | 项目定位、生命周期、架构边界、路线图、任务拆分和评估指标的可视化入口 |
 | `01-product-spec.md` | v1.0 | 产品定位、用户角色、核心概念、MVP 范围和验收标准 |
 | `02-knowledge-lifecycle-spec.md` | v1.0 | 上传、解析、分块、检索、沉淀、评估的生命周期管理 |
 | `03-system-architecture-spec.md` | v0.7 | 系统架构、模块边界、技术选型、数据流和扩展策略 |
@@ -16,6 +16,7 @@
 | `05-ingestion-spec.md` | v0.3 | 文件上传、解析、Document Block、chunking、source span 和重新处理 |
 | `06-llm-wiki-spec.md` | v0.1 | LLM Wiki 生成、页面结构、引用、状态、修订历史和反馈闭环 |
 | `07-search-and-chat-spec.md` | v0.1 | 搜索、RAG 问答、上下文组织、SSE 流式输出、引用和反馈评估闭环 |
+| `08-frontend-spec.md` | v0.1 | 页面信息架构、chunk 治理 UI、Source Viewer、Chat/Wiki/Search 交互和流式 Markdown 渲染 |
 
 0. `00-project-dashboard.md`
    - 用图、表、路线图和任务拆分说明 KnowWeave 的整体定位。
@@ -49,16 +50,19 @@
    - 定义 Search Result、RAG 上下文组织、SSE 协议、Citation 返回格式、Feedback 和 Evaluation Sample 沉淀。
    - 回答“KnowWeave 如何把检索、问答、引用和反馈连接成可评估的知识消费闭环”。
 
+8. `08-frontend-spec.md`
+   - 定义 Dashboard、Files、Chunks、Knowledge Units、Wiki、Search、Chat、Evaluation 等页面的交互边界。
+   - 回答“用户如何在界面中细粒度查看、编辑、定位、反馈和沉淀知识”。
+
 ## 文档边界
 
 - 产品规格文档保持高层、稳定，不展开过多技术实现细节。
 - 生命周期规格文档负责描述业务过程、用户操作和扩展方向，但不直接定义数据库表结构或 API 字段细节。
-- 本阶段文档可以包含必要的 API 草案和验收场景；已完成搜索与问答 API 初稿，前端交互、完整验收用例和评测运行仍应继续拆分为独立 Spec。
+- 本阶段文档可以包含必要的 API 草案和验收场景；已完成搜索与问答 API 初稿和前端交互规格，完整验收用例和评测运行仍应继续拆分为独立 Spec。
 
 ## 后续计划
 
 建议后续继续补充：
 
-1. `08-frontend-spec.md`：页面、交互、状态和演示流程。
-2. `09-acceptance-test-spec.md`：验收用例和演示检查清单。
-3. `10-evaluation-spec.md`：评测集、评测运行、指标计算和回归评估。
+1. `09-acceptance-test-spec.md`：验收用例和演示检查清单。
+2. `10-evaluation-spec.md`：评测集、评测运行、指标计算和回归评估。
