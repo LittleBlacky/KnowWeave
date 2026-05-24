@@ -1,5 +1,7 @@
 # KnowWeave 文档索引
 
+![KnowWeave Logo](assets/knowweave-logo.png)
+
 本文档用于说明 `docs` 目录下各规格文档的阅读顺序和职责边界。
 
 ## 阅读顺序
