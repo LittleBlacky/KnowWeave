@@ -1,6 +1,6 @@
 # KnowWeave 搜索与问答规格说明书
 
-版本：v0.2
+版本：v0.3
 更新时间：2026-05-24
 关联文档：
 
@@ -1061,9 +1061,12 @@ MVP 不做：
 1. `08-frontend-spec.md`
    - 定义 Search UI、Chat UI、流式 Markdown 渲染、citation 面板、chunk 原文定位、feedback 交互。
 
-建议后续继续拆分：
+验收测试规格也已拆分完成：
 
 1. `09-acceptance-test-spec.md`
    - 定义端到端验收用例、演示脚本、数据准备和评审检查清单。
-2. `10-evaluation-spec.md`
+
+建议后续继续拆分：
+
+1. `10-evaluation-spec.md`
    - 定义 evaluation_runs、指标计算、评测集管理和回归评估。

@@ -370,6 +370,8 @@ flowchart TD
   D6 --&gt; D7
   D7 --&gt; D8["08 前端交互规格"]
   D5 --&gt; D8
+  D8 --&gt; D9["09 验收测试规格"]
+  D7 --&gt; D9
 </whiteboard>
 
 <table>
@@ -388,9 +390,10 @@ flowchart TD
     <tr><td>LLM Wiki 生成、编辑、引用、revision</td><td>06 LLM Wiki 规格</td></tr>
     <tr><td>搜索、RAG 问答、流式回答、引用和反馈</td><td>07 搜索与问答规格</td></tr>
     <tr><td>页面交互、chunk 治理 UI、Source Viewer、Chat/Wiki/Search 展示</td><td>08 前端交互规格</td></tr>
+    <tr><td>P0/P1/P2 验收、演示剧本、失败分级和报告模板</td><td>09 验收测试规格</td></tr>
   </tbody>
 </table>
 
 <callout emoji="🏁" background-color="light-yellow" border-color="yellow">
-  <p><b>下一步：</b>继续拆分 09 验收测试规格和 10 评估规格；飞书多维表格继续作为 P0/P1/P2 任务、风险和验收状态的动态管理入口。</p>
+  <p><b>下一步：</b>继续拆分 10 评估规格；飞书多维表格继续作为 P0/P1/P2 任务、风险和验收状态的动态管理入口。</p>
 </callout>
