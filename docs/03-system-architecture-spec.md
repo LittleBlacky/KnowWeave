@@ -1,6 +1,6 @@
 # KnowWeave 系统架构规格说明书
 
-版本：v0.6
+版本：v0.7
 日期：2026-05-23  
 状态：草案  
 关联文档：`docs/01-product-spec.md`、`docs/02-knowledge-lifecycle-spec.md`
@@ -349,9 +349,9 @@ MVP 可以先使用 Markdown 编辑器或 textarea。
 {
   "id": "file_001",
   "name": "employee-handbook.pdf",
-  "type": "pdf",
+  "file_type": "pdf",
   "storage_path": "uploads/file_001.pdf",
-  "parse_status": "parsed",
+  "status": "parse_succeeded",
   "tags": ["hr", "policy"],
   "summary": "员工手册，包含考勤、请假和报销制度。",
   "created_at": "2026-05-23T00:00:00Z"
@@ -372,7 +372,8 @@ MVP 可以先使用 Markdown 编辑器或 textarea。
 - Chunk 是可审阅的证据片段。
 - Chunk 列表展示序号、类型、状态、来源位置、字符数、质量信号、父子关系和是否被知识单元引用。
 - Chunk 详情展示 raw_content、edited_content、source spans、父 chunk、相邻 chunk、质量信号、关联 Knowledge Unit 和 Wiki。
-- 用户可以编辑、忽略、确认、拆分、合并、查看原文位置、生成知识单元。
+- 用户可以编辑、忽略、确认、查看原文位置、生成知识单元。
+- 拆分和合并属于 P1 操作，MVP 可先通过重新分块实现间接调整。
 
 系统内部表现：
 
@@ -380,15 +381,16 @@ MVP 可以先使用 Markdown 编辑器或 textarea。
 {
   "id": "chunk_023",
   "file_id": "file_001",
-  "type": "text",
+  "chunk_type": "text",
   "raw_content": "请假申请需提前 1 个工作日提交，并由直属主管审批。",
   "edited_content": "员工请假需至少提前 1 个工作日提交申请，并由直属主管审批。",
+  "is_manually_edited": true,
   "status": "verified",
   "quality_signals": [],
   "source_spans": [
     {
       "page_number": 3,
-      "block_id": "block_012",
+      "document_block_id": "block_012",
       "char_start": 35,
       "char_end": 78,
       "bbox": [82.1, 210.5, 420.3, 228.9]
@@ -578,6 +580,7 @@ MVP Parser：
 - 维护父子 chunk 关系。
 - 计算 chunk 质量信号。
 - 支持 chunk 编辑、忽略、确认和重新分块。
+- chunk 手动拆分、合并和版本 diff 放在 P1。
 
 不负责：
 
@@ -620,7 +623,8 @@ P1：
 - 从 chunk 创建候选知识单元。
 - 从问答记录创建知识单元。
 - 手动创建知识单元。
-- 编辑、合并、拆分、废弃知识单元。
+- 编辑、废弃知识单元。
+- 合并和拆分知识单元，P1 支持。
 - 维护标签、状态、引用来源。
 
 MVP 可先实现：
@@ -688,7 +692,7 @@ P1 边界：
 - 调用 LLM Provider。
 - 返回答案和 citation。
 - 将模型流式输出转换为统一 SSE 事件。
-- 保存问答记录、retrieved_chunks、feedback 入口。
+- 保存问答记录、retrieved_contexts、feedback 入口。
 
 规则：
 
@@ -956,7 +960,7 @@ KnowWeave 的差异：
 - Knowledge Unit 创建、编辑、状态管理。
 - Document Wiki 生成和编辑。
 - 知识库问答和 citation。
-- 问答记录、retrieved chunks、feedback 保存。
+- 问答记录、retrieved_contexts、feedback 保存。
 - 文档索引和基础统计。
 
 ### 13.2 P1 尽量实现

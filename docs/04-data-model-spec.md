@@ -1,6 +1,6 @@
 # KnowWeave 数据模型规格说明书
 
-版本：v0.5
+版本：v0.6
 日期：2026-05-23
 状态：草案
 关联文档：`docs/01-product-spec.md`、`docs/02-knowledge-lifecycle-spec.md`、`docs/03-system-architecture-spec.md`
@@ -542,7 +542,7 @@ P1 预留：
 
 约束：
 
-- 至少应包含一种定位方式：页码、block、字符范围、行列范围、bbox 或时间戳。
+- 至少应包含一种定位方式：页码、document_block_id、timeline_block_id、字符范围、行列范围、bbox 或时间戳。
 - PDF MVP 至少保存 `page_number` 和 `document_block_id`。
 - Markdown MVP 优先保存 `line_start` 和 `line_end`。
 - 句号、标点或滑动窗口切分的 chunk 应尽量保存 `char_start` 和 `char_end`。
@@ -551,7 +551,8 @@ P1 预留：
 
 - `idx_source_spans_file_id`
 - `idx_source_spans_chunk_id`
-- `idx_source_spans_block_id`
+- `idx_source_spans_document_block_id`
+- `idx_source_spans_timeline_block_id`
 
 ### 6.7 knowledge_units
 
