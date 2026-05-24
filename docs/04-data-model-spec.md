@@ -1,6 +1,6 @@
 # KnowWeave 数据模型规格说明书
 
-版本：v0.7
+版本：v0.8
 日期：2026-05-23
 状态：草案
 关联文档：`docs/01-product-spec.md`、`docs/02-knowledge-lifecycle-spec.md`、`docs/03-system-architecture-spec.md`
@@ -1150,7 +1150,12 @@ MVP 可预留但不必完整实现：
 5. `docs/09-acceptance-test-spec.md`
    - 定义数据完整性、source span、retrieval_run_id、soft delete、citation 和 feedback 的验收检查。
 
-下一步继续拆分：
-
-1. `docs/10-evaluation-spec.md`
+6. `docs/10-evaluation-spec.md`
    - 定义 evaluation datasets、evaluation_runs、evaluation_results、指标计算和回归评估。
+
+下一步进入工程实现 Spec 拆分：
+
+1. 后端实现 Spec
+   - 将本文模型落到 PostgreSQL、SQLAlchemy models、Alembic 迁移和索引策略。
+2. DevOps 与演示 Spec
+   - 定义 pgvector 扩展初始化、种子数据和本地演示数据库脚本。

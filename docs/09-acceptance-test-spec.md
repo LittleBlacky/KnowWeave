@@ -1,6 +1,6 @@
 # KnowWeave 验收测试规格说明书
 
-版本：v0.1
+版本：v0.2
 更新时间：2026-05-24
 状态：Draft
 关联文档：
@@ -464,8 +464,15 @@ API 验收关注：
 
 ## 16. 后续 Spec
 
-下一篇建议继续编写：
+评测规格已拆分完成：
 
 1. `10-evaluation-spec.md`
    - 定义 evaluation datasets、evaluation_runs、指标计算、失败样本分析和回归评估。
    - 将本文中的 evaluation sample candidate 验收进一步细化为可运行的评测体系。
+
+下一步进入工程实现 Spec 拆分：
+
+1. 后端实现 Spec
+   - 将本文验收项落到 API、数据库、服务层和自动化测试。
+2. 前端实现 Spec
+   - 将本文验收场景落到页面、组件、交互状态和端到端测试。

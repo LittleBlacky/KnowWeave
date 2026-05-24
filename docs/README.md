@@ -8,16 +8,17 @@
 
 | 文档 | 当前版本 | 职责 |
 | --- | --- | --- |
-| `00-project-dashboard.md` | v0.3 | 项目定位、生命周期、架构边界、路线图、任务拆分和评估指标的可视化入口 |
-| `01-product-spec.md` | v1.1 | 产品定位、用户角色、核心概念、MVP 范围和验收标准 |
+| `00-project-dashboard.md` | v0.4 | 项目定位、生命周期、架构边界、路线图、任务拆分和评估指标的可视化入口 |
+| `01-product-spec.md` | v1.2 | 产品定位、用户角色、核心概念、MVP 范围和验收标准 |
 | `02-knowledge-lifecycle-spec.md` | v1.1 | 上传、解析、分块、检索、沉淀、评估的生命周期管理 |
-| `03-system-architecture-spec.md` | v0.8 | 系统架构、模块边界、技术选型、数据流和扩展策略 |
-| `04-data-model-spec.md` | v0.7 | 核心数据实体、关系、状态、索引、软删除、source span 定位和 Wiki Revision |
+| `03-system-architecture-spec.md` | v0.9 | 系统架构、模块边界、技术选型、数据流和扩展策略 |
+| `04-data-model-spec.md` | v0.8 | 核心数据实体、关系、状态、索引、软删除、source span 定位和 Wiki Revision |
 | `05-ingestion-spec.md` | v0.3 | 文件上传、解析、Document Block、chunking、source span 和重新处理 |
 | `06-llm-wiki-spec.md` | v0.1 | LLM Wiki 生成、页面结构、引用、状态、修订历史和反馈闭环 |
-| `07-search-and-chat-spec.md` | v0.3 | 搜索、RAG 问答、上下文组织、SSE 流式输出、引用和反馈评估闭环 |
-| `08-frontend-spec.md` | v0.2 | 页面信息架构、chunk 治理 UI、Source Viewer、Chat/Wiki/Search 交互和流式 Markdown 渲染 |
-| `09-acceptance-test-spec.md` | v0.1 | P0/P1/P2 验收测试、演示剧本、检查清单、失败分级和验收报告模板 |
+| `07-search-and-chat-spec.md` | v0.4 | 搜索、RAG 问答、上下文组织、SSE 流式输出、引用和反馈评估闭环 |
+| `08-frontend-spec.md` | v0.3 | 页面信息架构、chunk 治理 UI、Source Viewer、Chat/Wiki/Search 交互和流式 Markdown 渲染 |
+| `09-acceptance-test-spec.md` | v0.2 | P0/P1/P2 验收测试、演示剧本、检查清单、失败分级和验收报告模板 |
+| `10-evaluation-spec.md` | v0.1 | 评测样本、评测集、评测运行、指标计算、失败分析和回归评估 |
 
 0. `00-project-dashboard.md`
    - 用图、表、路线图和任务拆分说明 KnowWeave 的整体定位。
@@ -59,14 +60,20 @@
    - 定义 P0 MVP 的端到端验收剧本、模块检查清单、数据验收、失败分级和报告模板。
    - 回答“如何判断 KnowWeave 的第一阶段是真的跑通，而不是只完成了文档或局部功能”。
 
+10. `10-evaluation-spec.md`
+    - 定义评测样本、评测集、评测运行、指标计算、失败分析和回归评估。
+    - 回答“如何判断知识库、检索、回答和引用在迭代后是否变好或回退”。
+
 ## 文档边界
 
 - 产品规格文档保持高层、稳定，不展开过多技术实现细节。
 - 生命周期规格文档负责描述业务过程、用户操作和扩展方向，但不直接定义数据库表结构或 API 字段细节。
-- 本阶段文档可以包含必要的 API 草案和验收场景；已完成搜索与问答 API 初稿、前端交互规格和验收测试规格，评测运行仍应继续拆分为独立 Spec。
+- 本阶段文档可以包含必要的 API 草案和验收场景；已完成搜索与问答 API 初稿、前端交互规格、验收测试规格和评测闭环规格。
 
 ## 后续计划
 
-建议后续继续补充：
+建议后续进入工程实现拆分：
 
-1. `10-evaluation-spec.md`：评测集、评测运行、指标计算和回归评估。
+1. `11-backend-implementation-spec.md`：FastAPI、PostgreSQL + pgvector、Service 层、Provider 抽象、迁移和测试策略。
+2. `12-frontend-implementation-spec.md`：Next.js 页面路由、组件结构、API client、状态管理和前端测试策略。
+3. `13-devops-and-demo-spec.md`：Docker Compose、环境变量、演示数据和启动脚本。

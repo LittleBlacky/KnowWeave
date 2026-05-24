@@ -1,6 +1,6 @@
 # KnowWeave 项目可视化驾驶舱
 
-版本：v0.3
+版本：v0.4
 更新时间：2026-05-24
 项目阶段：Spec Coding / P0 方案冻结前
 
@@ -259,6 +259,8 @@ flowchart TD
   D5 --> D8
   D8 --> D9["09 验收测试规格"]
   D7 --> D9
+  D7 --> D10["10 评测闭环规格"]
+  D9 --> D10
 ```
 
 | 想了解什么 | 先读哪份 |
@@ -272,10 +274,11 @@ flowchart TD
 | 搜索、RAG 问答、流式回答、引用和反馈 | `07-search-and-chat-spec.md` |
 | 页面交互、chunk 治理 UI、Source Viewer、Chat/Wiki/Search 展示 | `08-frontend-spec.md` |
 | P0/P1/P2 验收、演示剧本、失败分级和报告模板 | `09-acceptance-test-spec.md` |
+| 评测集、评测运行、指标计算、失败样本分析和回归评估 | `10-evaluation-spec.md` |
 
 ## 17. 下一步
 
 1. 将本驾驶舱同步到飞书 `KnowWeave` 文件夹，作为协作入口。
 2. 在飞书中为核心流程创建可视化画板。
 3. 创建或维护任务/迭代多维表格，按 P0/P1/P2 管理开发状态。
-4. 继续拆分 `10-evaluation-spec.md`。
+4. 进入工程实现 Spec 拆分，优先补充后端实现、前端实现和 DevOps/演示启动方案。

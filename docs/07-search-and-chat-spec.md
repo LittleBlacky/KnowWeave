@@ -1,6 +1,6 @@
 # KnowWeave 搜索与问答规格说明书
 
-版本：v0.3
+版本：v0.4
 更新时间：2026-05-24
 关联文档：
 
@@ -1066,7 +1066,12 @@ MVP 不做：
 1. `09-acceptance-test-spec.md`
    - 定义端到端验收用例、演示脚本、数据准备和评审检查清单。
 
-建议后续继续拆分：
+评测规格也已拆分完成：
 
 1. `10-evaluation-spec.md`
    - 定义 evaluation_runs、指标计算、评测集管理和回归评估。
+
+下一步进入工程实现 Spec 拆分：
+
+1. 后端实现 Spec
+   - 定义 Search、Chat、Feedback、Evaluation API 的 Service 层实现、Provider 抽象和测试策略。
