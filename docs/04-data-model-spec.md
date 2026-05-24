@@ -1,6 +1,6 @@
 # KnowWeave 数据模型规格说明书
 
-版本：v0.4
+版本：v0.5
 日期：2026-05-23
 状态：草案
 关联文档：`docs/01-product-spec.md`、`docs/02-knowledge-lifecycle-spec.md`、`docs/03-system-architecture-spec.md`
@@ -236,6 +236,7 @@ Wiki 双链与知识网络：
 
 ### 5.1 file_status
 
+- `rejected`
 - `uploaded`
 - `queued_for_parse`
 - `parsing`
@@ -294,6 +295,15 @@ P2 预留：
 - `archived`
 
 `ignored` 和 `archived` 默认不参与检索、问答和知识单元自动生成。
+
+### 5.5.1 block_status
+
+MVP 不单独引入 `block_status` 枚举。Document Block 是否参与分块由 `document_blocks.is_ignored` 表达：
+
+- `is_ignored = false`：默认参与 chunking。
+- `is_ignored = true`：被用户排除，不参与后续自动 chunking。
+
+该字段只控制 block 是否进入重新分块流程，不代表原始文件内容被删除。
 
 ### 5.6 curation_status
 
@@ -400,6 +410,7 @@ P2 预留：
 | `block_type` | text | 是 | heading、paragraph、table 等 |
 | `raw_content` | text | 是 | block 文本或占位描述 |
 | `normalized_content` | text | 否 | 清洗后的内容 |
+| `is_ignored` | boolean | 是 | 是否被用户排除在 chunking 之外 |
 | `page_number` | integer | 否 | PDF 页码 |
 | `char_start` | integer | 否 | 在 raw_text 中的起始字符 |
 | `char_end` | integer | 否 | 在 raw_text 中的结束字符 |
@@ -414,6 +425,7 @@ P2 预留：
 
 - `block_index` 在同一 `parse_result_id` 下必须保持稳定顺序。
 - table、image、formula、code block 即使 MVP 不深度解析，也应保留类型、位置和上下文。
+- `is_ignored = true` 的 block 不应进入默认 chunking，但原始 block 记录仍应保留。
 
 索引：
 
@@ -465,6 +477,7 @@ P2 预留：
 | `chunk_type` | text | 是 | text、table、image 等 |
 | `raw_content` | text | 是 | 原始 chunk 内容 |
 | `edited_content` | text | 否 | 用户编辑后的内容 |
+| `is_manually_edited` | boolean | 是 | 是否被用户手工编辑过 |
 | `summary` | text | 否 | 摘要或可检索说明 |
 | `status` | text | 是 | chunk_status |
 | `quality_signals` | jsonb | 是 | 质量信号 |
@@ -479,6 +492,7 @@ P2 预留：
 约束：
 
 - `edited_content` 不覆盖 `raw_content`。
+- 当 `edited_content` 非空或用户保存过修订时，`is_manually_edited` 应为 true。
 - `source_spans` 不应因为用户编辑 `edited_content` 而丢失。
 - `status IN ('ignored', 'archived')` 时，`is_searchable` 默认应为 false。
 - 文件软删除后，业务层必须排除其 chunk。

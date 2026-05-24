@@ -1,6 +1,6 @@
 # KnowWeave 知识生命周期细粒度管理规格说明书
 
-版本：v0.8
+版本：v0.9
 日期：2026-05-23  
 状态：草案  
 关联文档：`docs/01-product-spec.md`
@@ -374,7 +374,7 @@ MVP 可分级实现：
 
 - uploaded：已上传，尚未解析。
 - duplicate_detected：疑似重复。
-- rejected：文件类型或大小不符合要求。
+- rejected：文件类型、大小或基础校验不符合要求。该状态属于 `knowledge_files.status`，不得进入解析、检索、问答和 Wiki 沉淀。
 - queued_for_parse：等待解析。
 
 ### 5.5 MVP 验收
@@ -398,7 +398,7 @@ MVP 可分级实现：
 - 查看解析后的全文。
 - 查看解析警告，例如空页、乱码、表格丢失。
 - 手动修正解析文本。
-- 标记某些页面或段落不参与后续处理。
+- 标记某些页面或段落不参与后续处理。MVP 通过 `document_blocks.is_ignored` 持久化该选择。
 
 ### 6.3 系统能力
 
@@ -419,7 +419,7 @@ MVP 可分级实现：
 - parsing：解析中。
 - parse_succeeded：解析成功。
 - parse_failed：解析失败。
-- parse_needs_review：解析成功但需要人工检查。
+- parse_needs_review：解析成功但需要人工检查。该状态属于 `knowledge_files.status`；对应 `parse_results.status` 仍为 parse_succeeded，并通过 warnings 说明原因。
 
 ### 6.5 解析结果字段
 
