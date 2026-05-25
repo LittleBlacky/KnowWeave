@@ -958,7 +958,7 @@ metadata 建议：
   "code": "",
   "explanation": "",
   "api_method": "POST",
-  "api_path": "/api/wiki-pages"
+  "api_path": "/api/v1/wiki/pages"
 }
 ```
 

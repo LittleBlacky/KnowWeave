@@ -199,7 +199,7 @@ flowchart LR
 | CHK-003 | 编辑 chunk | P0 | edited_content 保存后优先用于预览和搜索上下文 |
 | CHK-004 | raw_content 只读 | P0 | 编辑不会覆盖原始内容 |
 | CHK-005 | 忽略 chunk | P0 | ignored chunk 默认不参与搜索、问答和 Wiki 生成 |
-| CHK-006 | 确认 chunk | P0 | curation_status 可变为 verified |
+| CHK-006 | 确认 chunk | P0 | chunk_status 可变为 verified |
 | CHK-007 | 低质量提示 | P0 | too_short、too_long、missing_source_span 等 flags 可展示 |
 | CHK-008 | 父子分块展示 | P1 | parent_chunk_id 可视化展示或调试可见 |
 
@@ -298,7 +298,7 @@ P0 验收时至少应能看到以下对象：
 | source_spans | >= chunks 数 | 每个 P0 chunk 至少一个 |
 | knowledge_units | >= 1 | 可自动或手动生成 |
 | wiki_pages | >= 1 | Document Wiki |
-| retrieval_runs | >= 2 | Search 和 Chat 各至少一次 |
+| distinct retrieval_run_id | >= 2 | Search 和 Chat 各至少一次；P0 不要求单独 `retrieval_runs` 表 |
 | retrieved_contexts | >= 1 | Chat 召回上下文 |
 | citations | >= 1 | Wiki 或 Chat citation |
 | feedback | >= 1 | 用户反馈 |

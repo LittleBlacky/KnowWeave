@@ -316,13 +316,24 @@ MVP 不单独引入 `block_status` 枚举。Document Block 是否参与分块由
 
 ### 5.7 feedback_type
 
-- `helpful`
-- `not_helpful`
+- `answer_helpful`
 - `answer_wrong`
+- `citation_helpful`
 - `citation_wrong`
-- `missing_source`
+- `retrieval_helpful`
 - `retrieval_irrelevant`
 - `retrieval_missing`
+- `chunk_low_quality`
+- `wiki_needs_update`
+
+说明：
+
+- `answer_helpful` / `answer_wrong` 作用于 `chat_message`。
+- `citation_helpful` / `citation_wrong` 作用于 `citation`。
+- `retrieval_helpful` / `retrieval_irrelevant` 作用于 `retrieved_context`。
+- `retrieval_missing` 作用于 `chat_message` 或搜索上下文。
+- `chunk_low_quality` 作用于 `chunk`，可联动 `quality_signals`。
+- `wiki_needs_update` 作用于 `wiki_page`。
 
 ## 6. 表结构
 

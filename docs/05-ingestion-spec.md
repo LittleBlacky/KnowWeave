@@ -211,7 +211,7 @@ MVP 支持：
 请求：
 
 ```http
-POST /api/files/upload
+POST /api/v1/files/upload
 Content-Type: multipart/form-data
 ```
 
@@ -692,18 +692,17 @@ parse_succeeded -> parse_needs_review
 本节只定义 MVP 端点形态，具体 request/response 可在后续 API Spec 中细化。
 
 ```text
-POST   /api/files/upload
-GET    /api/files
-GET    /api/files/{file_id}
-POST   /api/files/{file_id}/parse
-POST   /api/files/{file_id}/reparse
-GET    /api/files/{file_id}/parse-results
-GET    /api/files/{file_id}/document-blocks
-GET    /api/files/{file_id}/chunks
-POST   /api/files/{file_id}/rechunk
-PATCH  /api/chunks/{chunk_id}
-POST   /api/chunks/{chunk_id}/ignore
-POST   /api/chunks/{chunk_id}/verify
+POST   /api/v1/files/upload
+GET    /api/v1/files
+GET    /api/v1/files/{file_id}
+POST   /api/v1/files/{file_id}/parse
+POST   /api/v1/files/{file_id}/reparse
+GET    /api/v1/files/{file_id}/document-blocks
+GET    /api/v1/files/{file_id}/chunks
+POST   /api/v1/files/{file_id}/rechunk
+PATCH  /api/v1/chunks/{chunk_id}
+POST   /api/v1/chunks/{chunk_id}/ignore
+POST   /api/v1/chunks/{chunk_id}/verify
 ```
 
 ### 12.1 重新分块请求

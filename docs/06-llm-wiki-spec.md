@@ -560,25 +560,25 @@ Wiki 既是人看的页面，也是 RAG 的高质量上下文。
 本节定义 MVP 端点形态，详细 API 后续在 Search/Chat 或 Frontend Spec 中细化。
 
 ```text
-GET    /api/wiki-pages
-POST   /api/wiki-pages/generate
-GET    /api/wiki-pages/{wiki_page_id}
-PATCH  /api/wiki-pages/{wiki_page_id}
-POST   /api/wiki-pages/{wiki_page_id}/regenerate
-POST   /api/wiki-pages/{wiki_page_id}/verify
-POST   /api/wiki-pages/{wiki_page_id}/archive
-GET    /api/wiki-pages/{wiki_page_id}/citations
-GET    /api/wiki-pages/{wiki_page_id}/knowledge-units
+POST   /api/v1/files/{file_id}/wiki
+GET    /api/v1/wiki/pages
+GET    /api/v1/wiki/pages/{wiki_page_id}
+PATCH  /api/v1/wiki/pages/{wiki_page_id}
+POST   /api/v1/wiki/pages/{wiki_page_id}/regenerate
+POST   /api/v1/wiki/pages/{wiki_page_id}/verify
+POST   /api/v1/wiki/pages/{wiki_page_id}/archive
+GET    /api/v1/wiki/pages/{wiki_page_id}/citations
+GET    /api/v1/wiki/pages/{wiki_page_id}/knowledge-units
 ```
 
 P1：
 
 ```text
-GET    /api/wiki-pages/{wiki_page_id}/revisions
-GET    /api/wiki-pages/{wiki_page_id}/revisions/{revision_id}
-POST   /api/wiki-pages/{wiki_page_id}/rollback
-POST   /api/wiki-pages/topic/generate
-POST   /api/wiki-pages/faq/generate
+GET    /api/v1/wiki/pages/{wiki_page_id}/revisions
+GET    /api/v1/wiki/pages/{wiki_page_id}/revisions/{revision_id}
+POST   /api/v1/wiki/pages/{wiki_page_id}/rollback
+POST   /api/v1/wiki/pages/topic/generate
+POST   /api/v1/wiki/pages/faq/generate
 ```
 
 ### 14.1 生成 Document Wiki 请求

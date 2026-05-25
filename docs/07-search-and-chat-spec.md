@@ -185,7 +185,7 @@ P0 chunk 结果应包含：
 - preview_text。
 - score。
 - source span。
-- curation_status。
+- chunk_status。
 - edited_content 是否存在。
 
 如果 chunk 有 `edited_content`，Search Result 展示和 Chat 上下文应优先使用 edited_content，但 citation 仍应指向原始 source span。
@@ -200,7 +200,7 @@ P0 Knowledge Unit 结果应包含：
 - title。
 - summary。
 - content。
-- curation_status。
+- status，使用 `curation_status` 枚举。
 - source chunks。
 - tags。
 
@@ -216,7 +216,7 @@ P0 Wiki 结果应包含：
 - title。
 - summary。
 - wiki_type。
-- curation_status。
+- status，使用 `curation_status` 枚举。
 - source_file_id。
 - citation_count。
 - updated_at。
@@ -246,7 +246,7 @@ Search API 和 Chat Service 内部使用统一 Search Result。
     "source_available": true
   },
   "status": {
-    "curation_status": "verified",
+    "chunk_status": "verified",
     "source_file_deleted": false
   },
   "metadata": {
@@ -343,9 +343,9 @@ P0 不需要实现该公式，但 Search Result metadata 应预留 `score_breakd
 默认搜索和问答召回应过滤：
 
 - `knowledge_files.status = soft_deleted`
-- `chunks.curation_status in ignored, archived`
-- `knowledge_units.curation_status = archived`
-- `wiki_pages.curation_status = archived`
+- `chunks.status in ignored, archived`
+- `knowledge_units.status = archived`
+- `wiki_pages.status = archived`
 - `source_available = false` 的对象默认不进入 Chat 上下文，但可以在普通搜索结果中提示
 
 `source_available` 是前端和 Chat 使用的最终可用性标记。`source_file_deleted`、解析结果失效、source span 缺失等只作为原因字段或诊断字段，不应替代 `source_available`。
@@ -359,7 +359,7 @@ P0 搜索过滤：
 | `types` | 是 | file、chunk、knowledge_unit、wiki_page |
 | `file_ids` | 是 | 限定来源文件 |
 | `tags` | 是 | 按标签过滤 |
-| `curation_status` | 是 | draft、verified、archived 等 |
+| `status` | 是 | draft、verified、archived 等；chunk 使用 `chunk_status` 枚举，Knowledge Unit 和 Wiki 使用 `curation_status` 枚举 |
 | `source_available` | 是 | 是否只看来源可用 |
 | `created_at_range` | 否 | P1 |
 | `updated_at_range` | 否 | P1 |
@@ -837,7 +837,7 @@ GET  /api/v1/search/runs/{retrieval_run_id}
   "filters": {
     "file_ids": ["file_001"],
     "tags": ["人事"],
-    "curation_status": ["verified", "draft"],
+    "status": ["verified", "draft"],
     "source_available": true
   },
   "top_k": 10,

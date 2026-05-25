@@ -314,6 +314,10 @@ P0 API 前缀统一为 `/api/v1`。
 | Chunks | `POST /chunks/{chunk_id}/ignore` | 是 | ChunkService |
 | Chunks | `POST /chunks/{chunk_id}/verify` | 是 | ChunkService |
 | Chunks | `POST /files/{file_id}/rechunk` | 是 | ChunkService |
+| Knowledge Units | `GET /knowledge-units` | 是 | KnowledgeUnitService |
+| Knowledge Units | `GET /knowledge-units/{knowledge_unit_id}` | 是 | KnowledgeUnitService |
+| Knowledge Units | `POST /knowledge-units` | 是 | KnowledgeUnitService |
+| Knowledge Units | `PATCH /knowledge-units/{knowledge_unit_id}` | 是 | KnowledgeUnitService |
 | Search | `POST /search` | 是 | SearchService |
 | Search | `GET /search/runs/{retrieval_run_id}` | 是 | SearchService |
 | Chat | `POST /chat/sessions` | 是 | ChatService |
@@ -556,6 +560,7 @@ P0 支持 feedback_type：
 - answer_wrong。
 - citation_helpful。
 - citation_wrong。
+- retrieval_helpful。
 - chunk_low_quality。
 - wiki_needs_update。
 - retrieval_missing。

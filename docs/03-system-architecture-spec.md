@@ -517,16 +517,16 @@ API 不应直接包含复杂业务逻辑。
 建议路由：
 
 ```text
-/api/files
-/api/parsing
-/api/chunks
-/api/knowledge-units
-/api/wiki-pages
-/api/search
-/api/chat
-/api/feedback
-/api/evaluation
-/api/settings
+/api/v1/files
+/api/v1/parsing
+/api/v1/chunks
+/api/v1/knowledge-units
+/api/v1/wiki/pages
+/api/v1/search
+/api/v1/chat
+/api/v1/feedback
+/api/v1/evaluation-samples
+/api/v1/settings
 ```
 
 ### 7.2 File Service

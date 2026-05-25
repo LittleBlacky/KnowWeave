@@ -779,14 +779,14 @@ P2 增加：
 ### 14.1 Evaluation Samples
 
 ```text
-POST   /api/evaluation-samples
-GET    /api/evaluation-samples
-GET    /api/evaluation-samples/{sample_id}
-PATCH  /api/evaluation-samples/{sample_id}
-POST   /api/evaluation-samples/{sample_id}/verify
-POST   /api/evaluation-samples/{sample_id}/archive
-POST   /api/chat/messages/{message_id}/to-evaluation-sample
-POST   /api/feedback/{feedback_id}/to-evaluation-sample
+POST   /api/v1/evaluation-samples
+GET    /api/v1/evaluation-samples
+GET    /api/v1/evaluation-samples/{sample_id}
+PATCH  /api/v1/evaluation-samples/{sample_id}
+POST   /api/v1/evaluation-samples/{sample_id}/verify
+POST   /api/v1/evaluation-samples/{sample_id}/archive
+POST   /api/v1/chat/messages/{message_id}/to-evaluation-sample
+POST   /api/v1/feedback/{feedback_id}/to-evaluation-sample
 ```
 
 创建样本：
@@ -823,14 +823,14 @@ POST   /api/feedback/{feedback_id}/to-evaluation-sample
 P1 增加：
 
 ```text
-POST   /api/evaluation-datasets
-GET    /api/evaluation-datasets
-GET    /api/evaluation-datasets/{dataset_id}
-PATCH  /api/evaluation-datasets/{dataset_id}
-POST   /api/evaluation-datasets/{dataset_id}/versions
-GET    /api/evaluation-datasets/{dataset_id}/samples
-POST   /api/evaluation-datasets/{dataset_id}/samples/{sample_id}
-DELETE /api/evaluation-datasets/{dataset_id}/samples/{sample_id}
+POST   /api/v1/evaluation-datasets
+GET    /api/v1/evaluation-datasets
+GET    /api/v1/evaluation-datasets/{dataset_id}
+PATCH  /api/v1/evaluation-datasets/{dataset_id}
+POST   /api/v1/evaluation-datasets/{dataset_id}/versions
+GET    /api/v1/evaluation-datasets/{dataset_id}/samples
+POST   /api/v1/evaluation-datasets/{dataset_id}/samples/{sample_id}
+DELETE /api/v1/evaluation-datasets/{dataset_id}/samples/{sample_id}
 ```
 
 ### 14.3 Runs
@@ -838,12 +838,12 @@ DELETE /api/evaluation-datasets/{dataset_id}/samples/{sample_id}
 P1 增加：
 
 ```text
-POST   /api/evaluation-runs
-GET    /api/evaluation-runs
-GET    /api/evaluation-runs/{run_id}
-POST   /api/evaluation-runs/{run_id}/cancel
-GET    /api/evaluation-runs/{run_id}/results
-GET    /api/evaluation-runs/{run_id}/metrics
+POST   /api/v1/evaluation-runs
+GET    /api/v1/evaluation-runs
+GET    /api/v1/evaluation-runs/{run_id}
+POST   /api/v1/evaluation-runs/{run_id}/cancel
+GET    /api/v1/evaluation-runs/{run_id}/results
+GET    /api/v1/evaluation-runs/{run_id}/metrics
 ```
 
 创建运行：
@@ -868,8 +868,8 @@ GET    /api/evaluation-runs/{run_id}/metrics
 P1 增加：
 
 ```text
-PATCH /api/evaluation-results/{result_id}/review
-POST  /api/evaluation-results/{result_id}/repair-actions
+PATCH /api/v1/evaluation-results/{result_id}/review
+POST  /api/v1/evaluation-results/{result_id}/repair-actions
 ```
 
 人工评审：
