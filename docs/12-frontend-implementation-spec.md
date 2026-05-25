@@ -498,25 +498,14 @@ useChatStream(sessionId)
 ### 8.3 Chat 流程
 
 ```mermaid
-sequenceDiagram
-  participant UI as Chat UI
-  participant Hook as useChatStream
-  participant API as Chat API
-  participant Store as Chat State
-
-  UI->>Hook: send(question)
-  Hook->>Store: append user message
-  Hook->>API: POST message with stream enabled
-  API-->>Hook: event start
-  Hook->>Store: create assistant placeholder
-  API-->>Hook: event retrieval
-  Hook->>Store: set retrieval panel
-  API-->>Hook: event delta
-  Hook->>Store: append answer text
-  API-->>Hook: event citations
-  Hook->>Store: set citations
-  API-->>Hook: event done
-  Hook->>Store: mark completed
+flowchart TD
+  Send["Chat UI sends question"] --> UserMsg["Store appends user message"]
+  UserMsg --> Post["useChatStream posts message"]
+  Post --> Start["SSE start creates assistant placeholder"]
+  Start --> Retrieval["SSE retrieval updates Retrieval Panel"]
+  Retrieval --> Delta["SSE delta appends answer text"]
+  Delta --> Citations["SSE citations updates Citation Panel"]
+  Citations --> Done["SSE done marks message completed"]
 ```
 
 ## 9. Feedback 实现
