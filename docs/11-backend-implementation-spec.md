@@ -480,6 +480,8 @@ P0 IndexService 不应：
 - 写入 `retrieved_contexts`。
 - 返回统一 Search Result。
 
+P0 不单独创建 `retrieval_runs` 表。`retrieval_run_id` 是 `retrieved_contexts` 的分组 ID，`GET /search/runs/{retrieval_run_id}` 通过该分组 ID 派生查询本次检索的 query、参数快照和结果列表。P1 如需记录运行状态、耗时、失败原因或评测关联，再独立引入 `retrieval_runs` 表。
+
 P0 排序：
 
 1. 文本匹配分。
@@ -724,6 +726,8 @@ sequenceDiagram
 ```
 
 ### 13.2 Search Response
+
+`GET /search/runs/{retrieval_run_id}` 返回的数据从 `retrieved_contexts` 派生。后端必须保证同一次 Search 或 Chat 召回写入的多条 `retrieved_contexts` 共享同一个 `retrieval_run_id`。
 
 ```json
 {

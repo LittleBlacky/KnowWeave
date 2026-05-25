@@ -509,7 +509,7 @@ sequenceDiagram
   participant DB as PostgreSQL
 
   User->>UI: 输入问题
-  UI->>Chat: POST /api/chat/sessions/{id}/messages
+  UI->>Chat: POST /api/v1/chat/sessions/{id}/messages
   Chat->>DB: 保存 user message
   Chat->>Search: search(query, filters)
   Search->>DB: 查询 file/chunk/KU/wiki
@@ -824,9 +824,9 @@ P1 可计算：
 ### 17.1 Search API
 
 ```text
-POST /api/search
-GET  /api/search/runs/{retrieval_run_id}
-POST /api/search/feedback
+POST /api/v1/search
+GET  /api/v1/search/runs/{retrieval_run_id}
+POST /api/v1/search/feedback
 ```
 
 请求：
@@ -869,13 +869,13 @@ POST /api/search/feedback
 ### 17.2 Chat API
 
 ```text
-POST /api/chat/sessions
-GET  /api/chat/sessions
-GET  /api/chat/sessions/{session_id}
-POST /api/chat/sessions/{session_id}/messages
-GET  /api/chat/messages/{message_id}/citations
-POST /api/chat/messages/{message_id}/feedback
-POST /api/chat/messages/{message_id}/to-evaluation-sample
+POST /api/v1/chat/sessions
+GET  /api/v1/chat/sessions
+GET  /api/v1/chat/sessions/{session_id}
+POST /api/v1/chat/sessions/{session_id}/messages
+GET  /api/v1/chat/messages/{message_id}/citations
+POST /api/v1/chat/messages/{message_id}/feedback
+POST /api/v1/chat/messages/{message_id}/to-evaluation-sample
 ```
 
 发送消息：
@@ -918,8 +918,8 @@ POST /api/chat/messages/{message_id}/to-evaluation-sample
 ### 17.3 Feedback API
 
 ```text
-POST /api/feedback
-GET  /api/feedback?target_type=&target_id=
+POST /api/v1/feedback
+GET  /api/v1/feedback?target_type=&target_id=
 ```
 
 请求：
