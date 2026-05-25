@@ -18,7 +18,7 @@
 | `07-search-and-chat-spec.md` | v0.4 | 搜索、RAG 问答、上下文组织、SSE 流式输出、引用和反馈评估闭环 |
 | `08-frontend-spec.md` | v0.3 | 页面信息架构、chunk 治理 UI、Source Viewer、Chat/Wiki/Search 交互和流式 Markdown 渲染 |
 | `09-acceptance-test-spec.md` | v0.2 | P0/P1/P2 验收测试、演示剧本、检查清单、失败分级和验收报告模板 |
-| `10-evaluation-spec.md` | v0.1 | 评测样本、评测集、评测运行、指标计算、失败分析和回归评估 |
+| `10-evaluation-spec.md` | v0.2 | 评测样本、评测集、评测运行、指标计算、失败分析和回归评估 |
 
 0. `00-project-dashboard.md`
    - 用图、表、路线图和任务拆分说明 KnowWeave 的整体定位。
