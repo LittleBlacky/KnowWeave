@@ -22,6 +22,7 @@
 | `11-backend-implementation-spec.md` | v0.1 | FastAPI 后端实现、Service 边界、Provider 抽象、迁移、SSE 和测试策略 |
 | `12-frontend-implementation-spec.md` | v0.1 | Next.js 前端实现、路由、组件边界、API client、SSE、状态管理和测试策略 |
 | `13-devops-and-demo-spec.md` | v0.1 | Docker Compose、环境变量、演示数据、Smoke 脚本和答辩演示流程 |
+| `14-tdd-task-breakdown.md` | v0.1 | P0 工程实现的 TDD 任务拆解、测试先行要求、执行顺序和完成标准 |
 
 0. `00-project-dashboard.md`
    - 用图、表、路线图和任务拆分说明 KnowWeave 的整体定位。
@@ -79,16 +80,21 @@
     - 定义 Docker Compose、PostgreSQL + pgvector 初始化、环境变量、演示数据、Smoke 脚本和答辩演示流程。
     - 回答“前后端工程如何稳定启动、演示和进入 P0 验收”。
 
+14. `14-tdd-task-breakdown.md`
+    - 定义 P0 工程实现的任务拆分、TDD 执行规则、每个任务的测试要求和完成标准。
+    - 回答“工程开发应该按什么顺序做，每个 task 如何用测试证明完成”。
+
 ## 文档边界
 
 - 产品规格文档保持高层、稳定，不展开过多技术实现细节。
 - 生命周期规格文档负责描述业务过程、用户操作和扩展方向，但不直接定义数据库表结构或 API 字段细节。
-- 本阶段文档可以包含必要的 API 草案和验收场景；已完成搜索与问答 API 初稿、前端交互规格、验收测试规格、评测闭环规格、后端实现规格、前端实现规格和 DevOps / Demo 规格。
+- 本阶段文档可以包含必要的 API 草案和验收场景；已完成搜索与问答 API 初稿、前端交互规格、验收测试规格、评测闭环规格、后端实现规格、前端实现规格、DevOps / Demo 规格和 TDD 任务拆解。
 
 ## 后续计划
 
 建议后续进入工程骨架实现：
 
-1. 创建 `backend/` FastAPI 脚手架。
-2. 创建 `frontend/` Next.js 脚手架。
-3. 创建 `docker-compose.yml`、`.env.example`、`docker/postgres/init.sql` 和 P0 smoke 脚本。
+1. 按 `14-tdd-task-breakdown.md` 先执行 T001，建立后端测试框架。
+2. 执行 T002，建立 Docker Compose、Postgres 和最小 smoke 基线。
+3. 执行 T003 / T004，建立数据库 migration 基线和前端测试框架。
+4. 之后按任务顺序进入文件上传、解析、chunk、search、chat、wiki、feedback 和 evaluation candidate 主链路。

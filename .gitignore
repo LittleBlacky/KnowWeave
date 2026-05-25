@@ -16,6 +16,7 @@ venv/
 .next/
 dist/
 build/
+.tmp/
 
 .agents/
 .specify/

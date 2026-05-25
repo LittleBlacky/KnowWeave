@@ -1,0 +1,105 @@
+{
+  "folder": {
+    "title": "KnowWeave",
+    "token": "Cv78f7FEslKKoldDxUNcrR3onaf",
+    "url": "https://my.feishu.cn/drive/folder/Cv78f7FEslKKoldDxUNcrR3onaf"
+  },
+  "documents": [
+    {
+      "file": "00-project-dashboard.md",
+      "title": "00 KnowWeave 项目可视化驾驶舱",
+      "token": "UPgrdeRzmoDbW9xLEy5ceoREnxg",
+      "url": "https://my.feishu.cn/docx/UPgrdeRzmoDbW9xLEy5ceoREnxg"
+    },
+    {
+      "file": "README.md",
+      "title": "README KnowWeave 文档索引",
+      "token": "S38ud9nWaoARSdxUgqVc4CnInOc",
+      "url": "https://my.feishu.cn/docx/S38ud9nWaoARSdxUgqVc4CnInOc"
+    },
+    {
+      "file": "01-product-spec.md",
+      "title": "01 KnowWeave 产品需求规格说明书",
+      "token": "PBGhdgdMsobarCxqC0DcYOxwnff",
+      "url": "https://my.feishu.cn/docx/PBGhdgdMsobarCxqC0DcYOxwnff"
+    },
+    {
+      "file": "02-knowledge-lifecycle-spec.md",
+      "title": "02 KnowWeave 知识生命周期细粒度管理规格说明书",
+      "token": "VTz2d59wnoKC2BxSQQAccNclnHb",
+      "url": "https://my.feishu.cn/docx/VTz2d59wnoKC2BxSQQAccNclnHb"
+    },
+    {
+      "file": "03-system-architecture-spec.md",
+      "title": "03 KnowWeave 系统架构规格说明书",
+      "token": "NIiudpd3kogQRjxX017cI9BLnAc",
+      "url": "https://my.feishu.cn/docx/NIiudpd3kogQRjxX017cI9BLnAc"
+    },
+    {
+      "file": "04-data-model-spec.md",
+      "title": "04 KnowWeave 数据模型规格说明书",
+      "token": "AZ1AdcNAFogRy2xPYapcIuRGngb",
+      "url": "https://my.feishu.cn/docx/AZ1AdcNAFogRy2xPYapcIuRGngb"
+    },
+    {
+      "file": "05-ingestion-spec.md",
+      "title": "05 KnowWeave Ingestion 规格说明书",
+      "token": "H5Jed6J7FoPp3CxjtXfccL4Sn0f",
+      "url": "https://my.feishu.cn/docx/H5Jed6J7FoPp3CxjtXfccL4Sn0f"
+    },
+    {
+      "file": "06-llm-wiki-spec.md",
+      "title": "06 KnowWeave LLM Wiki 规格说明书",
+      "token": "Peq8dY8yFoFbhuxR6n6cMdE9nbc",
+      "url": "https://my.feishu.cn/docx/Peq8dY8yFoFbhuxR6n6cMdE9nbc"
+    },
+    {
+      "file": "07-search-and-chat-spec.md",
+      "title": "07 KnowWeave 搜索与问答规格说明书",
+      "token": "WlurdH1rqojtL5xfGpAcH4hSnsf",
+      "url": "https://my.feishu.cn/docx/WlurdH1rqojtL5xfGpAcH4hSnsf"
+    },
+    {
+      "file": "08-frontend-spec.md",
+      "title": "08 KnowWeave 前端交互规格说明书",
+      "token": "EJOvdwWTNotceGxHK8hcXfZunug",
+      "url": "https://my.feishu.cn/docx/EJOvdwWTNotceGxHK8hcXfZunug"
+    },
+    {
+      "file": "09-acceptance-test-spec.md",
+      "title": "09 KnowWeave 验收测试规格说明书",
+      "token": "D6Y3dUb1doiMCixLmA6cwGwgn5f",
+      "url": "https://my.feishu.cn/docx/D6Y3dUb1doiMCixLmA6cwGwgn5f"
+    },
+    {
+      "file": "10-evaluation-spec.md",
+      "title": "10 KnowWeave 评测与反馈闭环规格说明书",
+      "token": "MCyMdRcTOo0pJUx7lAUcPmkln4g",
+      "url": "https://my.feishu.cn/docx/MCyMdRcTOo0pJUx7lAUcPmkln4g"
+    },
+    {
+      "file": "11-backend-implementation-spec.md",
+      "title": "11 KnowWeave 后端实现规格说明书",
+      "token": "Y8v2d9YfVozlWQxJDHZcXf9tnPe",
+      "url": "https://my.feishu.cn/docx/Y8v2d9YfVozlWQxJDHZcXf9tnPe"
+    },
+    {
+      "file": "12-frontend-implementation-spec.md",
+      "title": "12 KnowWeave 前端实现规格说明书",
+      "token": "IJaQdYCZyozksAxfx7Rc8NZXnNc",
+      "url": "https://my.feishu.cn/docx/IJaQdYCZyozksAxfx7Rc8NZXnNc"
+    },
+    {
+      "file": "13-devops-and-demo-spec.md",
+      "title": "13 KnowWeave DevOps 与 Demo 规格说明书",
+      "token": "N2PkdaBx3ob2IlxbS7WcTMN2nze",
+      "url": "https://my.feishu.cn/docx/N2PkdaBx3ob2IlxbS7WcTMN2nze"
+    },
+    {
+      "file": "14-tdd-task-breakdown.md",
+      "title": "14 KnowWeave TDD 任务拆解说明书",
+      "token": "TpVVdcbv7orBV8xmW4ec15fznEG",
+      "url": "https://my.feishu.cn/docx/TpVVdcbv7orBV8xmW4ec15fznEG"
+    }
+  ]
+}
