@@ -1,7 +1,7 @@
 # KnowWeave 搜索与问答规格说明书
 
 版本：v0.4
-更新时间：2026-05-24
+更新时间：2026-05-25
 关联文档：
 
 - `docs/01-product-spec.md`
@@ -826,7 +826,6 @@ P1 可计算：
 ```text
 POST /api/v1/search
 GET  /api/v1/search/runs/{retrieval_run_id}
-POST /api/v1/search/feedback
 ```
 
 请求：
@@ -874,7 +873,6 @@ GET  /api/v1/chat/sessions
 GET  /api/v1/chat/sessions/{session_id}
 POST /api/v1/chat/sessions/{session_id}/messages
 GET  /api/v1/chat/messages/{message_id}/citations
-POST /api/v1/chat/messages/{message_id}/feedback
 POST /api/v1/chat/messages/{message_id}/to-evaluation-sample
 ```
 
@@ -921,6 +919,8 @@ POST /api/v1/chat/messages/{message_id}/to-evaluation-sample
 POST /api/v1/feedback
 GET  /api/v1/feedback?target_type=&target_id=
 ```
+
+Search、Chat、Citation、Chunk 和 Wiki 的反馈统一写入 `POST /api/v1/feedback`，不在 Search 或 Chat 下保留单独 feedback endpoint。调用方通过 `target_type`、`target_id` 和 `metadata.message_id` / `metadata.retrieval_run_id` 建立关联。
 
 请求：
 
