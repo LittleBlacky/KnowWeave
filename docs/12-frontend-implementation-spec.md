@@ -20,7 +20,7 @@
 
 - 页面信息架构和详细交互规则，见 `docs/08-frontend-spec.md`。
 - 后端 API、Service 和数据库实现，见 `docs/11-backend-implementation-spec.md`。
-- Docker Compose、部署脚本和演示数据，见后续 `13-devops-and-demo-spec.md`。
+- Docker Compose、部署脚本和演示数据，见 `13-devops-and-demo-spec.md`。
 - 完整设计系统、权限系统、多租户和复杂协作编辑；这些属于 P1/P2。
 
 ## 1. 实现目标
@@ -230,7 +230,8 @@ flowchart TB
 
 `apiClient` 规则：
 
-- 自动拼接 `/api/v1`。
+- `NEXT_PUBLIC_API_BASE_URL` 默认包含 `/api/v1`，业务方法只拼接资源路径，例如 `/files`、`/search`。
+- 初始化时去除末尾 `/`，避免生成重复斜杠。
 - 自动解析 `{ data, error, request_id }` 响应包装。
 - 后端返回 `error` 时抛出 `ApiError`。
 - 支持 `AbortSignal`。
@@ -719,7 +720,7 @@ P0 Playwright 冒烟：
 
 ## 19. 后续文档
 
-第 12 篇完成后，DevOps 和 Demo 规格由以下文档承接：
+第 12 篇完成后，DevOps 和 Demo 规格已由以下文档承接：
 
 1. `13-devops-and-demo-spec.md`
    - 定义 Docker Compose、PostgreSQL + pgvector 初始化、环境变量、前后端启动、演示数据和答辩流程。

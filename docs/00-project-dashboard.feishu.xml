@@ -2,7 +2,7 @@
 
 <img src="QLgub2RcbokMrNxBCTqcNleGnih" width="1280" height="853" name="image.png"/>
 
-<p>版本：v0.7 更新时间：2026-05-25 项目阶段：Spec Coding / P0 方案冻结前</p>
+<p>版本：v0.7 更新时间：2026-05-25 项目阶段：Spec Coding / 工程骨架实现前</p>
 
 <callout emoji="📌" background-color="light-blue" border-color="blue" text-color="blue">
   <p><b>一句话定位：</b>KnowWeave 是面向企业知识文件的 LLM Wiki 知识库管理平台。它把上传、解析、分块、检索、问答、反馈和人工治理连接成闭环，让组织知识沉淀为可追溯、可编辑、可评估、可演化的 Wiki。</p>
@@ -417,5 +417,5 @@ flowchart TD
 </table>
 
 <callout emoji="🏁" background-color="light-yellow" border-color="yellow">
-  <p><b>下一步：</b>进入工程骨架实现，优先创建 backend、frontend、docker-compose 和 P0 smoke；飞书多维表格继续作为 P0/P1/P2 任务、风险和验收状态的动态管理入口。</p>
+  <p><b>下一步：</b>进入工程骨架实现，优先创建 backend、frontend、docker-compose.yml、.env.example 和 P0 smoke；飞书多维表格继续作为 P0/P1/P2 任务、风险和验收状态的动态管理入口。</p>
 </callout>

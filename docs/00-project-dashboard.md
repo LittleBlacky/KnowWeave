@@ -2,7 +2,7 @@
 
 版本：v0.7
 更新时间：2026-05-25
-项目阶段：Spec Coding / P0 方案冻结前
+项目阶段：Spec Coding / 工程骨架实现前
 
 ## 1. 一句话定位
 
@@ -293,7 +293,7 @@ flowchart TD
 
 ## 17. 下一步
 
-1. 将本驾驶舱同步到飞书 `KnowWeave` 文件夹，作为协作入口。
-2. 在飞书中为核心流程创建可视化画板。
-3. 创建或维护任务/迭代多维表格，按 P0/P1/P2 管理开发状态。
-4. 进入工程骨架实现，优先创建 backend、frontend、docker-compose 和 P0 smoke。
+1. 持续维护飞书 `KnowWeave` 文件夹中的驾驶舱、索引和关键规格文档。
+2. 按需补充核心流程可视化画板，但不阻塞 P0 工程实现。
+3. 维护任务/迭代多维表格，按 P0/P1/P2 管理开发状态。
+4. 进入工程骨架实现，优先创建 `backend/`、`frontend/`、`docker-compose.yml`、`.env.example` 和 P0 smoke。

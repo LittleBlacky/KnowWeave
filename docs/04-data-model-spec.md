@@ -1164,9 +1164,10 @@ MVP 可预留但不必完整实现：
 6. `docs/10-evaluation-spec.md`
    - 定义 evaluation datasets、evaluation_runs、evaluation_results、指标计算和回归评估。
 
-下一步进入工程实现 Spec 拆分：
-
-1. 后端实现 Spec
+7. `docs/11-backend-implementation-spec.md`
    - 将本文模型落到 PostgreSQL、SQLAlchemy models、Alembic 迁移和索引策略。
-2. DevOps 与演示 Spec
+
+8. `docs/13-devops-and-demo-spec.md`
    - 定义 pgvector 扩展初始化、种子数据和本地演示数据库脚本。
+
+下一步进入工程骨架实现，优先创建数据库迁移基线、pgvector 初始化脚本和 P0 smoke 数据。

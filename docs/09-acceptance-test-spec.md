@@ -2,7 +2,7 @@
 
 版本：v0.2
 更新时间：2026-05-24
-状态：Draft
+状态：草案
 关联文档：
 
 - `docs/01-product-spec.md`
@@ -311,7 +311,7 @@ P0 验收时至少应能看到以下对象：
 | chunk -> file | 每个 chunk 能回到 source file |
 | chunk -> source span | P0 chunk 不应缺 source span |
 | citation -> source | citation 至少有 chunk、KU、Wiki 或人工来源之一 |
-| retrieved_contexts -> retrieval_run | retrieved_contexts 必须有 retrieval_run_id |
+| retrieved_contexts -> retrieval_run_id | retrieved_contexts 必须有 retrieval_run_id；P0 不要求单独 `retrieval_runs` 表 |
 | feedback -> target | feedback target_type 和 target_id 可解析 |
 | soft delete | 文件软删除后新问答默认不召回其 chunk |
 
@@ -470,9 +470,13 @@ API 验收关注：
    - 定义 evaluation datasets、evaluation_runs、指标计算、失败样本分析和回归评估。
    - 将本文中的 evaluation sample candidate 验收进一步细化为可运行的评测体系。
 
-下一步进入工程实现 Spec 拆分：
+工程实现规格已完成：
 
-1. 后端实现 Spec
+1. `11-backend-implementation-spec.md`
    - 将本文验收项落到 API、数据库、服务层和自动化测试。
-2. 前端实现 Spec
+2. `12-frontend-implementation-spec.md`
    - 将本文验收场景落到页面、组件、交互状态和端到端测试。
+3. `13-devops-and-demo-spec.md`
+   - 将本文演示剧本落到本地启动、演示数据和 smoke 脚本。
+
+下一步进入工程骨架实现，并把本文检查清单转换为 P0 smoke 和演示前检查脚本。

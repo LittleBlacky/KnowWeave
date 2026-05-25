@@ -2,6 +2,7 @@
 
 版本：v0.4
 更新时间：2026-05-25
+状态：草案
 关联文档：
 
 - `docs/01-product-spec.md`
@@ -1071,7 +1072,13 @@ MVP 不做：
 1. `10-evaluation-spec.md`
    - 定义 evaluation_runs、指标计算、评测集管理和回归评估。
 
-下一步进入工程实现 Spec 拆分：
+工程实现规格也已拆分完成：
 
-1. 后端实现 Spec
+1. `11-backend-implementation-spec.md`
    - 定义 Search、Chat、Feedback、Evaluation API 的 Service 层实现、Provider 抽象和测试策略。
+2. `12-frontend-implementation-spec.md`
+   - 定义 Search UI、Chat SSE、Citation、Feedback 和 Evaluation Candidate 的前端落地方式。
+3. `13-devops-and-demo-spec.md`
+   - 定义本地启动、演示数据、Smoke 脚本和答辩流程。
+
+下一步进入工程骨架实现，优先跑通 Search -> Chat -> Citation -> Feedback -> Evaluation Candidate 的 P0 smoke。

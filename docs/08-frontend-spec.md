@@ -2,7 +2,7 @@
 
 版本：v0.3
 更新时间：2026-05-24
-状态：Draft
+状态：草案
 关联文档：
 
 - `docs/01-product-spec.md`
@@ -1112,7 +1112,11 @@ And citation 面板仍能查看来源，source_available = false 的来源要明
    - 定义 Evaluation 页面背后的数据集、运行、指标和回归评估。
    - 细化准确率、召回率、引用命中率和知识健康指标。
 
-下一步进入工程实现 Spec：
+工程实现规格已完成：
 
-1. 前端实现 Spec
+1. `12-frontend-implementation-spec.md`
    - 定义前端目录结构、组件命名、API client、状态管理和测试策略。
+2. `13-devops-and-demo-spec.md`
+   - 定义前端启动、环境变量、演示数据和 P0 E2E smoke。
+
+下一步进入 `frontend/` 工程骨架实现，并以本文交互规格作为 UI 验收来源。

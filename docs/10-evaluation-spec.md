@@ -22,7 +22,7 @@
 - 文件上传、解析、分块和 source span 生成，见 `05-ingestion-spec.md`。
 - Search、Chat、SSE 和 citation 保存细节，见 `07-search-and-chat-spec.md`。
 - 页面布局、组件交互和 Markdown 渲染细节，见 `08-frontend-spec.md`。
-- 工程代码目录、测试框架和 CI 实现，后续放入工程实现 Spec。
+- 工程代码目录、测试框架和 CI 实现，见 `11-backend-implementation-spec.md`、`12-frontend-implementation-spec.md` 和 `13-devops-and-demo-spec.md`。
 
 ## 1. 文档目标
 
@@ -1039,9 +1039,9 @@ MVP 不做：
 
 ## 22. 后续文档
 
-第 10 篇完成后，KnowWeave 的产品与规格主链路已经闭合。
+第 10 篇完成后，KnowWeave 的产品、验收和评测主链路已经闭合。
 
-后续建议进入工程实现拆分：
+工程实现规格已完成：
 
 1. `11-backend-implementation-spec.md`
    - 定义 FastAPI 目录结构、SQLAlchemy models、迁移、Service 层、Provider 抽象和测试策略。
@@ -1049,3 +1049,5 @@ MVP 不做：
    - 定义 Next.js 页面路由、组件结构、API client、状态管理和前端测试策略。
 3. `13-devops-and-demo-spec.md`
    - 定义 Docker Compose、PostgreSQL + pgvector 初始化、环境变量、演示数据和启动脚本。
+
+下一步进入工程骨架实现，优先确保 feedback 和 evaluation sample candidate 能在 P0 smoke 中形成可追溯闭环。

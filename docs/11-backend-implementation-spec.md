@@ -1031,7 +1031,7 @@ P0 使用 fake provider：
 
 ## 20. 本地启动
 
-后续 DevOps 文档会定义完整 Docker Compose。P0 后端文档先约定最小命令：
+完整 Docker Compose、环境变量和演示启动编排见 `docs/13-devops-and-demo-spec.md`。P0 后端文档先约定最小命令：
 
 ```bash
 cd backend
@@ -1113,3 +1113,5 @@ GET http://localhost:8000/api/v1/health
    - 定义 Next.js 页面路由、组件拆分、API client、SSE 消费、状态管理和前端测试。
 2. `13-devops-and-demo-spec.md`
    - 定义 Docker Compose、PostgreSQL + pgvector 初始化、环境变量、演示数据、启动脚本和答辩演示流程。
+
+下一步进入 `backend/` 工程骨架实现，并优先跑通 health、migration、upload、search、chat、feedback 和 P0 smoke。
