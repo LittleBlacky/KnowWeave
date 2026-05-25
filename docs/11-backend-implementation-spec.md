@@ -1107,7 +1107,7 @@ GET http://localhost:8000/api/v1/health
 
 ## 24. 后续文档
 
-第 11 篇完成后，后续建议继续：
+第 11 篇完成后，后续工程实现规格已经由以下文档承接：
 
 1. `12-frontend-implementation-spec.md`
    - 定义 Next.js 页面路由、组件拆分、API client、SSE 消费、状态管理和前端测试。

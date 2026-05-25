@@ -1,6 +1,6 @@
 # KnowWeave 项目可视化驾驶舱
 
-版本：v0.6
+版本：v0.7
 更新时间：2026-05-25
 项目阶段：Spec Coding / P0 方案冻结前
 
@@ -270,6 +270,9 @@ flowchart TD
   D11 --> D12
   D7 --> D12
   D10 --> D12
+  D9 --> D13["13 DevOps / Demo 规格"]
+  D11 --> D13
+  D12 --> D13
 ```
 
 | 想了解什么 | 先读哪份 |
@@ -286,10 +289,11 @@ flowchart TD
 | 评测集、评测运行、指标计算、失败样本分析和回归评估 | `10-evaluation-spec.md` |
 | 后端工程落地、Service、迁移、Provider、SSE 和测试策略 | `11-backend-implementation-spec.md` |
 | 前端工程落地、Next.js、API client、SSE、Source Viewer 和测试策略 | `12-frontend-implementation-spec.md` |
+| 启动编排、环境变量、演示数据、Smoke 脚本和答辩流程 | `13-devops-and-demo-spec.md` |
 
 ## 17. 下一步
 
 1. 将本驾驶舱同步到飞书 `KnowWeave` 文件夹，作为协作入口。
 2. 在飞书中为核心流程创建可视化画板。
 3. 创建或维护任务/迭代多维表格，按 P0/P1/P2 管理开发状态。
-4. 继续工程实现 Spec 拆分，下一步补充 DevOps/演示启动方案。
+4. 进入工程骨架实现，优先创建 backend、frontend、docker-compose 和 P0 smoke。

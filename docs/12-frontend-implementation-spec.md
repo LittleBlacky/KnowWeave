@@ -719,7 +719,7 @@ P0 Playwright 冒烟：
 
 ## 19. 后续文档
 
-第 12 篇完成后，后续建议继续：
+第 12 篇完成后，DevOps 和 Demo 规格由以下文档承接：
 
 1. `13-devops-and-demo-spec.md`
    - 定义 Docker Compose、PostgreSQL + pgvector 初始化、环境变量、前后端启动、演示数据和答辩流程。

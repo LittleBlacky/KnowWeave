@@ -21,6 +21,7 @@
 | `10-evaluation-spec.md` | v0.2 | 评测样本、评测集、评测运行、指标计算、失败分析和回归评估 |
 | `11-backend-implementation-spec.md` | v0.1 | FastAPI 后端实现、Service 边界、Provider 抽象、迁移、SSE 和测试策略 |
 | `12-frontend-implementation-spec.md` | v0.1 | Next.js 前端实现、路由、组件边界、API client、SSE、状态管理和测试策略 |
+| `13-devops-and-demo-spec.md` | v0.1 | Docker Compose、环境变量、演示数据、Smoke 脚本和答辩演示流程 |
 
 0. `00-project-dashboard.md`
    - 用图、表、路线图和任务拆分说明 KnowWeave 的整体定位。
@@ -74,14 +75,20 @@
     - 定义 Next.js App Router、页面路由、组件结构、API client、SSE Chat、Source Viewer、Feedback 和前端测试策略。
     - 回答“前端交互规格和后端 API 如何落到可开发、可测试、可演示的前端代码”。
 
+13. `13-devops-and-demo-spec.md`
+    - 定义 Docker Compose、PostgreSQL + pgvector 初始化、环境变量、演示数据、Smoke 脚本和答辩演示流程。
+    - 回答“前后端工程如何稳定启动、演示和进入 P0 验收”。
+
 ## 文档边界
 
 - 产品规格文档保持高层、稳定，不展开过多技术实现细节。
 - 生命周期规格文档负责描述业务过程、用户操作和扩展方向，但不直接定义数据库表结构或 API 字段细节。
-- 本阶段文档可以包含必要的 API 草案和验收场景；已完成搜索与问答 API 初稿、前端交互规格、验收测试规格、评测闭环规格、后端实现规格和前端实现规格。
+- 本阶段文档可以包含必要的 API 草案和验收场景；已完成搜索与问答 API 初稿、前端交互规格、验收测试规格、评测闭环规格、后端实现规格、前端实现规格和 DevOps / Demo 规格。
 
 ## 后续计划
 
-建议后续进入工程实现拆分：
+建议后续进入工程骨架实现：
 
-1. `13-devops-and-demo-spec.md`：Docker Compose、环境变量、演示数据和启动脚本。
+1. 创建 `backend/` FastAPI 脚手架。
+2. 创建 `frontend/` Next.js 脚手架。
+3. 创建 `docker-compose.yml`、`.env.example`、`docker/postgres/init.sql` 和 P0 smoke 脚本。
