@@ -8,6 +8,7 @@ from app.core.errors import AppError
 from app.models.chat import ChatMessage, Citation, RetrievedContext
 from app.models.feedback import Feedback
 from app.models.files import Chunk
+from app.models.knowledge import KnowledgeUnit
 from app.models.wiki import WikiPage
 
 SUPPORTED_TARGETS = {
@@ -15,6 +16,7 @@ SUPPORTED_TARGETS = {
     "retrieved_context": RetrievedContext,
     "citation": Citation,
     "chunk": Chunk,
+    "knowledge_unit": KnowledgeUnit,
     "wiki_page": WikiPage,
 }
 
@@ -87,6 +89,15 @@ class FeedbackService:
         self.session.commit()
         self.session.refresh(feedback)
         return feedback
+
+    def list_feedback(self, *, target_type: str | None = None) -> list[Feedback]:
+        from sqlalchemy import select
+
+        statement = select(Feedback)
+        if target_type is not None:
+            statement = statement.where(Feedback.target_type == target_type)
+        statement = statement.order_by(Feedback.created_at.desc())
+        return list(self.session.scalars(statement).all())
 
     def _validate_target(self, target_type: str, target_id: UUID) -> None:
         model = SUPPORTED_TARGETS.get(target_type)

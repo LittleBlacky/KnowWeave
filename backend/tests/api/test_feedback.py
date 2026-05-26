@@ -80,6 +80,34 @@ def test_feedback_api_saves_unified_feedback_payload(client: TestClient) -> None
     assert payload["data"]["metadata_"]["source"] == "component-test"
 
 
+def test_feedback_api_lists_feedback_and_accepts_knowledge_unit_target(client: TestClient) -> None:
+    chunk_id = _seed_chunk(client)
+    unit_response = client.post(
+        "/api/v1/knowledge-units",
+        json={
+            "title": "Leave approval rule",
+            "content": "Leave requests require manager approval.",
+            "status": "pending_review",
+            "source_chunk_ids": [chunk_id],
+        },
+    )
+    unit_id = unit_response.json()["data"]["id"]
+
+    create_response = client.post(
+        "/api/v1/feedback",
+        json={
+            "target_type": "knowledge_unit",
+            "target_id": unit_id,
+            "feedback_type": "retrieval_helpful",
+        },
+    )
+    list_response = client.get("/api/v1/feedback", params={"target_type": "knowledge_unit"})
+
+    assert create_response.status_code == 201
+    assert list_response.status_code == 200
+    assert list_response.json()["data"]["items"][0]["target_id"] == unit_id
+
+
 def test_feedback_api_returns_clear_error_for_missing_target(client: TestClient) -> None:
     response = client.post(
         "/api/v1/feedback",

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.schemas.common import ApiResponse
 from app.schemas.evaluation import EvaluationSampleRead
-from app.schemas.feedback import FeedbackCreate, FeedbackRead
+from app.schemas.feedback import FeedbackCreate, FeedbackList, FeedbackRead
 from app.services.evaluation_service import EvaluationService
 from app.services.feedback_service import FeedbackService
 
@@ -39,6 +39,19 @@ def create_feedback(
         data=FeedbackRead.model_validate(feedback),
         error=None,
         request_id="req_feedback_create",
+    )
+
+
+@router.get("")
+def list_feedback(
+    target_type: str | None = None,
+    service: FeedbackService = Depends(get_feedback_service),
+) -> ApiResponse[FeedbackList]:
+    records = service.list_feedback(target_type=target_type)
+    return ApiResponse(
+        data=FeedbackList(items=[FeedbackRead.model_validate(record) for record in records], total=len(records)),
+        error=None,
+        request_id="req_feedback_list",
     )
 
 

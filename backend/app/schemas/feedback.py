@@ -26,3 +26,8 @@ class FeedbackRead(BaseModel):
     metadata_: dict[str, object]
     created_at: datetime
     updated_at: datetime
+
+
+class FeedbackList(BaseModel):
+    items: list[FeedbackRead]
+    total: int

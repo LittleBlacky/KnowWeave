@@ -8,6 +8,7 @@ import { searchKnowledge, type SearchResponse, type SearchResult } from "@/share
 
 export function SearchPage() {
   const [query, setQuery] = useState("approval");
+  const [targetTypes, setTargetTypes] = useState(["file", "chunk", "knowledge_unit", "wiki_page"]);
   const [result, setResult] = useState<SearchResponse | null>(null);
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null);
   const [busy, setBusy] = useState(false);
@@ -15,7 +16,7 @@ export function SearchPage() {
   async function handleSearch() {
     setBusy(true);
     try {
-      const response = await searchKnowledge(query, 10);
+      const response = await searchKnowledge(query, 10, targetTypes);
       setResult(response);
       setSelectedResult(null);
     } finally {
@@ -47,6 +48,29 @@ export function SearchPage() {
           >
             Run search
           </button>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-3">
+          {[
+            ["file", "Files"],
+            ["chunk", "Chunks"],
+            ["knowledge_unit", "Knowledge Units"],
+            ["wiki_page", "Wiki Pages"],
+          ].map(([value, label]) => (
+            <label className="inline-flex items-center gap-2 text-sm" key={value}>
+              <input
+                checked={targetTypes.includes(value)}
+                onChange={(event) => {
+                  setTargetTypes((current) =>
+                    event.target.checked
+                      ? [...current, value]
+                      : current.filter((targetType) => targetType !== value),
+                  );
+                }}
+                type="checkbox"
+              />
+              {label}
+            </label>
+          ))}
         </div>
       </section>
 
@@ -119,6 +143,7 @@ function SearchResultCard({
 function sourceFromSearchResult(item: SearchResult) {
   return {
     id: item.source.source_span_id ?? item.result_id,
+    file_id: item.source.file_id,
     document_block_id: null,
     page_number: item.source.page_number,
     char_start: null,

@@ -18,6 +18,27 @@ class ChatSessionRead(BaseModel):
     updated_at: datetime
 
 
+class ChatSessionList(BaseModel):
+    items: list[ChatSessionRead]
+    total: int
+
+
+class ChatMessageRead(BaseModel):
+    id: UUID
+    session_id: UUID
+    role: str
+    content_markdown: str
+    status: str
+    model_provider: str | None = None
+    model_name: str | None = None
+    prompt_version: str | None = None
+    created_at: datetime
+
+
+class ChatSessionDetail(ChatSessionRead):
+    messages: list[ChatMessageRead]
+
+
 class ChatMessageRequest(BaseModel):
     question: str
     top_k: int = Field(default=5, ge=1, le=20)

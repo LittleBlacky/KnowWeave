@@ -13,6 +13,7 @@ export type ChatSession = {
 export type ChatCitation = {
   key: string;
   label: string | null;
+  file_id: string | null;
   chunk_id: string | null;
   source_span_id: string | null;
   preview_text: string;

@@ -250,8 +250,16 @@ export function verifyChunk(chunkId: string) {
   return apiClient.post<Chunk>(`/chunks/${chunkId}/verify`);
 }
 
-export function searchKnowledge(query: string, topK = 10) {
-  return apiClient.post<SearchResponse>("/search", { query, top_k: topK });
+export function searchKnowledge(
+  query: string,
+  topK = 10,
+  targetTypes: string[] = ["chunk"],
+) {
+  return apiClient.post<SearchResponse>("/search", {
+    query,
+    target_types: targetTypes,
+    top_k: topK,
+  });
 }
 
 export function listTags() {

@@ -1,6 +1,8 @@
 import type { SourceSpan } from "@/shared/api/knowweave";
+import Link from "next/link";
 
 export type SourceLocator = SourceSpan & {
+  file_id?: string | null;
   source_available?: boolean;
   source_label?: string | null;
   source_type?: string | null;
@@ -26,15 +28,45 @@ export function SourceLocatorPanel({ source }: SourceLocatorPanelProps) {
       </div>
       <div>{formatLocator(source, sourceAvailable)}</div>
       <p className="mt-2 text-[#5d645d]">{source?.preview_text ?? "Source preview unavailable."}</p>
-      <button
-        className="mt-3 rounded-md bg-[#123d37] px-3 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:bg-[#c9cdc7] disabled:text-[#5d645d]"
-        disabled={!sourceAvailable}
-        type="button"
-      >
-        Open source
-      </button>
+      {sourceAvailable ? (
+        <Link
+          className="mt-3 inline-block rounded-md bg-[#123d37] px-3 py-2 text-xs font-semibold text-white"
+          href={sourceHref(source)}
+        >
+          Open source
+        </Link>
+      ) : (
+        <button
+          className="mt-3 rounded-md bg-[#c9cdc7] px-3 py-2 text-xs font-semibold text-[#5d645d]"
+          disabled
+          type="button"
+        >
+          Open source
+        </button>
+      )}
     </div>
   );
+}
+
+function sourceHref(source: SourceLocator | undefined) {
+  const params = new URLSearchParams();
+  if (source?.file_id) {
+    params.set("file_id", source.file_id);
+  }
+  if (source?.id) {
+    params.set("source_span_id", source.id);
+  }
+  if (source?.page_number) {
+    params.set("page", String(source.page_number));
+  }
+  if (source?.line_start) {
+    params.set("line_start", String(source.line_start));
+  }
+  if (source?.line_end) {
+    params.set("line_end", String(source.line_end));
+  }
+  const query = params.toString();
+  return query ? `/files?${query}` : "/files";
 }
 
 function formatLocator(source: SourceLocator | undefined, sourceAvailable: boolean) {

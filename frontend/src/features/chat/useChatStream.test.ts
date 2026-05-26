@@ -42,6 +42,7 @@ describe("parseSseEvent", () => {
       citations: [
         {
           chunk_id: "chunk_policy",
+          file_id: "file_policy",
           key: "S1",
           label: "S1",
           preview_text: "Leave requests need approval.",

@@ -66,6 +66,23 @@ def test_parse_markdown_file_and_list_document_blocks(client: TestClient) -> Non
     assert blocks_payload["data"]["items"][1]["raw_content"] == "Paragraph body"
 
 
+def test_docs_aliases_return_document_blocks_and_rechunk(client: TestClient) -> None:
+    upload_response = client.post(
+        "/api/v1/files/upload",
+        files={"file": ("policy.md", b"# Policy\n\nParagraph body", "text/markdown")},
+    )
+    file_id = upload_response.json()["data"]["id"]
+    client.post(f"/api/v1/files/{file_id}/parse")
+
+    blocks_response = client.get(f"/api/v1/files/{file_id}/document-blocks")
+    rechunk_response = client.post(f"/api/v1/files/{file_id}/rechunk")
+
+    assert blocks_response.status_code == 200
+    assert blocks_response.json()["data"]["total"] == 2
+    assert rechunk_response.status_code == 200
+    assert rechunk_response.json()["data"]["total"] > 0
+
+
 def test_parse_missing_file_returns_standard_error(client: TestClient) -> None:
     response = client.post("/api/v1/files/00000000-0000-0000-0000-000000000000/parse")
 

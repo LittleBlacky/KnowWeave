@@ -132,6 +132,7 @@ export function KnowledgeUnitPage() {
                   <SourceLocatorPanel
                     source={{
                       id: source.source_span_id ?? source.id,
+                      file_id: source.file_id,
                       document_block_id: null,
                       page_number: null,
                       char_start: null,

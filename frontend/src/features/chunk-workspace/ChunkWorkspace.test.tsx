@@ -11,6 +11,10 @@ describe("ChunkWorkspace", () => {
 
     expect(await screen.findAllByText("Leave requests need approval.")).not.toHaveLength(0);
     expect(screen.getByText("Lines 1-3")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Open source" })).toHaveAttribute(
+      "href",
+      "/files?file_id=file_policy&source_span_id=span_policy&line_start=1&line_end=3",
+    );
 
     await user.clear(screen.getByLabelText("Edited chunk content"));
     await user.type(screen.getByLabelText("Edited chunk content"), "Leave requests require manager approval.");

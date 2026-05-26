@@ -44,11 +44,24 @@ class ChatService:
         self.session.refresh(chat_session)
         return chat_session
 
+    def list_sessions(self) -> list[ChatSession]:
+        statement = select(ChatSession).order_by(ChatSession.updated_at.desc())
+        return list(self.session.scalars(statement).all())
+
     def get_session(self, session_id: UUID) -> ChatSession:
         chat_session = self.session.get(ChatSession, session_id)
         if chat_session is None:
             raise ChatSessionNotFoundError()
         return chat_session
+
+    def list_session_messages(self, session_id: UUID) -> list[ChatMessage]:
+        self.get_session(session_id)
+        statement = (
+            select(ChatMessage)
+            .where(ChatMessage.session_id == session_id)
+            .order_by(ChatMessage.created_at.asc())
+        )
+        return list(self.session.scalars(statement).all())
 
     def list_citations(self, message_id: UUID) -> list[Citation]:
         message = self.session.get(ChatMessage, message_id)
@@ -203,6 +216,7 @@ def _citation_payload(citation: Citation, *, index: int) -> dict[str, object]:
     return {
         "key": citation.label or f"S{index + 1}",
         "label": citation.label,
+        "file_id": str(citation.file_id) if citation.file_id else None,
         "chunk_id": str(citation.chunk_id) if citation.chunk_id else None,
         "source_span_id": str(citation.source_span_id) if citation.source_span_id else None,
         "preview_text": citation.preview_text,

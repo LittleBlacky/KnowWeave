@@ -9,8 +9,10 @@ from app.models.chat import RetrievedContext
 from app.providers.storage import LocalStorageProvider
 from app.services.chunk_service import ChunkService
 from app.services.file_service import FileService
+from app.services.knowledge_unit_service import KnowledgeUnitService
 from app.services.parsing_service import ParsingService
 from app.services.search_service import SearchService
+from app.services.wiki_service import WikiService
 
 
 def _session_factory(tmp_path):
@@ -80,3 +82,38 @@ def test_search_service_can_inspect_retrieval_run(tmp_path) -> None:
         assert [item.result_id for item in inspected.results] == [
             item.result_id for item in result.results
         ]
+
+
+def test_search_service_searches_file_chunk_knowledge_unit_and_wiki(tmp_path) -> None:
+    SessionLocal = _session_factory(tmp_path)
+
+    with SessionLocal() as session:
+        chunk = _build_chunks(tmp_path, session)[0]
+        unit = KnowledgeUnitService(session=session).create_knowledge_unit(
+            title="Leave approval rule",
+            unit_type="rule",
+            content="Leave requests require manager approval.",
+            summary="Manager approval is required.",
+            status="pending_review",
+            source_chunk_ids=[chunk.id],
+        )
+        wiki = WikiService(session=session).generate_document_wiki(chunk.file_id)
+
+        result = SearchService(session=session).search(
+            query="approval",
+            target_types=["file", "chunk", "knowledge_unit", "wiki_page"],
+            top_k=10,
+        )
+
+        result_ids_by_type = {item.result_type: item.result_id for item in result.results}
+        assert result_ids_by_type["file"] == chunk.file_id
+        assert result_ids_by_type["chunk"] == chunk.id
+        assert result_ids_by_type["knowledge_unit"] == unit.id
+        assert result_ids_by_type["wiki_page"] == wiki.id
+        contexts = session.scalars(select(RetrievedContext)).all()
+        assert {context.result_type for context in contexts} == {
+            "file",
+            "chunk",
+            "knowledge_unit",
+            "wiki_page",
+        }

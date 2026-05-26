@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.db.base import Base
 from app.db.session import make_engine
-from app.models.chat import ChatMessage, Citation, RetrievedContext
+from app.models.chat import ChatMessage, Citation
 from app.providers.storage import LocalStorageProvider
 from app.services.chat_service import ChatService
 from app.services.chunk_service import ChunkService

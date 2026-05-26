@@ -22,7 +22,11 @@ def search(
     request: SearchRequest,
     service: SearchService = Depends(get_search_service),
 ) -> ApiResponse[SearchResponseRead]:
-    result = service.search(query=request.query, top_k=request.top_k)
+    result = service.search(
+        query=request.query,
+        top_k=request.top_k,
+        target_types=request.target_types,
+    )
     return ApiResponse(
         data=_search_response_read(result),
         error=None,

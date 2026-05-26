@@ -501,6 +501,7 @@ export const handlers = [
             {
               key: "S1",
               label: "S1",
+              file_id: "file_policy",
               chunk_id: "chunk_policy",
               source_span_id: "span_policy",
               preview_text: "Leave requests need approval.",

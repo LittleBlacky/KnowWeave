@@ -135,6 +135,7 @@ export function WikiPage() {
                   <SourceLocatorPanel
                     source={{
                       id: citation.source_span_id ?? citation.id,
+                      file_id: citation.file_id,
                       document_block_id: null,
                       page_number: null,
                       char_start: null,

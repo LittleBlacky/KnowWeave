@@ -136,6 +136,14 @@ def list_document_blocks(
     )
 
 
+@router.get("/{file_id}/document-blocks")
+def list_document_blocks_alias(
+    file_id: UUID,
+    service: ParsingService = Depends(get_parsing_service),
+) -> ApiResponse[DocumentBlockList]:
+    return list_document_blocks(file_id=file_id, service=service)
+
+
 @router.post("/{file_id}/chunks/build")
 def build_file_chunks(
     file_id: UUID,
@@ -148,6 +156,14 @@ def build_file_chunks(
         error=None,
         request_id="req_build_chunks",
     )
+
+
+@router.post("/{file_id}/rechunk")
+def rechunk_file(
+    file_id: UUID,
+    service: ChunkService = Depends(get_chunk_service),
+) -> ApiResponse[ChunkList]:
+    return build_file_chunks(file_id=file_id, service=service)
 
 
 @router.get("/{file_id}/chunks")

@@ -182,6 +182,7 @@ function CitationPanel({
 function sourceFromCitation(citation: ChatCitation) {
   return {
     id: citation.source_span_id ?? citation.key,
+    file_id: citation.file_id,
     document_block_id: null,
     page_number: null,
     char_start: null,

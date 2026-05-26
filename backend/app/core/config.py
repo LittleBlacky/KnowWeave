@@ -11,9 +11,9 @@ class Settings(BaseModel):
     service_name: str = "knowweave-backend"
     version: str = "0.1.0"
     environment: str = "development"
-    database_url: str = "sqlite:///./knowweave_dev.db"
+    database_url: str = "postgresql+psycopg://knowweave:knowweave@localhost:5432/knowweave"
     file_storage_root: str = "./data/files"
-    max_upload_mb: int = 20
+    max_upload_mb: int = 50
     qwen_api_key: str | None = None
 
     @property

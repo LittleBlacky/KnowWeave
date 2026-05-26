@@ -73,7 +73,9 @@ export function ChunkWorkspace() {
     );
   }
 
-  const source = selected.source_spans[0];
+  const source = selected.source_spans[0]
+    ? { ...selected.source_spans[0], file_id: selected.file_id }
+    : undefined;
 
   return (
     <div className="grid grid-cols-[minmax(260px,0.45fr)_minmax(0,0.55fr)] gap-4 max-xl:grid-cols-1">

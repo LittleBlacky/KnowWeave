@@ -37,14 +37,15 @@ def client(tmp_path, monkeypatch) -> TestClient:
     return TestClient(app)
 
 
-def _seed_chunk(client: TestClient) -> None:
+def _seed_chunk(client: TestClient) -> tuple[str, str]:
     upload_response = client.post(
         "/api/v1/files/upload",
         files={"file": ("policy.md", b"# Policy\n\nLeave requests need approval.", "text/markdown")},
     )
     file_id = upload_response.json()["data"]["id"]
     client.post(f"/api/v1/files/{file_id}/parse")
-    client.post(f"/api/v1/files/{file_id}/chunks/build")
+    chunks_response = client.post(f"/api/v1/files/{file_id}/chunks/build")
+    return file_id, chunks_response.json()["data"]["items"][0]["id"]
 
 
 def test_search_api_returns_retrieval_run_and_chunk_results(client: TestClient) -> None:
@@ -60,6 +61,45 @@ def test_search_api_returns_retrieval_run_and_chunk_results(client: TestClient) 
     assert payload["data"]["results"][0]["result_type"] == "chunk"
     assert payload["data"]["results"][0]["rank"] == 1
     assert payload["data"]["results"][0]["source"]["source_available"] is True
+
+
+def test_search_api_returns_requested_target_types(client: TestClient) -> None:
+    file_id, chunk_id = _seed_chunk(client)
+    unit_response = client.post(
+        "/api/v1/knowledge-units",
+        json={
+            "title": "Leave approval rule",
+            "unit_type": "rule",
+            "content": "Leave requests need approval.",
+            "summary": "Approval rule for leave.",
+            "status": "pending_review",
+            "source_chunk_ids": [chunk_id],
+        },
+    )
+    wiki_response = client.post(f"/api/v1/files/{file_id}/wiki")
+
+    response = client.post(
+        "/api/v1/search",
+        json={
+            "query": "approval",
+            "target_types": ["file", "chunk", "knowledge_unit", "wiki_page"],
+            "top_k": 10,
+        },
+    )
+
+    assert response.status_code == 200
+    results = response.json()["data"]["results"]
+    assert {item["result_type"] for item in results} == {
+        "file",
+        "chunk",
+        "knowledge_unit",
+        "wiki_page",
+    }
+    result_ids = {item["result_id"] for item in results}
+    assert file_id in result_ids
+    assert chunk_id in result_ids
+    assert unit_response.json()["data"]["id"] in result_ids
+    assert wiki_response.json()["data"]["id"] in result_ids
 
 
 def test_search_run_inspection_returns_persisted_contexts(client: TestClient) -> None:
