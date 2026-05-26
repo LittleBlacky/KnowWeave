@@ -208,6 +208,7 @@ def _chunk_read(chunk, *, service: ChunkService) -> ChunkRead:
         edited_content=chunk.edited_content,
         is_manually_edited=chunk.is_manually_edited,
         status=chunk.status,
+        summary=chunk.summary,
         quality_signals=chunk.quality_signals,
         char_count=chunk.char_count,
         search_text=chunk.search_text,

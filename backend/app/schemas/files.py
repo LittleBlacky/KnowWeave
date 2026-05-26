@@ -100,6 +100,7 @@ class ChunkRead(BaseModel):
     edited_content: str | None = None
     is_manually_edited: bool
     status: str
+    summary: str | None = None
     quality_signals: list[dict[str, Any]]
     char_count: int
     search_text: str
@@ -110,3 +111,9 @@ class ChunkRead(BaseModel):
 class ChunkList(BaseModel):
     items: list[ChunkRead]
     total: int
+
+
+class ChunkUpdateRequest(BaseModel):
+    edited_content: str | None = None
+    status: str | None = None
+    summary: str | None = None

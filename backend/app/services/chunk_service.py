@@ -11,6 +11,8 @@ from app.models.files import Chunk, DocumentBlock, KnowledgeFile, ParseResult, S
 from app.services.chunk_strategy import BlockForChunking, ChunkStrategyOptions, build_chunk_candidates
 from app.services.file_service import FileNotFoundError as KnowledgeFileNotFoundError
 
+SEARCHABLE_STATUSES = {"draft", "needs_review", "verified"}
+
 
 class ChunkingRequiresParseError(AppError):
     def __init__(self) -> None:
@@ -19,6 +21,11 @@ class ChunkingRequiresParseError(AppError):
             message="File must be parsed before chunks can be built.",
             status_code=400,
         )
+
+
+class ChunkNotFoundError(AppError):
+    def __init__(self) -> None:
+        super().__init__(code="CHUNK_NOT_FOUND", message="Chunk not found.", status_code=404)
 
 
 class ChunkService:
@@ -100,11 +107,62 @@ class ChunkService:
         statement = select(Chunk).where(Chunk.file_id == file_id).order_by(Chunk.chunk_index.asc())
         return list(self.session.scalars(statement).all())
 
+    def get_chunk(self, chunk_id: UUID) -> Chunk:
+        chunk = self.session.get(Chunk, chunk_id)
+        if chunk is None:
+            raise ChunkNotFoundError()
+        file_record = self.session.get(KnowledgeFile, chunk.file_id)
+        if file_record is None or file_record.deleted_at is not None:
+            raise ChunkNotFoundError()
+        return chunk
+
+    def update_chunk(
+        self,
+        chunk_id: UUID,
+        *,
+        edited_content: str | None = None,
+        status: str | None = None,
+        summary: str | None = None,
+    ) -> Chunk:
+        chunk = self.get_chunk(chunk_id)
+        if edited_content is not None:
+            chunk.edited_content = edited_content
+            chunk.is_manually_edited = True
+            chunk.search_text = edited_content
+        if status is not None:
+            self._set_status(chunk, status)
+        if summary is not None:
+            chunk.summary = summary
+        self.session.add(chunk)
+        self.session.commit()
+        self.session.refresh(chunk)
+        return chunk
+
+    def ignore_chunk(self, chunk_id: UUID) -> Chunk:
+        chunk = self.get_chunk(chunk_id)
+        self._set_status(chunk, "ignored")
+        self.session.add(chunk)
+        self.session.commit()
+        self.session.refresh(chunk)
+        return chunk
+
+    def verify_chunk(self, chunk_id: UUID) -> Chunk:
+        chunk = self.get_chunk(chunk_id)
+        self._set_status(chunk, "verified")
+        self.session.add(chunk)
+        self.session.commit()
+        self.session.refresh(chunk)
+        return chunk
+
     def source_spans_for_chunk(self, chunk_id: UUID) -> list[SourceSpan]:
         statement = (
             select(SourceSpan).where(SourceSpan.chunk_id == chunk_id).order_by(SourceSpan.created_at.asc())
         )
         return list(self.session.scalars(statement).all())
+
+    def _set_status(self, chunk: Chunk, status: str) -> None:
+        chunk.status = status
+        chunk.is_searchable = status in SEARCHABLE_STATUSES
 
     def _latest_successful_parse_result(self, file_id: UUID) -> ParseResult | None:
         statement = (
