@@ -126,5 +126,8 @@ function sourceFromSearchResult(item: SearchResult) {
     line_start: item.source.line_start,
     line_end: item.source.line_end,
     preview_text: item.preview_text,
+    source_available: item.source.source_available,
+    source_label: item.source.file_name ?? item.title,
+    source_type: item.result_type,
   };
 }

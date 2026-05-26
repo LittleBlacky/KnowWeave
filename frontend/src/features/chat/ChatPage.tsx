@@ -184,5 +184,8 @@ function sourceFromCitation(citation: ChatCitation) {
     line_start: 1,
     line_end: 3,
     preview_text: citation.preview_text,
+    source_available: citation.source_available,
+    source_label: citation.label ?? citation.key,
+    source_type: "citation",
   };
 }

@@ -131,7 +131,7 @@ pnpm typecheck
 - [X] T042 [US2] Implement ChatService and SSE endpoint in `backend/app/services/chat_service.py`, `backend/app/api/v1/chat.py`
 - [X] T043 [US2] Implement frontend search page and retrieval run panel in `frontend/src/features/search/`
 - [X] T044 [US2] Implement frontend Chat composer, stream hook, message list and citation panel in `frontend/src/features/chat/`
-- [ ] T045 [US2] Connect citations to source viewer in `frontend/src/features/source-viewer/`
+- [X] T045 [US2] Connect citations to source viewer in `frontend/src/features/source-viewer/`
 
 **Checkpoint**: US2 is demoable independently after US1 data exists.
 
