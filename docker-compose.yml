@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-knowweave}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-knowweave}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -26,7 +26,7 @@ services:
       FILE_STORAGE_ROOT: /app/data/files
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-50}
     ports:
-      - "8000:8000"
+      - "${BACKEND_HOST_PORT:-8000}:8000"
     volumes:
       - backend_files:/app/data/files
     depends_on:
@@ -47,7 +47,7 @@ services:
       NEXT_PUBLIC_APP_ENV: ${NEXT_PUBLIC_APP_ENV:-development}
       NEXT_PUBLIC_ENABLE_MOCKS: ${NEXT_PUBLIC_ENABLE_MOCKS:-false}
     ports:
-      - "3000:3000"
+      - "${FRONTEND_HOST_PORT:-3000}:3000"
     depends_on:
       backend:
         condition: service_healthy

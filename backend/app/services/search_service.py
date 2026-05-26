@@ -389,10 +389,18 @@ class SearchService:
                 | func.lower(ParseResult.raw_text).contains(normalized_query)
             )
             .order_by(KnowledgeFile.created_at.asc())
-            .distinct()
-            .limit(top_k)
+            .limit(top_k * 3)
         )
-        return list(self.session.scalars(statement).all())
+        files: list[KnowledgeFile] = []
+        seen_ids: set[UUID] = set()
+        for file_record in self.session.scalars(statement).all():
+            if file_record.id in seen_ids:
+                continue
+            files.append(file_record)
+            seen_ids.add(file_record.id)
+            if len(files) >= top_k:
+                break
+        return files
 
     def _search_knowledge_units(self, *, query: str, top_k: int) -> list[KnowledgeUnit]:
         normalized_query = query.strip().lower()

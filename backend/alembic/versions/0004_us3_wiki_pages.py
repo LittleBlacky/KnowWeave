@@ -1,7 +1,7 @@
 """US3 wiki pages
 
 Revision ID: 0004_us3_wiki_pages
-Revises: 0003_us2_retrieval_chat_citations
+Revises: 0003_retrieval_chat_citations
 Create Date: 2026-05-26
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 import sqlalchemy as sa
 
 revision = "0004_us3_wiki_pages"
-down_revision = "0003_us2_retrieval_chat_citations"
+down_revision = "0003_retrieval_chat_citations"
 branch_labels = None
 depends_on = None
 

@@ -1,6 +1,6 @@
 """US2 retrieval, chat and citations
 
-Revision ID: 0003_us2_retrieval_chat_citations
+Revision ID: 0003_retrieval_chat_citations
 Revises: 0002_us1_files_parsing_chunks
 Create Date: 2026-05-26
 """
@@ -10,7 +10,7 @@ from __future__ import annotations
 from alembic import op
 import sqlalchemy as sa
 
-revision = "0003_us2_retrieval_chat_citations"
+revision = "0003_retrieval_chat_citations"
 down_revision = "0002_us1_files_parsing_chunks"
 branch_labels = None
 depends_on = None
