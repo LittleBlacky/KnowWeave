@@ -1,5 +1,10 @@
+import { AppShell } from "@/app-shell/AppShell";
 import { KnowledgeUnitPage } from "@/features/knowledge-units/KnowledgeUnitPage";
 
 export default function Page() {
-  return <KnowledgeUnitPage />;
+  return (
+    <AppShell>
+      <KnowledgeUnitPage />
+    </AppShell>
+  );
 }
