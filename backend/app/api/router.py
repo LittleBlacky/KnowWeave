@@ -6,6 +6,7 @@ from app.api.v1.evaluation import router as evaluation_router
 from app.api.v1.feedback import router as feedback_router
 from app.api.v1.files import router as files_router
 from app.api.v1.health import router as health_router
+from app.api.v1.knowledge_units import router as knowledge_units_router
 from app.api.v1.search import router as search_router
 from app.api.v1.tags import router as tags_router
 from app.api.v1.wiki import router as wiki_router
@@ -20,3 +21,4 @@ api_router.include_router(wiki_router)
 api_router.include_router(feedback_router)
 api_router.include_router(evaluation_router)
 api_router.include_router(tags_router)
+api_router.include_router(knowledge_units_router)
