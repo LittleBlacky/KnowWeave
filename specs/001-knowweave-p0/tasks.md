@@ -78,7 +78,7 @@ pnpm typecheck
 - [X] T019 [P] [US1] Add parse service/API tests in `backend/tests/service/test_parse_service.py`, `backend/tests/api/test_file_parse.py`
 - [X] T020 [P] [US1] Add chunk strategy/service/API tests in `backend/tests/unit/test_chunk_strategy.py`, `backend/tests/service/test_chunk_service.py`, `backend/tests/api/test_chunks.py`
 - [X] T021 [P] [US1] Add chunk curation API tests in `backend/tests/api/test_chunk_curation.py`
-- [ ] T022 [P] [US1] Add frontend file and chunk workspace tests in `frontend/src/features/file-upload/FileUpload.test.tsx`, `frontend/src/features/file-list/FileList.test.tsx`, `frontend/src/features/chunk-workspace/ChunkWorkspace.test.tsx`
+- [X] T022 [P] [US1] Add frontend file and chunk workspace tests in `frontend/src/features/file-upload/FileUpload.test.tsx`, `frontend/src/features/file-list/FileList.test.tsx`, `frontend/src/features/chunk-workspace/ChunkWorkspace.test.tsx`
 
 ### Implementation for User Story 1
 
@@ -90,8 +90,8 @@ pnpm typecheck
 - [X] T028 [US1] Implement ParsingService and parse/block endpoints in `backend/app/services/parsing_service.py`, `backend/app/api/v1/files.py`
 - [X] T029 [US1] Implement ChunkService, chunking strategy and source span writing in `backend/app/services/chunk_service.py`
 - [X] T030 [US1] Implement chunk list/edit/ignore/verify endpoints in `backend/app/api/v1/chunks.py`
-- [ ] T031 [US1] Implement frontend file upload/list pages in `frontend/src/features/file-upload/`, `frontend/src/features/file-list/`
-- [ ] T032 [US1] Implement frontend chunk workspace and source locator panel in `frontend/src/features/chunk-workspace/`, `frontend/src/features/source-viewer/`
+- [X] T031 [US1] Implement frontend file upload/list pages in `frontend/src/features/file-upload/`, `frontend/src/features/file-list/`
+- [X] T032 [US1] Implement frontend chunk workspace and source locator panel in `frontend/src/features/chunk-workspace/`, `frontend/src/features/source-viewer/`
 
 **Checkpoint**: US1 is demoable independently.
 
