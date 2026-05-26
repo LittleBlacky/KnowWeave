@@ -158,7 +158,7 @@ pnpm typecheck
 
 - [X] T046 [P] [US3] Add Wiki service/API tests in `backend/tests/service/test_wiki_service.py`, `backend/tests/api/test_wiki.py`
 - [X] T047 [P] [US3] Add feedback service/API tests in `backend/tests/service/test_feedback_service.py`, `backend/tests/api/test_feedback.py`
-- [ ] T048 [P] [US3] Add evaluation service/API tests in `backend/tests/service/test_evaluation_service.py`, `backend/tests/api/test_evaluation_candidates.py`
+- [X] T048 [P] [US3] Add evaluation service/API tests in `backend/tests/service/test_evaluation_service.py`, `backend/tests/api/test_evaluation_candidates.py`
 - [ ] T049 [P] [US3] Add Knowledge Unit and tag service/API tests in `backend/tests/service/test_knowledge_unit_service.py`, `backend/tests/api/test_knowledge_units.py`, `backend/tests/api/test_tags.py`
 - [ ] T050 [P] [US3] Add frontend Knowledge Unit, tag, Wiki, feedback and evaluation tests in `frontend/src/features/knowledge-units/KnowledgeUnitPage.test.tsx`, `frontend/src/features/tags/TagManager.test.tsx`, `frontend/src/features/wiki/WikiPage.test.tsx`, `frontend/src/features/feedback/FeedbackDialog.test.tsx`, `frontend/src/features/evaluation/EvaluationCandidatePage.test.tsx`
 
