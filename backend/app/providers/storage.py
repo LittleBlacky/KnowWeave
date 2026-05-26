@@ -4,6 +4,10 @@ from pathlib import Path
 from uuid import uuid4
 
 
+class StoredFileNotFoundError(FileNotFoundError):
+    pass
+
+
 class LocalStorageProvider:
     def __init__(self, root: str | Path) -> None:
         self.root = Path(root)
@@ -15,3 +19,13 @@ class LocalStorageProvider:
         target = self.root / relative_path
         target.write_bytes(content)
         return relative_path
+
+    def read(self, relative_path: str) -> bytes:
+        root = self.root.resolve()
+        target = (root / relative_path).resolve()
+        if root not in (target, *target.parents):
+            raise StoredFileNotFoundError(relative_path)
+        try:
+            return target.read_bytes()
+        except FileNotFoundError as exc:
+            raise StoredFileNotFoundError(relative_path) from exc

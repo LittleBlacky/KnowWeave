@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -29,4 +30,45 @@ class FileDetail(FileRead):
 
 class FileList(BaseModel):
     items: list[FileRead]
+    total: int
+
+
+class ParseResultRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    file_id: UUID
+    parser_name: str
+    parser_version: str
+    status: str
+    raw_text: str
+    warnings: list[dict[str, Any]]
+    error_message: str | None = None
+    parse_metadata: dict[str, Any]
+    block_count: int
+    created_at: datetime
+
+
+class DocumentBlockRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    file_id: UUID
+    parse_result_id: UUID
+    block_index: int
+    block_type: str
+    raw_content: str
+    normalized_content: str | None = None
+    is_ignored: bool
+    page_number: int | None = None
+    line_start: int | None = None
+    line_end: int | None = None
+    char_start: int | None = None
+    char_end: int | None = None
+    metadata: dict[str, Any]
+    created_at: datetime
+
+
+class DocumentBlockList(BaseModel):
+    items: list[DocumentBlockRead]
     total: int
