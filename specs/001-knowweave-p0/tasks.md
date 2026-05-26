@@ -204,7 +204,7 @@ pnpm typecheck
 - [X] T065 Implement P0 smoke script in `scripts/smoke-p0.ps1`
 - [X] T066 [P] Add Playwright config and P0 browser smoke in `frontend/playwright.config.ts`, `frontend/e2e/p0-smoke.spec.ts`
 - [X] T067 Update README with Spec Kit workflow, local startup and smoke commands in `README.md`
-- [ ] T068 Run quickstart validation from `specs/001-knowweave-p0/quickstart.md`
+- [X] T068 Run quickstart validation from `specs/001-knowweave-p0/quickstart.md`
 
 **Validation**:
 
