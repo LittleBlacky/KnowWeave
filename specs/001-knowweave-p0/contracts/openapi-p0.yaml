@@ -1,0 +1,701 @@
+openapi: 3.1.0
+info:
+  title: KnowWeave P0 API
+  version: 0.1.0
+  description: P0 API contract summary derived from KnowWeave backend, search/chat, frontend and TDD specs.
+servers:
+  - url: http://localhost:8000/api/v1
+paths:
+  /health:
+    get:
+      summary: Check backend health
+      responses:
+        "200":
+          description: Backend is alive
+
+  /files:
+    get:
+      summary: List knowledge files
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: tag
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File list
+
+  /files/upload:
+    post:
+      summary: Upload a knowledge file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                directory_path:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "201":
+          description: File uploaded
+        "400":
+          description: Unsupported type, too large, or invalid upload
+
+  /files/{file_id}:
+    get:
+      summary: Get file details
+      parameters:
+        - $ref: "#/components/parameters/FileId"
+      responses:
+        "200":
+          description: File detail
+    delete:
+      summary: Soft delete a file
+      parameters:
+        - $ref: "#/components/parameters/FileId"
+      responses:
+        "204":
+          description: File soft-deleted
+
+  /files/{file_id}/parse:
+    post:
+      summary: Parse a file into document blocks
+      parameters:
+        - $ref: "#/components/parameters/FileId"
+      responses:
+        "200":
+          description: Parse result
+
+  /files/{file_id}/document-blocks:
+    get:
+      summary: List document blocks for a file
+      parameters:
+        - $ref: "#/components/parameters/FileId"
+      responses:
+        "200":
+          description: Document blocks
+
+  /files/{file_id}/chunks:
+    get:
+      summary: List chunks for a file
+      parameters:
+        - $ref: "#/components/parameters/FileId"
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File chunk list
+
+  /files/{file_id}/chunks/build:
+    post:
+      summary: Build chunks and source spans for a file
+      parameters:
+        - $ref: "#/components/parameters/FileId"
+      responses:
+        "200":
+          description: Chunks generated
+
+  /files/{file_id}/rechunk:
+    post:
+      summary: Rebuild chunks for a file and archive or supersede old chunks
+      parameters:
+        - $ref: "#/components/parameters/FileId"
+      responses:
+        "200":
+          description: Chunks rebuilt
+
+  /chunks:
+    get:
+      summary: List chunks
+      parameters:
+        - name: file_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: is_searchable
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Chunk list
+
+  /chunks/{chunk_id}:
+    get:
+      summary: Get chunk details
+      parameters:
+        - $ref: "#/components/parameters/ChunkId"
+      responses:
+        "200":
+          description: Chunk detail
+    patch:
+      summary: Edit chunk content or status
+      parameters:
+        - $ref: "#/components/parameters/ChunkId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChunkUpdateRequest"
+      responses:
+        "200":
+          description: Chunk updated
+
+  /chunks/{chunk_id}/ignore:
+    post:
+      summary: Mark a chunk as ignored
+      parameters:
+        - $ref: "#/components/parameters/ChunkId"
+      responses:
+        "200":
+          description: Chunk ignored
+
+  /chunks/{chunk_id}/verify:
+    post:
+      summary: Mark a chunk as verified
+      parameters:
+        - $ref: "#/components/parameters/ChunkId"
+      responses:
+        "200":
+          description: Chunk verified
+
+  /knowledge-units:
+    get:
+      summary: List knowledge units
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: source_file_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: unit_type
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Knowledge unit list
+    post:
+      summary: Create a manual knowledge unit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KnowledgeUnitWriteRequest"
+      responses:
+        "201":
+          description: Knowledge unit created
+
+  /knowledge-units/{knowledge_unit_id}:
+    get:
+      summary: Get knowledge unit details
+      parameters:
+        - $ref: "#/components/parameters/KnowledgeUnitId"
+      responses:
+        "200":
+          description: Knowledge unit detail
+    patch:
+      summary: Edit knowledge unit content, tags, sources or status
+      parameters:
+        - $ref: "#/components/parameters/KnowledgeUnitId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KnowledgeUnitWriteRequest"
+      responses:
+        "200":
+          description: Knowledge unit updated
+
+  /tags:
+    get:
+      summary: List tags
+      responses:
+        "200":
+          description: Tag list
+    post:
+      summary: Create tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagWriteRequest"
+      responses:
+        "201":
+          description: Tag created
+
+  /tags/{tag_id}:
+    patch:
+      summary: Update tag metadata
+      parameters:
+        - $ref: "#/components/parameters/TagId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagWriteRequest"
+      responses:
+        "200":
+          description: Tag updated
+    delete:
+      summary: Delete tag
+      parameters:
+        - $ref: "#/components/parameters/TagId"
+      responses:
+        "204":
+          description: Tag deleted
+
+  /tag-bindings:
+    post:
+      summary: Bind a tag to a file, knowledge unit or wiki page
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagBindingRequest"
+      responses:
+        "201":
+          description: Tag binding created
+    delete:
+      summary: Remove a tag binding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagBindingRequest"
+      responses:
+        "204":
+          description: Tag binding removed
+
+  /search:
+    post:
+      summary: Search files, chunks, knowledge units and wiki pages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+      responses:
+        "200":
+          description: Search response with retrieval_run_id
+
+  /search/runs/{retrieval_run_id}:
+    get:
+      summary: Inspect a persisted retrieval run derived from retrieved_contexts
+      parameters:
+        - $ref: "#/components/parameters/RetrievalRunId"
+      responses:
+        "200":
+          description: Retrieval run details
+
+  /chat/sessions:
+    get:
+      summary: List chat sessions
+      responses:
+        "200":
+          description: Chat sessions
+    post:
+      summary: Create chat session
+      responses:
+        "201":
+          description: Chat session created
+
+  /chat/sessions/{session_id}:
+    get:
+      summary: Get chat session details
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Chat session detail
+
+  /chat/sessions/{session_id}/messages:
+    post:
+      summary: Send user message and stream assistant answer
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [question]
+              properties:
+                question:
+                  type: string
+                top_k:
+                  type: integer
+                  default: 5
+      responses:
+        "200":
+          description: text/event-stream with start, retrieval, delta, citations, done
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /chat/messages/{message_id}/citations:
+    get:
+      summary: List citations for a chat message
+      parameters:
+        - $ref: "#/components/parameters/MessageId"
+      responses:
+        "200":
+          description: Message citations
+
+  /chat/messages/{message_id}/to-evaluation-sample:
+    post:
+      summary: Create an evaluation sample candidate from a chat message
+      parameters:
+        - $ref: "#/components/parameters/MessageId"
+      responses:
+        "201":
+          description: Evaluation sample candidate created
+
+  /files/{file_id}/wiki:
+    post:
+      summary: Generate Document Wiki draft for a file
+      parameters:
+        - $ref: "#/components/parameters/FileId"
+      responses:
+        "201":
+          description: Wiki page created
+
+  /wiki/pages:
+    get:
+      summary: List wiki pages
+      responses:
+        "200":
+          description: Wiki page list
+
+  /wiki/pages/{wiki_page_id}:
+    get:
+      summary: Get wiki page
+      parameters:
+        - $ref: "#/components/parameters/WikiPageId"
+      responses:
+        "200":
+          description: Wiki detail
+    patch:
+      summary: Edit wiki page
+      parameters:
+        - $ref: "#/components/parameters/WikiPageId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [change_summary]
+              properties:
+                title:
+                  type: string
+                content_markdown:
+                  type: string
+                status:
+                  type: string
+                change_summary:
+                  type: string
+      responses:
+        "200":
+          description: Wiki updated
+
+  /feedback:
+    get:
+      summary: List feedback
+      parameters:
+        - name: target_type
+          in: query
+          schema:
+            type: string
+        - name: target_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Feedback list
+    post:
+      summary: Submit feedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeedbackRequest"
+      responses:
+        "201":
+          description: Feedback saved
+
+  /feedback/{feedback_id}/to-evaluation-sample:
+    post:
+      summary: Create an evaluation sample candidate from feedback
+      parameters:
+        - $ref: "#/components/parameters/FeedbackId"
+      responses:
+        "201":
+          description: Evaluation sample candidate created
+
+  /evaluation-samples:
+    get:
+      summary: List evaluation samples
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Evaluation samples
+    post:
+      summary: Create evaluation sample candidate
+      responses:
+        "201":
+          description: Evaluation sample created
+
+  /evaluation-samples/{sample_id}:
+    patch:
+      summary: Update evaluation sample status or expected answer/source hints
+      parameters:
+        - $ref: "#/components/parameters/SampleId"
+      responses:
+        "200":
+          description: Evaluation sample updated
+
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+    PageSize:
+      name: page_size
+      in: query
+      schema:
+        type: integer
+        default: 20
+    FileId:
+      name: file_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ChunkId:
+      name: chunk_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    KnowledgeUnitId:
+      name: knowledge_unit_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    TagId:
+      name: tag_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RetrievalRunId:
+      name: retrieval_run_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    SessionId:
+      name: session_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    MessageId:
+      name: message_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    WikiPageId:
+      name: wiki_page_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    FeedbackId:
+      name: feedback_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    SampleId:
+      name: sample_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    ChunkUpdateRequest:
+      type: object
+      properties:
+        edited_content:
+          type: string
+        status:
+          type: string
+          enum: [draft, needs_review, verified, ignored, archived]
+        summary:
+          type: string
+    KnowledgeUnitWriteRequest:
+      type: object
+      required: [title, content]
+      properties:
+        title:
+          type: string
+        unit_type:
+          type: string
+        content:
+          type: string
+        summary:
+          type: string
+        status:
+          type: string
+          enum: [draft, pending_review, verified, archived]
+        applicable_scope:
+          type: string
+        tag_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        source_chunk_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    TagWriteRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        color:
+          type: string
+    TagBindingRequest:
+      type: object
+      required: [tag_id, target_type, target_id]
+      properties:
+        tag_id:
+          type: string
+          format: uuid
+        target_type:
+          type: string
+          enum: [file, knowledge_unit, wiki_page]
+        target_id:
+          type: string
+          format: uuid
+    SearchRequest:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+        target_types:
+          type: array
+          items:
+            type: string
+            enum: [file, chunk, knowledge_unit, wiki_page]
+        filters:
+          type: object
+          properties:
+            tags:
+              type: array
+              items:
+                type: string
+            status:
+              type: string
+            source_available:
+              type: boolean
+        top_k:
+          type: integer
+          default: 10
+    FeedbackRequest:
+      type: object
+      required: [target_type, target_id, feedback_type]
+      properties:
+        target_type:
+          type: string
+          enum: [chat_message, retrieved_context, citation, wiki_page, chunk]
+        target_id:
+          type: string
+          format: uuid
+        feedback_type:
+          type: string
+          enum:
+            - answer_helpful
+            - answer_wrong
+            - citation_helpful
+            - citation_wrong
+            - retrieval_helpful
+            - retrieval_irrelevant
+            - retrieval_missing
+            - chunk_low_quality
+            - wiki_needs_update
+        comment:
+          type: string
+        metadata:
+          type: object
