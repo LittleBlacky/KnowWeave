@@ -145,6 +145,44 @@ export type KnowledgeUnitListResponse = {
   total: number;
 };
 
+export type Wiki = {
+  id: string;
+  title: string;
+  wiki_type: string;
+  status: string;
+  summary: string | null;
+  content_markdown: string;
+  source_file_id: string | null;
+  generation_prompt_version: string | null;
+  search_text: string;
+  metadata_: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  verified_at: string | null;
+};
+
+export type WikiListResponse = {
+  items: Wiki[];
+  total: number;
+};
+
+export type Citation = {
+  id: string;
+  target_type: string;
+  target_id: string;
+  file_id: string | null;
+  chunk_id: string | null;
+  source_span_id: string | null;
+  label: string | null;
+  preview_text: string;
+  source_available: boolean;
+};
+
+export type CitationListResponse = {
+  items: Citation[];
+  total: number;
+};
+
 export function listFiles() {
   return apiClient.get<FileListResponse>("/files");
 }
@@ -238,4 +276,29 @@ export function updateKnowledgeUnit(
     tag_ids: input.tag_ids ?? [],
     source_chunk_ids: input.source_chunk_ids ?? [],
   });
+}
+
+export function listWikiPages() {
+  return apiClient.get<WikiListResponse>("/wiki");
+}
+
+export function getWiki(wikiId: string) {
+  return apiClient.get<Wiki>(`/wiki/${wikiId}`);
+}
+
+export function listWikiCitations(wikiId: string) {
+  return apiClient.get<CitationListResponse>(`/wiki/${wikiId}/citations`);
+}
+
+export function updateWiki(
+  wikiId: string,
+  input: {
+    content_markdown: string;
+    change_summary: string;
+    status?: string;
+    title?: string;
+    summary?: string | null;
+  },
+) {
+  return apiClient.patch<Wiki>(`/wiki/${wikiId}`, input);
 }
