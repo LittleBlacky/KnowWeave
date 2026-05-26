@@ -159,14 +159,14 @@ pnpm typecheck
 - [X] T046 [P] [US3] Add Wiki service/API tests in `backend/tests/service/test_wiki_service.py`, `backend/tests/api/test_wiki.py`
 - [X] T047 [P] [US3] Add feedback service/API tests in `backend/tests/service/test_feedback_service.py`, `backend/tests/api/test_feedback.py`
 - [X] T048 [P] [US3] Add evaluation service/API tests in `backend/tests/service/test_evaluation_service.py`, `backend/tests/api/test_evaluation_candidates.py`
-- [ ] T049 [P] [US3] Add Knowledge Unit and tag service/API tests in `backend/tests/service/test_knowledge_unit_service.py`, `backend/tests/api/test_knowledge_units.py`, `backend/tests/api/test_tags.py`
+- [X] T049 [P] [US3] Add Knowledge Unit and tag service/API tests in `backend/tests/service/test_knowledge_unit_service.py`, `backend/tests/api/test_knowledge_units.py`, `backend/tests/api/test_tags.py`
 - [ ] T050 [P] [US3] Add frontend Knowledge Unit, tag, Wiki, feedback and evaluation tests in `frontend/src/features/knowledge-units/KnowledgeUnitPage.test.tsx`, `frontend/src/features/tags/TagManager.test.tsx`, `frontend/src/features/wiki/WikiPage.test.tsx`, `frontend/src/features/feedback/FeedbackDialog.test.tsx`, `frontend/src/features/evaluation/EvaluationCandidatePage.test.tsx`
 
 ### Implementation for User Story 3
 
-- [ ] T051 [US3] Create knowledge unit, knowledge unit source, wiki, feedback, evaluation, tag and tag binding models plus migration in `backend/app/models/`, `backend/alembic/versions/`
-- [ ] T052 [US3] Implement KnowledgeUnitService and knowledge unit endpoints in `backend/app/services/knowledge_unit_service.py`, `backend/app/api/v1/knowledge_units.py`
-- [ ] T053 [US3] Implement TagService and tag/binding endpoints in `backend/app/services/tag_service.py`, `backend/app/api/v1/tags.py`
+- [X] T051 [US3] Create knowledge unit, knowledge unit source, wiki, feedback, evaluation, tag and tag binding models plus migration in `backend/app/models/`, `backend/alembic/versions/`
+- [X] T052 [US3] Implement KnowledgeUnitService and knowledge unit endpoints in `backend/app/services/knowledge_unit_service.py`, `backend/app/api/v1/knowledge_units.py`
+- [X] T053 [US3] Implement TagService and tag/binding endpoints in `backend/app/services/tag_service.py`, `backend/app/api/v1/tags.py`
 - [X] T054 [US3] Implement WikiService and wiki endpoints in `backend/app/services/wiki_service.py`, `backend/app/api/v1/wiki.py`
 - [X] T055 [US3] Implement FeedbackService and feedback endpoints including feedback-to-evaluation conversion in `backend/app/services/feedback_service.py`, `backend/app/api/v1/feedback.py`
 - [X] T056 [US3] Implement EvaluationService and `/evaluation-samples` endpoints in `backend/app/services/evaluation_service.py`, `backend/app/api/v1/evaluation.py`
