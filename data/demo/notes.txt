@@ -1,0 +1,8 @@
+KnowWeave demo notes
+
+The security review keyword appears here for plain text parsing.
+Access approval must include a manager name, ticket ID, and business reason.
+Feedback about missing citations should become an evaluation candidate.
+This short repeated line is intentionally low value.
+This short repeated line is intentionally low value.
+
