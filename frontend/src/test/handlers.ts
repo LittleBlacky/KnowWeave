@@ -192,4 +192,52 @@ export const handlers = [
       request_id: "req_search",
     }),
   ),
+  http.post("http://localhost:8000/api/v1/chat/sessions", () =>
+    HttpResponse.json(
+      {
+        data: {
+          id: "session_chat_001",
+          title: "New chat",
+          scope: {},
+          created_at: "2026-05-26T00:00:00Z",
+          updated_at: "2026-05-26T00:00:00Z",
+        },
+        error: null,
+        request_id: "req_chat_session_create",
+      },
+      { status: 201 },
+    ),
+  ),
+  http.post("http://localhost:8000/api/v1/chat/sessions/:sessionId/messages", () =>
+    HttpResponse.text(
+      [
+        'event: start\ndata: {"message_id":"msg_chat_001","retrieval_run_id":"run_chat_001"}',
+        `event: retrieval\ndata: ${JSON.stringify({
+          retrieval_run_id: "run_chat_001",
+          results: [searchResult],
+        })}`,
+        'event: delta\ndata: {"message_id":"msg_chat_001","delta":"Fake answer: "}',
+        'event: delta\ndata: {"message_id":"msg_chat_001","delta":"approval"}',
+        `event: citations\ndata: ${JSON.stringify({
+          message_id: "msg_chat_001",
+          citations: [
+            {
+              key: "S1",
+              label: "S1",
+              chunk_id: "chunk_policy",
+              source_span_id: "span_policy",
+              preview_text: "Leave requests need approval.",
+              source_available: true,
+            },
+          ],
+        })}`,
+        'event: done\ndata: {"message_id":"msg_chat_001","status":"completed"}',
+      ].join("\n\n"),
+      {
+        headers: {
+          "content-type": "text/event-stream",
+        },
+      },
+    ),
+  ),
 ];
