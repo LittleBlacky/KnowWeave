@@ -7,11 +7,12 @@ from uuid import UUID
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.errors import AppError
 from app.models.base import utcnow
 from app.models.chat import ChatMessage, ChatSession, Citation, RetrievedContext
-from app.providers.base import LLMProvider
-from app.providers.fake_llm import FakeLLMProvider
+from app.providers.base import LLMProvider, LLMProviderError
+from app.providers.factory import build_default_llm_provider
 from app.services.search_service import SearchResultItem, SearchService
 
 
@@ -35,7 +36,7 @@ class ChatService:
     ) -> None:
         self.session = session
         self.search_service = search_service or SearchService(session=session)
-        self.llm_provider = llm_provider or FakeLLMProvider()
+        self.llm_provider = llm_provider or build_default_llm_provider(get_settings())
 
     def create_session(self, *, title: str) -> ChatSession:
         chat_session = ChatSession(title=title, scope={})
@@ -98,8 +99,8 @@ class ChatService:
             role="assistant",
             content_markdown="",
             status="streaming",
-            model_provider="fake",
-            model_name="fake-llm",
+            model_provider=_provider_name(self.llm_provider),
+            model_name=_provider_model_name(self.llm_provider),
             prompt_version="chat_qa_v1",
             created_at=utcnow(),
         )
@@ -126,16 +127,30 @@ class ChatService:
         )
 
         answer_parts: list[str] = []
-        async for event in self.llm_provider.stream(
-            messages=[{"role": "user", "content": question}],
-            options={},
-        ):
-            if event.type == "delta" and event.text:
-                answer_parts.append(event.text)
-                yield _sse(
-                    "delta",
-                    {"message_id": str(assistant_message.id), "delta": event.text},
-                )
+        try:
+            async for event in self.llm_provider.stream(
+                messages=_chat_messages(question=question, results=search_response.results),
+                options={},
+            ):
+                if event.type == "delta" and event.text:
+                    answer_parts.append(event.text)
+                    yield _sse(
+                        "delta",
+                        {"message_id": str(assistant_message.id), "delta": event.text},
+                    )
+        except LLMProviderError as exc:
+            assistant_message.status = "failed"
+            self.session.add(assistant_message)
+            self.session.commit()
+            yield _sse(
+                "error",
+                {
+                    "message_id": str(assistant_message.id),
+                    "status": "failed",
+                    "message": str(exc),
+                },
+            )
+            return
 
         answer = "".join(answer_parts)
         assistant_message.content_markdown = answer
@@ -198,6 +213,35 @@ def _sse(event: str, data: dict[str, object]) -> str:
     return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
+def _chat_messages(*, question: str, results: list[SearchResultItem]) -> list[dict[str, str]]:
+    evidence_lines = []
+    for index, result in enumerate(results, start=1):
+        source = result.source
+        location_parts = []
+        if source.get("file_name"):
+            location_parts.append(str(source["file_name"]))
+        if source.get("line_start") and source.get("line_end"):
+            location_parts.append(f"lines {source['line_start']}-{source['line_end']}")
+        location = ", ".join(location_parts) or result.title
+        evidence_lines.append(f"[S{index}] {location}: {result.preview_text}")
+
+    evidence = "\n".join(evidence_lines) if evidence_lines else "No retrieved evidence was found."
+    return [
+        {
+            "role": "system",
+            "content": (
+                "You are KnowWeave's evidence-grounded assistant. Answer using the retrieved "
+                "evidence when it is relevant. Cite evidence labels like [S1]. If the evidence "
+                "is insufficient, say what is missing instead of inventing facts."
+            ),
+        },
+        {
+            "role": "user",
+            "content": f"Question:\n{question}\n\nRetrieved evidence:\n{evidence}",
+        },
+    ]
+
+
 def _search_result_payload(item: SearchResultItem) -> dict[str, object]:
     return {
         "result_id": str(item.result_id),
@@ -210,6 +254,15 @@ def _search_result_payload(item: SearchResultItem) -> dict[str, object]:
         "status": item.status,
         "metadata": item.metadata,
     }
+
+
+def _provider_name(provider: LLMProvider) -> str:
+    return str(getattr(provider, "provider_name", "unknown"))
+
+
+def _provider_model_name(provider: LLMProvider) -> str | None:
+    model_name = getattr(provider, "model_name", None)
+    return str(model_name) if model_name is not None else None
 
 
 def _citation_payload(citation: Citation, *, index: int) -> dict[str, object]:

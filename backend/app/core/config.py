@@ -15,6 +15,16 @@ class Settings(BaseModel):
     file_storage_root: str = "./data/files"
     max_upload_mb: int = 50
     qwen_api_key: str | None = None
+    qwen_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    qwen_chat_model: str = "qwen-plus"
+    qwen_generation_model: str = "qwen-plus"
+    qwen_timeout_seconds: float = 60.0
+    cors_origins: tuple[str, ...] = (
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:4317",
+        "http://127.0.0.1:4317",
+    )
 
     @property
     def qwen_enabled(self) -> bool:
@@ -46,4 +56,30 @@ def get_settings() -> Settings:
             os.getenv("MAX_UPLOAD_MB", str(Settings.model_fields["max_upload_mb"].default))
         ),
         qwen_api_key=os.getenv("QWEN_API_KEY"),
+        qwen_base_url=os.getenv(
+            "QWEN_BASE_URL",
+            Settings.model_fields["qwen_base_url"].default,
+        ),
+        qwen_chat_model=os.getenv(
+            "QWEN_CHAT_MODEL",
+            Settings.model_fields["qwen_chat_model"].default,
+        ),
+        qwen_generation_model=os.getenv(
+            "QWEN_GENERATION_MODEL",
+            Settings.model_fields["qwen_generation_model"].default,
+        ),
+        qwen_timeout_seconds=float(
+            os.getenv(
+                "QWEN_TIMEOUT_SECONDS",
+                str(Settings.model_fields["qwen_timeout_seconds"].default),
+            )
+        ),
+        cors_origins=tuple(
+            origin.strip()
+            for origin in os.getenv(
+                "CORS_ORIGINS",
+                ",".join(Settings.model_fields["cors_origins"].default),
+            ).split(",")
+            if origin.strip()
+        ),
     )

@@ -25,6 +25,12 @@ services:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-knowweave}:${POSTGRES_PASSWORD:-knowweave}@postgres:5432/${POSTGRES_DB:-knowweave}
       FILE_STORAGE_ROOT: /app/data/files
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-50}
+      QWEN_API_KEY: ${QWEN_API_KEY:-}
+      QWEN_BASE_URL: ${QWEN_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
+      QWEN_CHAT_MODEL: ${QWEN_CHAT_MODEL:-qwen-plus}
+      QWEN_GENERATION_MODEL: ${QWEN_GENERATION_MODEL:-qwen-plus}
+      QWEN_TIMEOUT_SECONDS: ${QWEN_TIMEOUT_SECONDS:-60}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000,http://localhost:4317,http://127.0.0.1:4317}
     ports:
       - "${BACKEND_HOST_PORT:-8000}:8000"
     volumes:

@@ -8,6 +8,7 @@ from app.providers.base import LLMResult, LLMStreamEvent
 
 class FakeLLMProvider:
     def __init__(self, *, model_name: str = "fake-llm", delta_size: int = 16) -> None:
+        self.provider_name = "fake"
         self.model_name = model_name
         self.delta_size = delta_size
 
@@ -51,7 +52,14 @@ class FakeLLMProvider:
 
     def _answer_for(self, messages: list[dict[str, str]]) -> str:
         prompt = messages[-1]["content"] if messages else ""
-        return f"Fake answer: {prompt}\n\n[S1] Generated for P0 tests."
+        question = self._question_from_prompt(prompt)
+        return f"Fake answer: {question}\n\n[S1] Generated for P0 tests."
+
+    def _question_from_prompt(self, prompt: str) -> str:
+        if not prompt.startswith("Question:\n"):
+            return prompt
+        question, _, _ = prompt.removeprefix("Question:\n").partition("\n\nRetrieved evidence:")
+        return question.strip()
 
     def _usage_for(self, messages: list[dict[str, str]]) -> dict[str, int]:
         input_tokens = sum(len(message.get("content", "").split()) for message in messages)
