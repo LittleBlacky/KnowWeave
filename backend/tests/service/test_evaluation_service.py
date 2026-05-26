@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import asyncio
+import json
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
@@ -43,15 +45,15 @@ def _seed_chat_message(tmp_path, session) -> ChatMessage:
     async def collect_events() -> None:
         async for event in service.stream_answer(
             session_id=chat_session.id,
-            question="Who approves leave requests?",
+            question="manager approval",
             top_k=1,
         ):
             events.append(event)
 
     asyncio.run(collect_events())
     message_id = next(line for event in events for line in event.splitlines() if line.startswith("data: "))
-    raw_message_id = message_id.split('"message_id": "')[1].split('"')[0]
-    return session.get(ChatMessage, raw_message_id)
+    raw_message_id = json.loads(message_id.removeprefix("data: "))["message_id"]
+    return session.get(ChatMessage, UUID(raw_message_id))
 
 
 def test_evaluation_service_creates_candidate_from_citation_feedback(tmp_path) -> None:
@@ -78,7 +80,7 @@ def test_evaluation_service_creates_candidate_from_citation_feedback(tmp_path) -
         assert sample.created_from == "feedback"
         assert sample.source_feedback_id == feedback.id
         assert sample.source_chat_message_id == message.id
-        assert sample.expected_source_chunks == [citation.chunk_id]
+        assert sample.expected_source_chunks == [str(citation.chunk_id)]
         assert sample.metadata_["feedback_snapshot"]["feedback_type"] == "citation_wrong"
         assert sample.metadata_["feedback_snapshot"]["comment"] == feedback.comment
         assert sample.metadata_["expected_source_hint"] == "Manager approval section"
@@ -92,7 +94,7 @@ def test_evaluation_service_creates_candidate_from_chat_message_with_snapshots(t
 
         sample = EvaluationService(session=session).create_candidate_from_chat_message(message.id)
 
-        assert sample.question == "Who approves leave requests?"
+        assert sample.question == "manager approval"
         assert sample.expected_answer.startswith("Fake answer:")
         assert sample.created_from == "chat_message"
         assert sample.source_chat_message_id == message.id

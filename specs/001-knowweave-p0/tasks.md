@@ -168,9 +168,9 @@ pnpm typecheck
 - [ ] T052 [US3] Implement KnowledgeUnitService and knowledge unit endpoints in `backend/app/services/knowledge_unit_service.py`, `backend/app/api/v1/knowledge_units.py`
 - [ ] T053 [US3] Implement TagService and tag/binding endpoints in `backend/app/services/tag_service.py`, `backend/app/api/v1/tags.py`
 - [X] T054 [US3] Implement WikiService and wiki endpoints in `backend/app/services/wiki_service.py`, `backend/app/api/v1/wiki.py`
-- [ ] T055 [US3] Implement FeedbackService and feedback endpoints including feedback-to-evaluation conversion in `backend/app/services/feedback_service.py`, `backend/app/api/v1/feedback.py`
-- [ ] T056 [US3] Implement EvaluationService and `/evaluation-samples` endpoints in `backend/app/services/evaluation_service.py`, `backend/app/api/v1/evaluation.py`
-- [ ] T057 [US3] Implement chat-message-to-evaluation endpoint in `backend/app/api/v1/chat.py`
+- [X] T055 [US3] Implement FeedbackService and feedback endpoints including feedback-to-evaluation conversion in `backend/app/services/feedback_service.py`, `backend/app/api/v1/feedback.py`
+- [X] T056 [US3] Implement EvaluationService and `/evaluation-samples` endpoints in `backend/app/services/evaluation_service.py`, `backend/app/api/v1/evaluation.py`
+- [X] T057 [US3] Implement chat-message-to-evaluation endpoint in `backend/app/api/v1/chat.py`
 - [ ] T058 [US3] Implement frontend Knowledge Unit and tag management pages in `frontend/src/features/knowledge-units/`, `frontend/src/features/tags/`
 - [ ] T059 [US3] Implement frontend Wiki list/editor/citation panel in `frontend/src/features/wiki/`
 - [ ] T060 [US3] Implement unified FeedbackDialog in `frontend/src/features/feedback/`

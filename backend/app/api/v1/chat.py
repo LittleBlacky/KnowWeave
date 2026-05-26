@@ -15,13 +15,19 @@ from app.schemas.chat import (
     CitationRead,
 )
 from app.schemas.common import ApiResponse
+from app.schemas.evaluation import EvaluationSampleRead
 from app.services.chat_service import ChatService
+from app.services.evaluation_service import EvaluationService
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 def get_chat_service(db: Session = Depends(get_db)) -> ChatService:
     return ChatService(session=db)
+
+
+def get_evaluation_service(db: Session = Depends(get_db)) -> EvaluationService:
+    return EvaluationService(session=db)
 
 
 @router.post("/sessions", status_code=201)
@@ -79,4 +85,17 @@ def list_message_citations(
         data=CitationList(items=items, total=len(items)),
         error=None,
         request_id="req_chat_citations",
+    )
+
+
+@router.post("/messages/{message_id}/to-evaluation-sample", status_code=201)
+def message_to_evaluation_sample(
+    message_id: UUID,
+    service: EvaluationService = Depends(get_evaluation_service),
+) -> ApiResponse[EvaluationSampleRead]:
+    sample = service.create_candidate_from_chat_message(message_id)
+    return ApiResponse(
+        data=EvaluationSampleRead.model_validate(sample),
+        error=None,
+        request_id="req_chat_to_evaluation",
     )
