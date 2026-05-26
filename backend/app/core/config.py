@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from functools import lru_cache
 
@@ -9,6 +11,7 @@ class Settings(BaseModel):
     service_name: str = "knowweave-backend"
     version: str = "0.1.0"
     environment: str = "development"
+    database_url: str = "sqlite:///./knowweave_dev.db"
     qwen_api_key: str | None = None
 
     @property
@@ -27,8 +30,11 @@ def get_settings() -> Settings:
         version=os.getenv("KNOWWEAVE_VERSION", Settings.model_fields["version"].default),
         environment=os.getenv(
             "KNOWWEAVE_ENVIRONMENT",
-            Settings.model_fields["environment"].default,
+            os.getenv("APP_ENV", Settings.model_fields["environment"].default),
+        ),
+        database_url=os.getenv(
+            "DATABASE_URL",
+            Settings.model_fields["database_url"].default,
         ),
         qwen_api_key=os.getenv("QWEN_API_KEY"),
     )
-

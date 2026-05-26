@@ -8,6 +8,9 @@ DeepParseXWeb/
 .env
 .env.*
 !.env.example
+data/files/
+logs/
+*.db
 node_modules/
 __pycache__/
 .venv/

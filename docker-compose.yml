@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-knowweave}
+      POSTGRES_USER: ${POSTGRES_USER:-knowweave}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-knowweave}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-knowweave} -d $${POSTGRES_DB:-knowweave}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
