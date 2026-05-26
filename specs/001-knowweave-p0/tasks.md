@@ -48,7 +48,7 @@ powershell -ExecutionPolicy Bypass -File scripts/test-compose.ps1
 - [X] T012 Create frontend Next.js app structure and base scripts in `frontend/package.json`, `frontend/tsconfig.json`, `frontend/src/app/page.tsx`
 - [X] T013 [P] Configure frontend Vitest, Testing Library and MSW in `frontend/vitest.config.ts`, `frontend/src/test/`
 - [X] T014 [P] Implement AppShell and API client baseline in `frontend/src/app-shell/AppShell.tsx`, `frontend/src/shared/api/client.ts`
-- [ ] T015 [P] Add frontend AppShell/API client tests in `frontend/src/app-shell/AppShell.test.tsx`, `frontend/src/shared/api/client.test.ts`
+- [X] T015 [P] Add frontend AppShell/API client tests in `frontend/src/app-shell/AppShell.test.tsx`, `frontend/src/shared/api/client.test.ts`
 
 **Checkpoint**: Foundation ready. No user story work starts until T010-T015 pass.
 
