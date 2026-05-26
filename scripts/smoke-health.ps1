@@ -62,7 +62,7 @@ Push-Location $repoRoot
 try {
   Invoke-Compose -Runner $runner ps postgres *> $null
   if ($LASTEXITCODE -eq 0) {
-    Invoke-Compose -Runner $runner exec -T postgres pg_isready -U knowweave -d knowweave *> $null
+    Invoke-Compose -Runner $runner exec -T postgres pg_isready --username=knowweave --dbname=knowweave *> $null
     if ($LASTEXITCODE -eq 0) {
       $result.postgres = "pass"
     }
