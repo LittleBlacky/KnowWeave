@@ -156,7 +156,7 @@ pnpm typecheck
 
 ### Tests for User Story 3
 
-- [ ] T046 [P] [US3] Add Wiki service/API tests in `backend/tests/service/test_wiki_service.py`, `backend/tests/api/test_wiki.py`
+- [X] T046 [P] [US3] Add Wiki service/API tests in `backend/tests/service/test_wiki_service.py`, `backend/tests/api/test_wiki.py`
 - [ ] T047 [P] [US3] Add feedback service/API tests in `backend/tests/service/test_feedback_service.py`, `backend/tests/api/test_feedback.py`
 - [ ] T048 [P] [US3] Add evaluation service/API tests in `backend/tests/service/test_evaluation_service.py`, `backend/tests/api/test_evaluation_candidates.py`
 - [ ] T049 [P] [US3] Add Knowledge Unit and tag service/API tests in `backend/tests/service/test_knowledge_unit_service.py`, `backend/tests/api/test_knowledge_units.py`, `backend/tests/api/test_tags.py`
