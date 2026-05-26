@@ -3,6 +3,7 @@
 from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin
 from app.models.chat import ChatMessage, ChatSession, Citation, RetrievedContext
 from app.models.files import Chunk, DocumentBlock, KnowledgeFile, ParseResult, SourceSpan
+from app.models.wiki import WikiPage
 
 __all__ = [
     "ChatMessage",
@@ -16,4 +17,5 @@ __all__ = [
     "SourceSpan",
     "TimestampMixin",
     "UUIDPrimaryKeyMixin",
+    "WikiPage",
 ]
