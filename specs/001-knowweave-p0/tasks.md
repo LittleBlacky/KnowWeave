@@ -45,7 +45,7 @@ powershell -ExecutionPolicy Bypass -File scripts/test-compose.ps1
 - [X] T009 [P] Add database migration/session tests in `backend/tests/db/test_migration.py`, `backend/tests/db/test_session.py`
 - [X] T010 Create backend shared error/response schema scaffolding in `backend/app/core/errors.py`, `backend/app/schemas/common.py`
 - [X] T011 Create backend model package and initial ORM model files in `backend/app/models/`
-- [ ] T012 Create frontend Next.js app structure and base scripts in `frontend/package.json`, `frontend/tsconfig.json`, `frontend/src/app/page.tsx`
+- [X] T012 Create frontend Next.js app structure and base scripts in `frontend/package.json`, `frontend/tsconfig.json`, `frontend/src/app/page.tsx`
 - [ ] T013 [P] Configure frontend Vitest, Testing Library and MSW in `frontend/vitest.config.ts`, `frontend/src/test/`
 - [ ] T014 [P] Implement AppShell and API client baseline in `frontend/src/app-shell/AppShell.tsx`, `frontend/src/shared/api/client.ts`
 - [ ] T015 [P] Add frontend AppShell/API client tests in `frontend/src/app-shell/AppShell.test.tsx`, `frontend/src/shared/api/client.test.ts`

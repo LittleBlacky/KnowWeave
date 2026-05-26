@@ -18,6 +18,7 @@ venv/
 .pytest_cache/
 *.egg-info/
 .ruff_cache/
+*.tsbuildinfo
 .next/
 dist/
 build/
