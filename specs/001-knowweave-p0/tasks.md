@@ -73,7 +73,7 @@ pnpm typecheck
 ### Tests for User Story 1
 
 - [ ] T016 [P] [US1] Add upload API contract tests in `backend/tests/api/test_files_upload.py`
-- [ ] T017 [P] [US1] Add FileService tests for storage and soft delete in `backend/tests/service/test_file_service.py`
+- [X] T017 [P] [US1] Add FileService tests for storage and soft delete in `backend/tests/service/test_file_service.py`
 - [ ] T018 [P] [US1] Add txt, markdown, pdf and docx parser unit tests in `backend/tests/unit/test_text_parser.py`, `backend/tests/unit/test_markdown_parser.py`, `backend/tests/unit/test_pdf_text_parser.py`, `backend/tests/unit/test_docx_text_parser.py`
 - [ ] T019 [P] [US1] Add parse service/API tests in `backend/tests/service/test_parse_service.py`, `backend/tests/api/test_file_parse.py`
 - [ ] T020 [P] [US1] Add chunk strategy/service/API tests in `backend/tests/unit/test_chunk_strategy.py`, `backend/tests/service/test_chunk_service.py`, `backend/tests/api/test_chunks.py`
