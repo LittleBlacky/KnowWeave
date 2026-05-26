@@ -72,3 +72,41 @@ class DocumentBlockRead(BaseModel):
 class DocumentBlockList(BaseModel):
     items: list[DocumentBlockRead]
     total: int
+
+
+class SourceSpanRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    document_block_id: UUID | None = None
+    page_number: int | None = None
+    char_start: int | None = None
+    char_end: int | None = None
+    line_start: int | None = None
+    line_end: int | None = None
+    preview_text: str
+
+
+class ChunkRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    file_id: UUID
+    parse_result_id: UUID
+    document_block_id: UUID | None = None
+    chunk_index: int
+    chunk_type: str
+    raw_content: str
+    edited_content: str | None = None
+    is_manually_edited: bool
+    status: str
+    quality_signals: list[dict[str, Any]]
+    char_count: int
+    search_text: str
+    is_searchable: bool
+    source_spans: list[SourceSpanRead]
+
+
+class ChunkList(BaseModel):
+    items: list[ChunkRead]
+    total: int

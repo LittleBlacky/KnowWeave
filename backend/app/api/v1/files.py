@@ -12,13 +12,17 @@ from app.models.files import DocumentBlock
 from app.providers.storage import LocalStorageProvider
 from app.schemas.common import ApiResponse
 from app.schemas.files import (
+    ChunkList,
+    ChunkRead,
     DocumentBlockList,
     DocumentBlockRead,
     FileDetail,
     FileList,
     FileRead,
     ParseResultRead,
+    SourceSpanRead,
 )
+from app.services.chunk_service import ChunkService
 from app.services.file_service import FileService
 from app.services.parsing_service import ParsingService
 
@@ -44,6 +48,10 @@ def get_parsing_service(
         session=db,
         storage=LocalStorageProvider(settings.file_storage_root),
     )
+
+
+def get_chunk_service(db: Session = Depends(get_db)) -> ChunkService:
+    return ChunkService(session=db)
 
 
 @router.post("/upload", status_code=status.HTTP_201_CREATED)
@@ -128,6 +136,34 @@ def list_document_blocks(
     )
 
 
+@router.post("/{file_id}/chunks/build")
+def build_file_chunks(
+    file_id: UUID,
+    service: ChunkService = Depends(get_chunk_service),
+) -> ApiResponse[ChunkList]:
+    chunks = service.build_chunks_for_file(file_id)
+    items = [_chunk_read(chunk, service=service) for chunk in chunks]
+    return ApiResponse(
+        data=ChunkList(items=items, total=len(items)),
+        error=None,
+        request_id="req_build_chunks",
+    )
+
+
+@router.get("/{file_id}/chunks")
+def list_file_chunks(
+    file_id: UUID,
+    service: ChunkService = Depends(get_chunk_service),
+) -> ApiResponse[ChunkList]:
+    chunks = service.list_file_chunks(file_id)
+    items = [_chunk_read(chunk, service=service) for chunk in chunks]
+    return ApiResponse(
+        data=ChunkList(items=items, total=len(items)),
+        error=None,
+        request_id="req_file_chunks",
+    )
+
+
 @router.delete("/{file_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_file(
     file_id: UUID,
@@ -156,4 +192,37 @@ def _document_block_read(block: DocumentBlock) -> DocumentBlockRead:
         char_end=block.char_end,
         metadata=metadata,
         created_at=block.created_at,
+    )
+
+
+def _chunk_read(chunk, *, service: ChunkService) -> ChunkRead:
+    spans = service.source_spans_for_chunk(chunk.id)
+    return ChunkRead(
+        id=chunk.id,
+        file_id=chunk.file_id,
+        parse_result_id=chunk.parse_result_id,
+        document_block_id=chunk.document_block_id,
+        chunk_index=chunk.chunk_index,
+        chunk_type=chunk.chunk_type,
+        raw_content=chunk.raw_content,
+        edited_content=chunk.edited_content,
+        is_manually_edited=chunk.is_manually_edited,
+        status=chunk.status,
+        quality_signals=chunk.quality_signals,
+        char_count=chunk.char_count,
+        search_text=chunk.search_text,
+        is_searchable=chunk.is_searchable,
+        source_spans=[
+            SourceSpanRead(
+                id=span.id,
+                document_block_id=span.document_block_id,
+                page_number=span.page_number,
+                char_start=span.char_start,
+                char_end=span.char_end,
+                line_start=span.line_start,
+                line_end=span.line_end,
+                preview_text=span.preview_text,
+            )
+            for span in spans
+        ],
     )
