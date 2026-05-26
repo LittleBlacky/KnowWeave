@@ -198,7 +198,7 @@ pnpm typecheck
 
 **Purpose**: Prove the full P0 loop is repeatable and demo-ready.
 
-- [ ] T062 [P] Create demo data fixtures in `data/demo/company_policy.md`, `data/demo/security_handbook.pdf`, `data/demo/team_faq.docx`, `data/demo/notes.txt`
+- [X] T062 [P] Create demo data fixtures in `data/demo/company_policy.md`, `data/demo/security_handbook.pdf`, `data/demo/team_faq.docx`, `data/demo/notes.txt`
 - [ ] T063 [P] Add demo data tests in `scripts/test-demo-data.ps1`, `backend/tests/service/test_seed_demo_data.py`
 - [ ] T064 Implement demo seed script in `scripts/seed-demo-data.ps1`
 - [ ] T065 Implement P0 smoke script in `scripts/smoke-p0.ps1`
