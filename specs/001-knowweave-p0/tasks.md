@@ -75,7 +75,7 @@ pnpm typecheck
 - [X] T016 [P] [US1] Add upload API contract tests in `backend/tests/api/test_files_upload.py`
 - [X] T017 [P] [US1] Add FileService tests for storage and soft delete in `backend/tests/service/test_file_service.py`
 - [X] T018 [P] [US1] Add txt, markdown, pdf and docx parser unit tests in `backend/tests/unit/test_text_parser.py`, `backend/tests/unit/test_markdown_parser.py`, `backend/tests/unit/test_pdf_text_parser.py`, `backend/tests/unit/test_docx_text_parser.py`
-- [ ] T019 [P] [US1] Add parse service/API tests in `backend/tests/service/test_parse_service.py`, `backend/tests/api/test_file_parse.py`
+- [X] T019 [P] [US1] Add parse service/API tests in `backend/tests/service/test_parse_service.py`, `backend/tests/api/test_file_parse.py`
 - [ ] T020 [P] [US1] Add chunk strategy/service/API tests in `backend/tests/unit/test_chunk_strategy.py`, `backend/tests/service/test_chunk_service.py`, `backend/tests/api/test_chunks.py`
 - [ ] T021 [P] [US1] Add chunk curation API tests in `backend/tests/api/test_chunk_curation.py`
 - [ ] T022 [P] [US1] Add frontend file and chunk workspace tests in `frontend/src/features/file-upload/FileUpload.test.tsx`, `frontend/src/features/file-list/FileList.test.tsx`, `frontend/src/features/chunk-workspace/ChunkWorkspace.test.tsx`
@@ -87,7 +87,7 @@ pnpm typecheck
 - [X] T025 [US1] Implement LocalStorageProvider and FileService in `backend/app/providers/storage.py`, `backend/app/services/file_service.py`
 - [X] T026 [US1] Implement file upload/list/detail/delete endpoints in `backend/app/api/v1/files.py`, `backend/app/api/router.py`
 - [X] T027 [US1] Implement parser provider interfaces and txt/markdown/pdf/docx parsers in `backend/app/providers/parsers/`
-- [ ] T028 [US1] Implement ParsingService and parse/block endpoints in `backend/app/services/parsing_service.py`, `backend/app/api/v1/files.py`
+- [X] T028 [US1] Implement ParsingService and parse/block endpoints in `backend/app/services/parsing_service.py`, `backend/app/api/v1/files.py`
 - [ ] T029 [US1] Implement ChunkService, chunking strategy and source span writing in `backend/app/services/chunk_service.py`
 - [ ] T030 [US1] Implement chunk list/edit/ignore/verify endpoints in `backend/app/api/v1/chunks.py`
 - [ ] T031 [US1] Implement frontend file upload/list pages in `frontend/src/features/file-upload/`, `frontend/src/features/file-list/`
