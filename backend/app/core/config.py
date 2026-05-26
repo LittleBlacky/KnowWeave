@@ -12,6 +12,8 @@ class Settings(BaseModel):
     version: str = "0.1.0"
     environment: str = "development"
     database_url: str = "sqlite:///./knowweave_dev.db"
+    file_storage_root: str = "./data/files"
+    max_upload_mb: int = 20
     qwen_api_key: str | None = None
 
     @property
@@ -35,6 +37,13 @@ def get_settings() -> Settings:
         database_url=os.getenv(
             "DATABASE_URL",
             Settings.model_fields["database_url"].default,
+        ),
+        file_storage_root=os.getenv(
+            "FILE_STORAGE_ROOT",
+            Settings.model_fields["file_storage_root"].default,
+        ),
+        max_upload_mb=int(
+            os.getenv("MAX_UPLOAD_MB", str(Settings.model_fields["max_upload_mb"].default))
         ),
         qwen_api_key=os.getenv("QWEN_API_KEY"),
     )

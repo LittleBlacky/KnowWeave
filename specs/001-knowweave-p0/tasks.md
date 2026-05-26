@@ -84,7 +84,7 @@ pnpm typecheck
 
 - [X] T023 [P] [US1] Create file, parse result, document block, chunk and source span models in `backend/app/models/`
 - [X] T024 [US1] Create Alembic migration for files, parsing, chunks and source spans in `backend/alembic/versions/`
-- [ ] T025 [US1] Implement LocalStorageProvider and FileService in `backend/app/providers/storage.py`, `backend/app/services/file_service.py`
+- [X] T025 [US1] Implement LocalStorageProvider and FileService in `backend/app/providers/storage.py`, `backend/app/services/file_service.py`
 - [ ] T026 [US1] Implement file upload/list/detail/delete endpoints in `backend/app/api/v1/files.py`, `backend/app/api/router.py`
 - [ ] T027 [US1] Implement parser provider interfaces and txt/markdown/pdf/docx parsers in `backend/app/providers/parsers/`
 - [ ] T028 [US1] Implement ParsingService and parse/block endpoints in `backend/app/services/parsing_service.py`, `backend/app/api/v1/files.py`
