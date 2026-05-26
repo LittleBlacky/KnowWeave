@@ -89,6 +89,62 @@ export type SearchResponse = {
   results: SearchResult[];
 };
 
+export type Tag = {
+  id: string;
+  name: string;
+  description: string | null;
+  color: string | null;
+  binding_count?: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TagListResponse = {
+  items: Tag[];
+  total: number;
+};
+
+export type KnowledgeUnitSource = {
+  id: string;
+  knowledge_unit_id: string;
+  file_id: string | null;
+  chunk_id: string | null;
+  source_span_id: string | null;
+  source_type: string;
+  source_label: string;
+  source_available: boolean;
+  created_at: string;
+};
+
+export type KnowledgeUnit = {
+  id: string;
+  title: string;
+  unit_type: string;
+  content: string;
+  summary: string | null;
+  status: string;
+  trust_level: number | null;
+  applicable_scope: string | null;
+  created_from: string;
+  search_text: string;
+  metadata_: Record<string, unknown>;
+  source_count: number;
+  tags: Tag[];
+  created_at: string;
+  updated_at: string;
+  verified_at: string | null;
+  archived_at: string | null;
+};
+
+export type KnowledgeUnitDetail = KnowledgeUnit & {
+  sources: KnowledgeUnitSource[];
+};
+
+export type KnowledgeUnitListResponse = {
+  items: KnowledgeUnit[];
+  total: number;
+};
+
 export function listFiles() {
   return apiClient.get<FileListResponse>("/files");
 }
@@ -125,4 +181,61 @@ export function verifyChunk(chunkId: string) {
 
 export function searchKnowledge(query: string, topK = 10) {
   return apiClient.post<SearchResponse>("/search", { query, top_k: topK });
+}
+
+export function listTags() {
+  return apiClient.get<TagListResponse>("/tags");
+}
+
+export function createTag(input: { name: string; description?: string; color?: string }) {
+  return apiClient.post<Tag>("/tags", input);
+}
+
+export function bindTag(input: { tag_id: string; target_type: string; target_id: string }) {
+  return apiClient.post<{ id: string; tag_id: string; target_type: string; target_id: string }>(
+    "/tag-bindings",
+    input,
+  );
+}
+
+export function listKnowledgeUnits(params: {
+  status?: string;
+  tag?: string;
+  source_file_id?: string;
+  unit_type?: string;
+} = {}) {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value) {
+      query.set(key, value);
+    }
+  }
+  const suffix = query.toString() ? `?${query.toString()}` : "";
+  return apiClient.get<KnowledgeUnitListResponse>(`/knowledge-units${suffix}`);
+}
+
+export function getKnowledgeUnit(knowledgeUnitId: string) {
+  return apiClient.get<KnowledgeUnitDetail>(`/knowledge-units/${knowledgeUnitId}`);
+}
+
+export function updateKnowledgeUnit(
+  knowledgeUnitId: string,
+  input: {
+    title: string;
+    content: string;
+    unit_type?: string;
+    summary?: string | null;
+    status?: string;
+    applicable_scope?: string | null;
+    tag_ids?: string[];
+    source_chunk_ids?: string[];
+  },
+) {
+  return apiClient.patch<KnowledgeUnit>(`/knowledge-units/${knowledgeUnitId}`, {
+    ...input,
+    unit_type: input.unit_type ?? "concept",
+    status: input.status ?? "draft",
+    tag_ids: input.tag_ids ?? [],
+    source_chunk_ids: input.source_chunk_ids ?? [],
+  });
 }
