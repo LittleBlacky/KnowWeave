@@ -183,6 +183,34 @@ export type CitationListResponse = {
   total: number;
 };
 
+export type Feedback = {
+  id: string;
+  target_type: string;
+  target_id: string;
+  feedback_type: string;
+  comment: string | null;
+  status: string;
+  metadata_: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type EvaluationSample = {
+  id: string;
+  question: string;
+  expected_answer: string | null;
+  expected_source_files: string[];
+  expected_source_chunks: string[];
+  created_from: string;
+  source_chat_message_id: string | null;
+  source_feedback_id: string | null;
+  status: string;
+  difficulty: string | null;
+  metadata_: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
 export function listFiles() {
   return apiClient.get<FileListResponse>("/files");
 }
@@ -301,4 +329,18 @@ export function updateWiki(
   },
 ) {
   return apiClient.patch<Wiki>(`/wiki/${wikiId}`, input);
+}
+
+export function createFeedback(input: {
+  target_type: string;
+  target_id: string;
+  feedback_type: string;
+  comment?: string;
+  metadata?: Record<string, unknown>;
+}) {
+  return apiClient.post<Feedback>("/feedback", input);
+}
+
+export function createEvaluationSampleFromFeedback(feedbackId: string) {
+  return apiClient.post<EvaluationSample>(`/feedback/${feedbackId}/to-evaluation-sample`);
 }
