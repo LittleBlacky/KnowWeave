@@ -62,6 +62,33 @@ export type ChunkListResponse = {
   total: number;
 };
 
+export type SearchResult = {
+  result_id: string;
+  result_type: string;
+  title: string;
+  preview_text: string;
+  score: string;
+  rank: number;
+  source: {
+    file_id: string | null;
+    file_name: string | null;
+    source_span_id: string | null;
+    page_number: number | null;
+    line_start: number | null;
+    line_end: number | null;
+    source_available: boolean;
+  };
+  status: Record<string, unknown>;
+  metadata: Record<string, unknown>;
+};
+
+export type SearchResponse = {
+  retrieval_run_id: string;
+  query: string;
+  strategy: string;
+  results: SearchResult[];
+};
+
 export function listFiles() {
   return apiClient.get<FileListResponse>("/files");
 }
@@ -94,4 +121,8 @@ export function ignoreChunk(chunkId: string) {
 
 export function verifyChunk(chunkId: string) {
   return apiClient.post<Chunk>(`/chunks/${chunkId}/verify`);
+}
+
+export function searchKnowledge(query: string, topK = 10) {
+  return apiClient.post<SearchResponse>("/search", { query, top_k: topK });
 }

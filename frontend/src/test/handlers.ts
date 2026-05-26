@@ -42,6 +42,33 @@ const policyChunk = {
   source_spans: [sourceSpan],
 };
 
+const searchResult = {
+  result_id: "chunk_policy",
+  result_type: "chunk",
+  title: "policy.md",
+  preview_text: "Leave requests need approval.",
+  score: "1.0000",
+  rank: 1,
+  source: {
+    file_id: "file_policy",
+    file_name: "policy.md",
+    source_span_id: "span_policy",
+    page_number: null,
+    line_start: 1,
+    line_end: 3,
+    source_available: true,
+  },
+  status: {
+    chunk_status: "draft",
+    source_file_deleted: false,
+  },
+  metadata: {
+    chunk_index: 0,
+    retrieval_strategy: "keyword",
+    matched_fields: ["search_text"],
+  },
+};
+
 export const handlers = [
   http.get("http://localhost/api/v1/health", () =>
     HttpResponse.json({
@@ -151,6 +178,18 @@ export const handlers = [
       },
       error: null,
       request_id: "req_chunk_verify",
+    }),
+  ),
+  http.post("http://localhost:8000/api/v1/search", () =>
+    HttpResponse.json({
+      data: {
+        retrieval_run_id: "run_search_001",
+        query: "approval",
+        strategy: "keyword",
+        results: [searchResult],
+      },
+      error: null,
+      request_id: "req_search",
     }),
   ),
 ];

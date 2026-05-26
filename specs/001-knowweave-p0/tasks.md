@@ -119,7 +119,7 @@ pnpm typecheck
 - [X] T033 [P] [US2] Add search service/API tests in `backend/tests/service/test_search_service.py`, `backend/tests/api/test_search.py`
 - [X] T034 [P] [US2] Add Fake Provider unit tests in `backend/tests/unit/test_fake_llm_provider.py`
 - [X] T035 [P] [US2] Add Chat SSE API tests in `backend/tests/api/test_chat_sse.py`
-- [ ] T036 [P] [US2] Add frontend search tests in `frontend/src/features/search/SearchPage.test.tsx`
+- [X] T036 [P] [US2] Add frontend search tests in `frontend/src/features/search/SearchPage.test.tsx`
 - [ ] T037 [P] [US2] Add frontend Chat stream tests in `frontend/src/features/chat/useChatStream.test.ts`, `frontend/src/features/chat/ChatPage.test.tsx`
 
 ### Implementation for User Story 2
@@ -129,7 +129,7 @@ pnpm typecheck
 - [X] T040 [US2] Implement search and retrieval-run inspection endpoints in `backend/app/api/v1/search.py`, `backend/app/api/router.py`
 - [X] T041 [US2] Implement LLMProvider interface and FakeLLMProvider in `backend/app/providers/base.py`, `backend/app/providers/fake_llm.py`
 - [X] T042 [US2] Implement ChatService and SSE endpoint in `backend/app/services/chat_service.py`, `backend/app/api/v1/chat.py`
-- [ ] T043 [US2] Implement frontend search page and retrieval run panel in `frontend/src/features/search/`
+- [X] T043 [US2] Implement frontend search page and retrieval run panel in `frontend/src/features/search/`
 - [ ] T044 [US2] Implement frontend Chat composer, stream hook, message list and citation panel in `frontend/src/features/chat/`
 - [ ] T045 [US2] Connect citations to source viewer in `frontend/src/features/source-viewer/`
 
