@@ -43,7 +43,7 @@ powershell -ExecutionPolicy Bypass -File scripts/test-compose.ps1
 
 - [X] T008 Add SQLAlchemy base/session and Alembic baseline in `backend/app/db/base.py`, `backend/app/db/session.py`, `backend/alembic.ini`, `backend/alembic/env.py`, `backend/alembic/versions/0001_database_baseline.py`
 - [X] T009 [P] Add database migration/session tests in `backend/tests/db/test_migration.py`, `backend/tests/db/test_session.py`
-- [ ] T010 Create backend shared error/response schema scaffolding in `backend/app/core/errors.py`, `backend/app/schemas/common.py`
+- [X] T010 Create backend shared error/response schema scaffolding in `backend/app/core/errors.py`, `backend/app/schemas/common.py`
 - [ ] T011 Create backend model package and initial ORM model files in `backend/app/models/`
 - [ ] T012 Create frontend Next.js app structure and base scripts in `frontend/package.json`, `frontend/tsconfig.json`, `frontend/src/app/page.tsx`
 - [ ] T013 [P] Configure frontend Vitest, Testing Library and MSW in `frontend/vitest.config.ts`, `frontend/src/test/`
