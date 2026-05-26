@@ -124,7 +124,7 @@ pnpm typecheck
 
 ### Implementation for User Story 2
 
-- [ ] T038 [US2] Create retrieval, chat and citation models plus migration in `backend/app/models/`, `backend/alembic/versions/`
+- [X] T038 [US2] Create retrieval, chat and citation models plus migration in `backend/app/models/`, `backend/alembic/versions/`
 - [ ] T039 [US2] Implement IndexService and SearchService in `backend/app/services/index_service.py`, `backend/app/services/search_service.py`
 - [ ] T040 [US2] Implement search and retrieval-run inspection endpoints in `backend/app/api/v1/search.py`, `backend/app/api/router.py`
 - [ ] T041 [US2] Implement LLMProvider interface and FakeLLMProvider in `backend/app/providers/base.py`, `backend/app/providers/fake_llm.py`
