@@ -3,6 +3,7 @@
 import { MessageSquareText, Send } from "lucide-react";
 import { useState } from "react";
 
+import { FeedbackDialog } from "@/features/feedback/FeedbackDialog";
 import { SourceLocatorPanel } from "@/features/source-viewer/SourceLocatorPanel";
 import type { SearchResult } from "@/shared/api/knowweave";
 
@@ -47,6 +48,10 @@ export function ChatPage() {
               onSelect={setSelectedCitation}
               selectedKey={selectedCitation?.key ?? null}
             />
+          ) : null}
+
+          {state.messageId && state.status === "completed" ? (
+            <FeedbackDialog targetId={state.messageId} targetType="chat_message" />
           ) : null}
         </div>
 
