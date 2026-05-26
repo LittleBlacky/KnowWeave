@@ -160,7 +160,7 @@ pnpm typecheck
 - [X] T047 [P] [US3] Add feedback service/API tests in `backend/tests/service/test_feedback_service.py`, `backend/tests/api/test_feedback.py`
 - [X] T048 [P] [US3] Add evaluation service/API tests in `backend/tests/service/test_evaluation_service.py`, `backend/tests/api/test_evaluation_candidates.py`
 - [X] T049 [P] [US3] Add Knowledge Unit and tag service/API tests in `backend/tests/service/test_knowledge_unit_service.py`, `backend/tests/api/test_knowledge_units.py`, `backend/tests/api/test_tags.py`
-- [ ] T050 [P] [US3] Add frontend Knowledge Unit, tag, Wiki, feedback and evaluation tests in `frontend/src/features/knowledge-units/KnowledgeUnitPage.test.tsx`, `frontend/src/features/tags/TagManager.test.tsx`, `frontend/src/features/wiki/WikiPage.test.tsx`, `frontend/src/features/feedback/FeedbackDialog.test.tsx`, `frontend/src/features/evaluation/EvaluationCandidatePage.test.tsx`
+- [X] T050 [P] [US3] Add frontend Knowledge Unit, tag, Wiki, feedback and evaluation tests in `frontend/src/features/knowledge-units/KnowledgeUnitPage.test.tsx`, `frontend/src/features/tags/TagManager.test.tsx`, `frontend/src/features/wiki/WikiPage.test.tsx`, `frontend/src/features/feedback/FeedbackDialog.test.tsx`, `frontend/src/features/evaluation/EvaluationCandidatePage.test.tsx`
 
 ### Implementation for User Story 3
 
@@ -171,10 +171,10 @@ pnpm typecheck
 - [X] T055 [US3] Implement FeedbackService and feedback endpoints including feedback-to-evaluation conversion in `backend/app/services/feedback_service.py`, `backend/app/api/v1/feedback.py`
 - [X] T056 [US3] Implement EvaluationService and `/evaluation-samples` endpoints in `backend/app/services/evaluation_service.py`, `backend/app/api/v1/evaluation.py`
 - [X] T057 [US3] Implement chat-message-to-evaluation endpoint in `backend/app/api/v1/chat.py`
-- [ ] T058 [US3] Implement frontend Knowledge Unit and tag management pages in `frontend/src/features/knowledge-units/`, `frontend/src/features/tags/`
-- [ ] T059 [US3] Implement frontend Wiki list/editor/citation panel in `frontend/src/features/wiki/`
-- [ ] T060 [US3] Implement unified FeedbackDialog in `frontend/src/features/feedback/`
-- [ ] T061 [US3] Implement Evaluation Candidate page in `frontend/src/features/evaluation/`
+- [X] T058 [US3] Implement frontend Knowledge Unit and tag management pages in `frontend/src/features/knowledge-units/`, `frontend/src/features/tags/`
+- [X] T059 [US3] Implement frontend Wiki list/editor/citation panel in `frontend/src/features/wiki/`
+- [X] T060 [US3] Implement unified FeedbackDialog in `frontend/src/features/feedback/`
+- [X] T061 [US3] Implement Evaluation Candidate page in `frontend/src/features/evaluation/`
 
 **Checkpoint**: US3 completes the LLM Wiki and feedback-to-evaluation loop.
 
