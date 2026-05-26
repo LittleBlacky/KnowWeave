@@ -201,7 +201,7 @@ pnpm typecheck
 - [X] T062 [P] Create demo data fixtures in `data/demo/company_policy.md`, `data/demo/security_handbook.pdf`, `data/demo/team_faq.docx`, `data/demo/notes.txt`
 - [X] T063 [P] Add demo data tests in `scripts/test-demo-data.ps1`, `backend/tests/service/test_seed_demo_data.py`
 - [X] T064 Implement demo seed script in `scripts/seed-demo-data.ps1`
-- [ ] T065 Implement P0 smoke script in `scripts/smoke-p0.ps1`
+- [X] T065 Implement P0 smoke script in `scripts/smoke-p0.ps1`
 - [ ] T066 [P] Add Playwright config and P0 browser smoke in `frontend/playwright.config.ts`, `frontend/e2e/p0-smoke.spec.ts`
 - [ ] T067 Update README with Spec Kit workflow, local startup and smoke commands in `README.md`
 - [ ] T068 Run quickstart validation from `specs/001-knowweave-p0/quickstart.md`
