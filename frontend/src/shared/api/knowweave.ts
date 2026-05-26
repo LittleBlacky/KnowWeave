@@ -211,6 +211,11 @@ export type EvaluationSample = {
   updated_at: string;
 };
 
+export type EvaluationSampleListResponse = {
+  items: EvaluationSample[];
+  total: number;
+};
+
 export function listFiles() {
   return apiClient.get<FileListResponse>("/files");
 }
@@ -343,4 +348,9 @@ export function createFeedback(input: {
 
 export function createEvaluationSampleFromFeedback(feedbackId: string) {
   return apiClient.post<EvaluationSample>(`/feedback/${feedbackId}/to-evaluation-sample`);
+}
+
+export function listEvaluationSamples(status?: string) {
+  const suffix = status ? `?status=${encodeURIComponent(status)}` : "";
+  return apiClient.get<EvaluationSampleListResponse>(`/evaluation-samples${suffix}`);
 }
