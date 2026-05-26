@@ -383,14 +383,29 @@ class SearchService:
             .outerjoin(ParseResult, ParseResult.file_id == KnowledgeFile.id)
             .where(KnowledgeFile.deleted_at.is_(None))
             .where(KnowledgeFile.status != "soft_deleted")
-            .where(
+        )
+        if self._is_postgresql():
+            searchable_text = func.concat(
+                KnowledgeFile.name,
+                " ",
+                KnowledgeFile.original_filename,
+                " ",
+                func.coalesce(ParseResult.raw_text, ""),
+            )
+            vector = self._postgres_vector(searchable_text)
+            ts_query = self._postgres_query(query)
+            statement = statement.where(vector.op("@@")(ts_query)).order_by(
+                func.ts_rank(vector, ts_query).desc(),
+                KnowledgeFile.created_at.asc(),
+            )
+        else:
+            statement = statement.where(
                 func.lower(KnowledgeFile.name).contains(normalized_query)
                 | func.lower(KnowledgeFile.original_filename).contains(normalized_query)
                 | func.lower(ParseResult.raw_text).contains(normalized_query)
-            )
-            .order_by(KnowledgeFile.created_at.asc())
-            .limit(top_k * 3)
-        )
+            ).order_by(KnowledgeFile.created_at.asc())
+
+        statement = statement.limit(top_k * 3)
         files: list[KnowledgeFile] = []
         seen_ids: set[UUID] = set()
         for file_record in self.session.scalars(statement).all():
@@ -407,13 +422,20 @@ class SearchService:
         if not normalized_query:
             return []
 
-        statement = (
-            select(KnowledgeUnit)
-            .where(KnowledgeUnit.status != "archived")
-            .where(func.lower(KnowledgeUnit.search_text).contains(normalized_query))
-            .order_by(KnowledgeUnit.updated_at.desc())
-            .limit(top_k)
-        )
+        statement = select(KnowledgeUnit).where(KnowledgeUnit.status != "archived")
+        if self._is_postgresql():
+            vector = self._postgres_vector(KnowledgeUnit.search_text)
+            ts_query = self._postgres_query(query)
+            statement = statement.where(vector.op("@@")(ts_query)).order_by(
+                func.ts_rank(vector, ts_query).desc(),
+                KnowledgeUnit.updated_at.desc(),
+            )
+        else:
+            statement = statement.where(func.lower(KnowledgeUnit.search_text).contains(normalized_query)).order_by(
+                KnowledgeUnit.updated_at.desc()
+            )
+
+        statement = statement.limit(top_k)
         return list(self.session.scalars(statement).all())
 
     def _search_wiki_pages(self, *, query: str, top_k: int) -> list[WikiPage]:
@@ -421,13 +443,30 @@ class SearchService:
         if not normalized_query:
             return []
 
-        statement = (
-            select(WikiPage)
-            .where(func.lower(WikiPage.search_text).contains(normalized_query))
-            .order_by(WikiPage.updated_at.desc())
-            .limit(top_k)
-        )
+        statement = select(WikiPage)
+        if self._is_postgresql():
+            vector = self._postgres_vector(WikiPage.search_text)
+            ts_query = self._postgres_query(query)
+            statement = statement.where(vector.op("@@")(ts_query)).order_by(
+                func.ts_rank(vector, ts_query).desc(),
+                WikiPage.updated_at.desc(),
+            )
+        else:
+            statement = statement.where(func.lower(WikiPage.search_text).contains(normalized_query)).order_by(
+                WikiPage.updated_at.desc()
+            )
+
+        statement = statement.limit(top_k)
         return list(self.session.scalars(statement).all())
+
+    def _is_postgresql(self) -> bool:
+        return self.session.get_bind().dialect.name == "postgresql"
+
+    def _postgres_vector(self, text_expression):
+        return func.to_tsvector("simple", func.coalesce(text_expression, ""))
+
+    def _postgres_query(self, query: str):
+        return func.plainto_tsquery("simple", query.strip())
 
     def _source_span_for_chunk(self, chunk_id: UUID) -> SourceSpan | None:
         statement = select(SourceSpan).where(SourceSpan.chunk_id == chunk_id).limit(1)

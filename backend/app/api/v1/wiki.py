@@ -27,6 +27,7 @@ def create_file_wiki(
     return ApiResponse(data=WikiPageRead.model_validate(wiki), error=None, request_id="req_wiki_create")
 
 
+@router.get("/wiki/pages")
 @router.get("/wiki")
 def list_wiki_pages(service: WikiService = Depends(get_wiki_service)) -> ApiResponse[WikiPageList]:
     pages = service.list_wiki_pages()
@@ -37,6 +38,7 @@ def list_wiki_pages(service: WikiService = Depends(get_wiki_service)) -> ApiResp
     )
 
 
+@router.get("/wiki/pages/{wiki_id}")
 @router.get("/wiki/{wiki_id}")
 def get_wiki(
     wiki_id: UUID,
@@ -46,6 +48,7 @@ def get_wiki(
     return ApiResponse(data=WikiPageRead.model_validate(wiki), error=None, request_id="req_wiki_detail")
 
 
+@router.patch("/wiki/pages/{wiki_id}")
 @router.patch("/wiki/{wiki_id}")
 def update_wiki(
     wiki_id: UUID,
@@ -63,6 +66,7 @@ def update_wiki(
     return ApiResponse(data=WikiPageRead.model_validate(wiki), error=None, request_id="req_wiki_update")
 
 
+@router.get("/wiki/pages/{wiki_id}/citations")
 @router.get("/wiki/{wiki_id}/citations")
 def list_wiki_citations(
     wiki_id: UUID,

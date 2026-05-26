@@ -69,9 +69,17 @@ def test_wiki_api_creates_lists_reads_and_edits_document_wiki(client: TestClient
     assert list_response.status_code == 200
     assert list_response.json()["data"]["items"][0]["id"] == created["id"]
 
+    contract_list_response = client.get("/api/v1/wiki/pages")
+    assert contract_list_response.status_code == 200
+    assert contract_list_response.json()["data"]["items"][0]["id"] == created["id"]
+
     detail_response = client.get(f"/api/v1/wiki/{created['id']}")
     assert detail_response.status_code == 200
     assert detail_response.json()["data"]["id"] == created["id"]
+
+    contract_detail_response = client.get(f"/api/v1/wiki/pages/{created['id']}")
+    assert contract_detail_response.status_code == 200
+    assert contract_detail_response.json()["data"]["id"] == created["id"]
 
     rejected = client.patch(
         f"/api/v1/wiki/{created['id']}",
@@ -92,6 +100,17 @@ def test_wiki_api_creates_lists_reads_and_edits_document_wiki(client: TestClient
     assert update_response.json()["data"]["content_markdown"] == "Updated policy content."
     assert update_response.json()["data"]["status"] == "verified"
 
+    contract_update_response = client.patch(
+        f"/api/v1/wiki/pages/{created['id']}",
+        json={
+            "content_markdown": "Updated again.",
+            "change_summary": "Verified contract alias.",
+            "status": "verified",
+        },
+    )
+    assert contract_update_response.status_code == 200
+    assert contract_update_response.json()["data"]["content_markdown"] == "Updated again."
+
 
 def test_wiki_api_returns_citations_with_source_span(client: TestClient) -> None:
     file_id = _seed_file(client)
@@ -106,3 +125,7 @@ def test_wiki_api_returns_citations_with_source_span(client: TestClient) -> None
     assert payload["items"][0]["source_span_id"]
     assert payload["items"][0]["preview_text"] == "# Policy\n\nLeave requests require manager approval."
     assert payload["items"][0]["source_available"] is True
+
+    contract_response = client.get(f"/api/v1/wiki/pages/{wiki_id}/citations")
+    assert contract_response.status_code == 200
+    assert contract_response.json()["data"]["total"] == 1
