@@ -8,7 +8,7 @@ DeepParseXWeb/
 .env
 .env.*
 !.env.example
-data/files/
+backend/data/*
 logs/
 *.db
 node_modules/

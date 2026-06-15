@@ -266,7 +266,9 @@ export function generateFileWiki(fileId: string) {
 }
 
 export function listDocumentBlocks(fileId: string) {
-  return apiClient.get<DocumentBlockListResponse>(`/files/${fileId}/document-blocks`);
+  return apiClient.get<DocumentBlockListResponse>(
+    `/files/${fileId}/document-blocks`,
+  );
 }
 
 export function listFileChunks(fileId: string) {

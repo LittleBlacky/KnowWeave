@@ -9,10 +9,10 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import {useParams} from "next/navigation";
+import {useEffect, useState} from "react";
 
-import { AppShell } from "@/app-shell/AppShell";
+import {AppShell} from "@/app-shell/AppShell";
 import {
   listDocumentBlocks,
   listFileChunks,
@@ -58,7 +58,7 @@ export default function FileDetailPage() {
   async function handleParse() {
     setActionStatus("Parsing…");
     const result = await parseFile(fileId);
-    setFile((prev) => prev ? { ...prev, status: result.status } : prev);
+    setFile((prev) => (prev ? {...prev, status: result.status} : prev));
     const blockRes = await listDocumentBlocks(fileId);
     setBlocks(blockRes.items);
     setActionStatus(result.status);
@@ -85,7 +85,11 @@ export default function FileDetailPage() {
     return (
       <AppShell>
         <div className="flex items-center justify-center py-20">
-          <Loader2 aria-hidden="true" className="animate-spin text-[#275a53]" size={32} />
+          <Loader2
+            aria-hidden="true"
+            className="animate-spin text-[#275a53]"
+            size={32}
+          />
         </div>
       </AppShell>
     );
@@ -94,7 +98,9 @@ export default function FileDetailPage() {
   if (!file) {
     return (
       <AppShell>
-        <div className="py-20 text-center text-sm text-[#6f756f]">File not found.</div>
+        <div className="py-20 text-center text-sm text-[#6f756f]">
+          File not found.
+        </div>
       </AppShell>
     );
   }
@@ -126,7 +132,8 @@ export default function FileDetailPage() {
             <div>
               <h1 className="text-xl font-semibold">{file.name}</h1>
               <p className="mt-1 text-sm text-[#6f756f]">
-                {file.file_type} · {sizeDisplay} · SHA256: {file.sha256.slice(0, 8)}…
+                {file.file_type} · {sizeDisplay} · SHA256:{" "}
+                {file.sha256.slice(0, 8)}…
               </p>
             </div>
           </div>
@@ -171,7 +178,9 @@ export default function FileDetailPage() {
       {blocks.length > 0 && (
         <section className="mt-4 rounded-md border border-[#dcded8] bg-white">
           <div className="border-b border-[#dcded8] px-4 py-3">
-            <h2 className="text-base font-semibold">Document Blocks ({blocks.length})</h2>
+            <h2 className="text-base font-semibold">
+              Document Blocks ({blocks.length})
+            </h2>
           </div>
           <div className="divide-y divide-[#dcded8]">
             {blocks.map((block) => (
@@ -180,9 +189,13 @@ export default function FileDetailPage() {
                   <span className="rounded bg-[#f0f2ed] px-2 py-0.5 text-xs font-semibold text-[#6f756f]">
                     {block.block_type}
                   </span>
-                  <span className="text-xs text-[#6f756f]">#{block.block_index}</span>
+                  <span className="text-xs text-[#6f756f]">
+                    #{block.block_index}
+                  </span>
                   {block.page_number != null && (
-                    <span className="text-xs text-[#6f756f]">p.{block.page_number}</span>
+                    <span className="text-xs text-[#6f756f]">
+                      p.{block.page_number}
+                    </span>
                   )}
                 </div>
                 <pre className="mt-1 max-h-40 overflow-auto whitespace-pre-wrap text-sm text-[#30342f]">
@@ -198,19 +211,27 @@ export default function FileDetailPage() {
       {chunks.length > 0 && (
         <section className="mt-4 rounded-md border border-[#dcded8] bg-white">
           <div className="border-b border-[#dcded8] px-4 py-3">
-            <h2 className="text-base font-semibold">Chunks ({chunks.length})</h2>
+            <h2 className="text-base font-semibold">
+              Chunks ({chunks.length})
+            </h2>
           </div>
           <div className="divide-y divide-[#dcded8]">
             {chunks.map((chunk) => (
               <div key={chunk.id} className="px-4 py-3">
                 <div className="mb-1 flex items-center gap-2">
-                  <span className="text-sm font-medium">Chunk {chunk.chunk_index}</span>
+                  <span className="text-sm font-medium">
+                    Chunk {chunk.chunk_index}
+                  </span>
                   <span className="rounded-full bg-[#f0f2ed] px-2 py-0.5 text-xs text-[#6f756f]">
                     {chunk.status}
                   </span>
-                  <span className="text-xs text-[#6f756f]">{chunk.char_count} chars</span>
+                  <span className="text-xs text-[#6f756f]">
+                    {chunk.char_count} chars
+                  </span>
                 </div>
-                <p className="text-sm text-[#30342f] line-clamp-3">{chunk.search_text}</p>
+                <p className="text-sm text-[#30342f] line-clamp-3">
+                  {chunk.search_text}
+                </p>
               </div>
             ))}
           </div>
@@ -221,10 +242,15 @@ export default function FileDetailPage() {
         <section className="mt-4 rounded-md border border-[#dcded8] bg-white">
           <div className="grid min-h-48 place-items-center px-4 py-10 text-center">
             <div>
-              <Boxes aria-hidden="true" className="mx-auto mb-3 text-[#275a53]" size={28} />
+              <Boxes
+                aria-hidden="true"
+                className="mx-auto mb-3 text-[#275a53]"
+                size={28}
+              />
               <p className="text-sm font-medium">No content extracted yet</p>
               <p className="mt-1 max-w-md text-sm text-[#6f756f]">
-                Parse the file to extract document blocks, then build chunks for retrieval.
+                Parse the file to extract document blocks, then build chunks for
+                retrieval.
               </p>
             </div>
           </div>

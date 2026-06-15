@@ -83,11 +83,18 @@ class ParsingService:
         return list(self.session.scalars(statement).all())
 
     def _record_success(self, *, file_record: KnowledgeFile, parsed: ParserResult) -> ParseResult:
+        has_empty_output = any(w.code == "PARSER_OUTPUT_EMPTY" for w in parsed.warnings)
+        has_blocks = len(parsed.blocks) > 0
+        if has_empty_output or not has_blocks:
+            status = "parse_failed"
+        else:
+            status = "parse_succeeded"
+
         parse_result = ParseResult(
             file_id=file_record.id,
             parser_name=parsed.parser_name,
             parser_version=parsed.parser_version,
-            status="parse_succeeded",
+            status=status,
             raw_text=parsed.raw_text,
             warnings=[
                 {"code": warning.code, "message": warning.message} for warning in parsed.warnings
@@ -128,11 +135,12 @@ class ParsingService:
             )
 
         warning_codes = {warning.code for warning in parsed.warnings}
-        file_record.status = (
-            "parse_needs_review"
-            if warning_codes & NEEDS_REVIEW_WARNING_CODES
-            else "parse_succeeded"
-        )
+        if not has_blocks or has_empty_output:
+            file_record.status = "parse_failed"
+        elif warning_codes & NEEDS_REVIEW_WARNING_CODES:
+            file_record.status = "parse_needs_review"
+        else:
+            file_record.status = "parse_succeeded"
         self.session.add(file_record)
         self.session.commit()
         self.session.refresh(parse_result)

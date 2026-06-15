@@ -1,8 +1,8 @@
 "use client";
 
-import { BookOpenCheck, Boxes, FileText, Play, Trash2 } from "lucide-react";
+import {BookOpenCheck, Boxes, FileText, Play, Trash2} from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 import {
   buildFileChunks,
@@ -16,7 +16,7 @@ type FileListProps = {
   refreshKey: number;
 };
 
-export function FileList({ refreshKey }: FileListProps) {
+export function FileList({refreshKey}: FileListProps) {
   const [files, setFiles] = useState<KnowledgeFile[]>([]);
   const [statusByFile, setStatusByFile] = useState<Record<string, string>>({});
 
@@ -32,33 +32,41 @@ export function FileList({ refreshKey }: FileListProps) {
   }, [refreshKey]);
 
   async function handleParse(file: KnowledgeFile) {
-    setStatusByFile((current) => ({ ...current, [file.id]: "Parsing" }));
+    setStatusByFile((current) => ({...current, [file.id]: "Parsing"}));
     const result = await parseFile(file.id);
     setFiles((current) =>
-      current.map((item) => (item.id === file.id ? { ...item, status: result.status } : item)),
+      current.map((item) =>
+        item.id === file.id ? {...item, status: result.status} : item,
+      ),
     );
-    setStatusByFile((current) => ({ ...current, [file.id]: result.status }));
+    setStatusByFile((current) => ({...current, [file.id]: result.status}));
   }
 
   async function handleBuildChunks(file: KnowledgeFile) {
-    setStatusByFile((current) => ({ ...current, [file.id]: "Building chunks" }));
+    setStatusByFile((current) => ({...current, [file.id]: "Building chunks"}));
     const result = await buildFileChunks(file.id);
-    setStatusByFile((current) => ({ ...current, [file.id]: `${result.total} chunks built` }));
+    setStatusByFile((current) => ({
+      ...current,
+      [file.id]: `${result.total} chunks built`,
+    }));
   }
 
   async function handleGenerateWiki(file: KnowledgeFile) {
-    setStatusByFile((current) => ({ ...current, [file.id]: "Generating Wiki" }));
+    setStatusByFile((current) => ({...current, [file.id]: "Generating Wiki"}));
     try {
       const wiki = await generateFileWiki(file.id);
-      setStatusByFile((current) => ({ ...current, [file.id]: `Wiki: ${wiki.title}` }));
+      setStatusByFile((current) => ({
+        ...current,
+        [file.id]: `Wiki: ${wiki.title}`,
+      }));
     } catch {
-      setStatusByFile((current) => ({ ...current, [file.id]: "Wiki failed" }));
+      setStatusByFile((current) => ({...current, [file.id]: "Wiki failed"}));
     }
   }
 
   async function handleDelete(file: KnowledgeFile) {
-    setStatusByFile((current) => ({ ...current, [file.id]: "Deleting" }));
-    await fetch(`/api/v1/files/${file.id}`, { method: "DELETE" });
+    setStatusByFile((current) => ({...current, [file.id]: "Deleting"}));
+    await fetch(`/api/v1/files/${file.id}`, {method: "DELETE"});
     setFiles((current) => current.filter((f) => f.id !== file.id));
   }
 
@@ -84,7 +92,11 @@ export function FileList({ refreshKey }: FileListProps) {
               <tr key={file.id}>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <FileText aria-hidden="true" className="text-[#275a53]" size={16} />
+                    <FileText
+                      aria-hidden="true"
+                      className="text-[#275a53]"
+                      size={16}
+                    />
                     <Link
                       href={`/files/${file.id}`}
                       className="font-medium text-[#123d37] hover:underline"
@@ -147,3 +159,4 @@ export function FileList({ refreshKey }: FileListProps) {
     </section>
   );
 }
+
