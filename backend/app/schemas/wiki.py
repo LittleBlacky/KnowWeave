@@ -6,6 +6,12 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 
+class WikiTopicRequest(BaseModel):
+    theme: str
+    file_ids: list[UUID] | None = None
+    knowledge_unit_ids: list[UUID] | None = None
+
+
 class WikiPageRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

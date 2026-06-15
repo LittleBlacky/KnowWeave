@@ -7,8 +7,9 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import AppError
 from app.models.base import utcnow
-from app.models.chat import Citation
+from app.models.chat import ChatMessage, Citation
 from app.models.files import Chunk, KnowledgeFile, SourceSpan
+from app.models.knowledge import KnowledgeUnit, KnowledgeUnitSource
 from app.models.wiki import WikiPage, WikiRevision
 from app.services.file_service import FileNotFoundError
 
@@ -74,6 +75,117 @@ class WikiService:
         for index, chunk in enumerate(chunks, start=1):
             self.session.add(self._citation_for_chunk(wiki, chunk, index=index))
 
+        self.session.commit()
+        self.session.refresh(wiki)
+        return wiki
+
+    def generate_topic_wiki(
+        self,
+        *,
+        theme: str,
+        file_ids: list[UUID] | None = None,
+        knowledge_unit_ids: list[UUID] | None = None,
+    ) -> WikiPage:
+        """Generate a Topic Wiki aggregating evidence across files and KUs."""
+        chunks: list[Chunk] = []
+        source_files: set[str] = set()
+
+        if file_ids:
+            for fid in file_ids:
+                file_record = self.session.get(KnowledgeFile, fid)
+                if file_record is not None and file_record.deleted_at is None:
+                    source_files.add(file_record.name)
+                    chunks.extend(self._chunks_for_file(fid))
+
+        if knowledge_unit_ids:
+            for kid in knowledge_unit_ids:
+                ku = self.session.get(KnowledgeUnit, kid)
+                if ku is not None:
+                    source_files.add(ku.title)
+                    # Find chunks linked to this KU
+                    ku_chunks = (
+                        self.session.scalars(
+                            select(Chunk)
+                            .join(KnowledgeUnitSource, KnowledgeUnitSource.chunk_id == Chunk.id)
+                            .where(KnowledgeUnitSource.knowledge_unit_id == kid)
+                            .where(Chunk.status != "ignored")
+                            .limit(5)
+                        ).all()
+                    )
+                    chunks.extend(ku_chunks)
+
+        if not chunks:
+            raise WikiChunkRequiredError()
+
+        deduped = {c.id: c for c in chunks}.values()
+        content = self._draft_topic_content(theme=theme, chunks=list(deduped), sources=sorted(source_files))
+
+        wiki = WikiPage(
+            title=theme,
+            wiki_type="topic_wiki",
+            status="draft",
+            summary=f"Topic wiki across {len(source_files)} sources, {len(deduped)} chunks.",
+            content_markdown=content,
+            source_file_id=None,
+            generation_prompt_version="fake_topic_v1",
+            search_text=content,
+            metadata_={"source_files": sorted(source_files), "chunk_count": len(deduped)},
+            verified_at=None,
+        )
+        self.session.add(wiki)
+        self.session.flush()
+
+        for index, chunk in enumerate(list(deduped), start=1):
+            self.session.add(self._citation_for_chunk(wiki, chunk, index=index))
+
+        self.create_revision(wiki_id=wiki.id, change_summary="Initial AI-generated topic wiki", edit_source="ai_generated")
+        self.session.commit()
+        self.session.refresh(wiki)
+        return wiki
+
+    def generate_faq_wiki(self, file_id: UUID) -> WikiPage:
+        """Generate a FAQ Wiki from file chunks and recent chat history."""
+        file_record = self.session.get(KnowledgeFile, file_id)
+        if file_record is None or file_record.deleted_at is not None:
+            raise FileNotFoundError()
+
+        chunks = self._chunks_for_file(file_id)
+        if not chunks:
+            raise WikiChunkRequiredError()
+
+        # Also pull recent chat messages for FAQ context
+        recent_messages = self.session.scalars(
+            select(ChatMessage)
+            .where(ChatMessage.role == "user")
+            .order_by(ChatMessage.created_at.desc())
+            .limit(10)
+        ).all()
+
+        content = self._draft_faq_content(
+            file_name=file_record.name,
+            chunks=chunks,
+            questions=[m.content_markdown for m in recent_messages],
+        )
+
+        wiki = WikiPage(
+            title=f"{file_record.name} FAQ",
+            wiki_type="faq_wiki",
+            status="draft",
+            summary=f"FAQ wiki generated from {len(chunks)} chunks and {len(recent_messages)} chat questions.",
+            content_markdown=content,
+            source_file_id=file_record.id,
+            generation_prompt_version="fake_faq_v1",
+            search_text=content,
+            metadata_={"chunk_count": len(chunks), "chat_questions_used": len(recent_messages)},
+            verified_at=None,
+        )
+        self.session.add(wiki)
+        self.session.flush()
+
+        for index, chunk in enumerate(chunks, start=1):
+            self.session.add(self._citation_for_chunk(wiki, chunk, index=index))
+
+        self.create_revision(wiki_id=wiki.id, change_summary="Initial AI-generated FAQ wiki", edit_source="ai_generated")
         self.session.commit()
         self.session.refresh(wiki)
         return wiki
@@ -232,6 +344,25 @@ class WikiService:
 
     def _draft_content(self, file_record: KnowledgeFile, chunks: list[Chunk]) -> str:
         sections = [f"# {file_record.name}", "", "## Source Summary"]
+        for index, chunk in enumerate(chunks, start=1):
+            sections.append(f"- {chunk.edited_content or chunk.raw_content} [S{index}]")
+        return "\n".join(sections)
+
+    def _draft_topic_content(self, *, theme: str, chunks: list[Chunk], sources: list[str]) -> str:
+        sections = [f"# {theme}", "", f"## Sources: {', '.join(sources)}", "", "## Key Points"]
+        for index, chunk in enumerate(chunks, start=1):
+            sections.append(f"- {chunk.edited_content or chunk.raw_content} [S{index}]")
+        return "\n".join(sections)
+
+    def _draft_faq_content(
+        self, *, file_name: str, chunks: list[Chunk], questions: list[str]
+    ) -> str:
+        sections = [f"# {file_name} FAQ", "", "## Common Questions"]
+        for question in questions[:10]:
+            sections.append(f"### Q: {question}")
+            sections.append(f"A: See source chunks below for relevant policy. [S1]")
+        sections.append("")
+        sections.append("## Reference Chunks")
         for index, chunk in enumerate(chunks, start=1):
             sections.append(f"- {chunk.edited_content or chunk.raw_content} [S{index}]")
         return "\n".join(sections)

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.schemas.chat import CitationList, CitationRead
 from app.schemas.common import ApiResponse
-from app.schemas.wiki import WikiPageList, WikiPageRead, WikiRevisionRead, WikiUpdateRequest
+from app.schemas.wiki import WikiPageList, WikiPageRead, WikiRevisionRead, WikiTopicRequest, WikiUpdateRequest
 from app.services.wiki_service import WikiService
 
 router = APIRouter(tags=["wiki"])
@@ -19,6 +19,34 @@ def get_wiki_service(db: Session = Depends(get_db)) -> WikiService:
 
 
 @router.post("/files/{file_id}/wiki", status_code=status.HTTP_201_CREATED)
+def create_file_wiki(
+    file_id: UUID,
+    service: WikiService = Depends(get_wiki_service),
+) -> ApiResponse[WikiPageRead]:
+    wiki = service.generate_document_wiki(file_id)
+    return ApiResponse(data=WikiPageRead.model_validate(wiki), error=None, request_id="req_wiki_create")
+
+
+@router.post("/wiki/topic", status_code=status.HTTP_201_CREATED)
+def create_topic_wiki(
+    request: WikiTopicRequest,
+    service: WikiService = Depends(get_wiki_service),
+) -> ApiResponse[WikiPageRead]:
+    wiki = service.generate_topic_wiki(
+        theme=request.theme,
+        file_ids=request.file_ids,
+        knowledge_unit_ids=request.knowledge_unit_ids,
+    )
+    return ApiResponse(data=WikiPageRead.model_validate(wiki), error=None, request_id="req_topic_wiki")
+
+
+@router.post("/files/{file_id}/faq-wiki", status_code=status.HTTP_201_CREATED)
+def create_faq_wiki(
+    file_id: UUID,
+    service: WikiService = Depends(get_wiki_service),
+) -> ApiResponse[WikiPageRead]:
+    wiki = service.generate_faq_wiki(file_id)
+    return ApiResponse(data=WikiPageRead.model_validate(wiki), error=None, request_id="req_faq_wiki")
 def create_file_wiki(
     file_id: UUID,
     service: WikiService = Depends(get_wiki_service),
