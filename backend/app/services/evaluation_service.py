@@ -191,6 +191,32 @@ class EvaluationService:
     def _retrieved_context_snapshots(self, message_id: UUID) -> list[dict[str, object]]:
         return [_retrieved_context_snapshot(context) for context in self._retrieved_contexts_for_message(message_id)]
 
+    def run_metrics(self) -> dict[str, object]:
+        """Compute basic evaluation metrics across all candidate samples."""
+        samples = self.list_samples()
+        total = len(samples)
+        if total == 0:
+            return {"total_samples": 0, "message": "No evaluation samples available."}
+
+        verified = sum(1 for s in samples if s.status == "verified")
+        candidates = sum(1 for s in samples if s.status == "candidate")
+        with_answer = sum(1 for s in samples if s.expected_answer)
+        with_sources = sum(
+            1 for s in samples
+            if (s.expected_source_files and len(s.expected_source_files) > 0)
+            or (s.expected_source_chunks and len(s.expected_source_chunks) > 0)
+        )
+
+        return {
+            "total_samples": total,
+            "verified": verified,
+            "candidates": candidates,
+            "with_answer": with_answer,
+            "with_sources": with_sources,
+            "source_traceability_pct": round(with_sources / total * 100, 1) if total > 0 else 0,
+            "answer_coverage_pct": round(with_answer / total * 100, 1) if total > 0 else 0,
+        }
+
     def _citations_for_message(self, message_id: UUID) -> list[Citation]:
         statement = (
             select(Citation)

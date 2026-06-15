@@ -56,3 +56,11 @@ def list_evaluation_samples(
         request_id="req_evaluation_sample_list",
     )
 
+
+@router.get("/evaluation/metrics")
+def get_evaluation_metrics(
+    service: EvaluationService = Depends(get_evaluation_service),
+) -> ApiResponse[dict]:
+    metrics = service.run_metrics()
+    return ApiResponse(data=metrics, error=None, request_id="req_evaluation_metrics")
+
