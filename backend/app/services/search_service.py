@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 from decimal import Decimal
+from math import sqrt
 from uuid import UUID, uuid4
 
 from sqlalchemy import func, select
@@ -14,6 +15,7 @@ from app.models.chat import RetrievedContext
 from app.models.files import Chunk, KnowledgeFile, ParseResult, SourceSpan
 from app.models.knowledge import KnowledgeUnit, KnowledgeUnitSource
 from app.models.wiki import WikiPage
+from app.providers.embedding import EmbeddingProvider
 from app.services.index_service import IndexService
 
 
@@ -48,9 +50,16 @@ class RetrievalRunNotFoundError(AppError):
 
 
 class SearchService:
-    def __init__(self, *, session: Session, index: IndexService | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        session: Session,
+        index: IndexService | None = None,
+        embedding_provider: EmbeddingProvider | None = None,
+    ) -> None:
         self.session = session
         self.index = index or IndexService(session=session)
+        self.embedding_provider = embedding_provider
 
     def search(
         self,
@@ -58,14 +67,24 @@ class SearchService:
         query: str,
         top_k: int = 10,
         target_types: list[str] | None = None,
+        strategy: str = "keyword",
     ) -> SearchResponse:
         retrieval_run_id = uuid4()
         requested_target_types = self._normalize_target_types(target_types)
-        results = self._search_targets(
-            query=query,
-            top_k=top_k,
-            target_types=requested_target_types,
-        )
+
+        if strategy == "hybrid" and self.embedding_provider is not None:
+            results = self._hybrid_search(
+                query=query,
+                top_k=top_k,
+                target_types=requested_target_types,
+            )
+        else:
+            results = self._search_targets(
+                query=query,
+                top_k=top_k,
+                target_types=requested_target_types,
+            )
+
         for rank, result in enumerate(results, start=1):
             result.rank = rank
             self._persist_result_context(
@@ -79,7 +98,7 @@ class SearchService:
         return SearchResponse(
             retrieval_run_id=retrieval_run_id,
             query=query,
-            strategy="keyword",
+            strategy=strategy,
             results=results,
         )
 
@@ -502,3 +521,103 @@ class SearchService:
             if target_type in supported and target_type not in normalized:
                 normalized.append(target_type)
         return normalized or ["chunk"]
+
+    # ---- Hybrid / Semantic Search ----
+
+    def _hybrid_search(
+        self,
+        *,
+        query: str,
+        top_k: int,
+        target_types: list[str],
+    ) -> list[SearchResultItem]:
+        keyword_results = self._search_targets(query=query, top_k=top_k * 2, target_types=target_types)
+        if "chunk" not in target_types or self.embedding_provider is None:
+            return keyword_results[:top_k]
+
+        vector_results = self._vector_search_chunks(query=query, top_k=top_k)
+        merged = self._merge_search_results(keyword_results, vector_results, top_k=top_k)
+        return merged
+
+    def _vector_search_chunks(self, *, query: str, top_k: int) -> list[SearchResultItem]:
+        """Search chunks by embedding cosine similarity."""
+        if self.embedding_provider is None:
+            return []
+
+        query_embedding = self.embedding_provider.embed_single(query)
+
+        statement = (
+            select(Chunk)
+            .where(Chunk.is_searchable.is_(True))
+            .where(Chunk.embedding.isnot(None))
+        )
+        chunks = list(self.session.scalars(statement).all())
+
+        scored: list[tuple[float, Chunk]] = []
+        for chunk in chunks:
+            if chunk.embedding is None:
+                continue
+            sim = _cosine_similarity(query_embedding.embedding, chunk.embedding)
+            scored.append((sim, chunk))
+
+        scored.sort(key=lambda x: -x[0])
+        results: list[SearchResultItem] = []
+        for rank, (sim, chunk) in enumerate(scored[:top_k], start=1):
+            results.append(
+                self._chunk_result_item(
+                    chunk,
+                    rank=rank,
+                    score=Decimal(str(round(sim, 4))),
+                )
+            )
+        return results
+
+    def _merge_search_results(
+        self,
+        keyword_results: list[SearchResultItem],
+        vector_results: list[SearchResultItem],
+        *,
+        top_k: int,
+    ) -> list[SearchResultItem]:
+        """Combine keyword and vector results with dedup."""
+        seen: set[str] = set()
+        merged: list[SearchResultItem] = []
+
+        keyword_map: dict[str, SearchResultItem] = {}
+        for r in keyword_results:
+            key = f"{r.result_type}:{r.result_id}"
+            keyword_map[key] = r
+
+        # Interleave: alternate keyword and vector results
+        max_len = max(len(keyword_results), len(vector_results))
+        for i in range(max_len):
+            if i < len(keyword_results):
+                item = keyword_results[i]
+                key = f"{item.result_type}:{item.result_id}"
+                if key not in seen:
+                    seen.add(key)
+                    merged.append(item)
+            if i < len(vector_results):
+                item = vector_results[i]
+                key = f"{item.result_type}:{item.result_id}"
+                if key not in seen:
+                    seen.add(key)
+                    if key in keyword_map:
+                        # Boost score for results found by both strategies
+                        kw_score = float(keyword_map[key].score)
+                        vec_score = float(item.score)
+                        item.score = Decimal(str(round(max(kw_score, vec_score) + 0.1, 4)))
+                    merged.append(item)
+
+        return merged[:top_k]
+
+
+def _cosine_similarity(a: list[float], b: list[float]) -> float:
+    if len(a) != len(b):
+        raise ValueError("Vector dimensions must match")
+    dot = sum(x * y for x, y in zip(a, b, strict=True))
+    norm_a = sqrt(sum(x * x for x in a))
+    norm_b = sqrt(sum(y * y for y in b))
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return dot / (norm_a * norm_b)

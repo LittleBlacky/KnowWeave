@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.errors import AppError
 from app.models.base import utcnow
 from app.models.files import Chunk, DocumentBlock, KnowledgeFile, ParseResult, SourceSpan
+from app.providers.embedding import EmbeddingProvider
 from app.services.chunk_strategy import BlockForChunking, ChunkStrategyOptions, build_chunk_candidates
 from app.services.file_service import FileNotFoundError as KnowledgeFileNotFoundError
 
@@ -29,8 +30,9 @@ class ChunkNotFoundError(AppError):
 
 
 class ChunkService:
-    def __init__(self, *, session: Session) -> None:
+    def __init__(self, *, session: Session, embedding_provider: EmbeddingProvider | None = None) -> None:
         self.session = session
+        self.embedding_provider = embedding_provider
 
     def build_chunks_for_file(
         self,
@@ -75,6 +77,15 @@ class ChunkService:
             )
             self.session.add(chunk)
             self.session.flush()
+
+            # Generate embedding for semantic search
+            if self.embedding_provider is not None:
+                try:
+                    emb_result = self.embedding_provider.embed_single(candidate.raw_content)
+                    chunk.embedding = emb_result.embedding
+                except Exception:
+                    pass  # embedding is best-effort; don't block chunk creation
+
             self.session.add(
                 SourceSpan(
                     file_id=file_id,

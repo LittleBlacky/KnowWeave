@@ -98,6 +98,7 @@ class Chunk(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     search_text: Mapped[str] = mapped_column(Text, nullable=False)
     metadata_: Mapped[dict[str, Any]] = mapped_column("metadata", JSON, default=dict, nullable=False)
     is_searchable: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
+    embedding: Mapped[list[float] | None] = mapped_column(JSON, nullable=True)
 
 
 class SourceSpan(UUIDPrimaryKeyMixin, Base):

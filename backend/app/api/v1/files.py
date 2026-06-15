@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings, get_settings
 from app.db.session import get_db
 from app.models.files import DocumentBlock
+from app.providers.embedding import EmbeddingProvider
+from app.providers.fake_embedding import FakeEmbeddingProvider
 from app.providers.storage import LocalStorageProvider
 from app.schemas.common import ApiResponse
 from app.schemas.files import (
@@ -50,8 +52,15 @@ def get_parsing_service(
     )
 
 
-def get_chunk_service(db: Session = Depends(get_db)) -> ChunkService:
-    return ChunkService(session=db)
+def get_chunk_service(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+) -> ChunkService:
+    embedding: EmbeddingProvider | None = None
+    if settings.qwen_enabled:
+        # Real embedding provider can be wired here in the future
+        pass
+    return ChunkService(session=db, embedding_provider=embedding or FakeEmbeddingProvider())
 
 
 @router.post("/upload", status_code=status.HTTP_201_CREATED)

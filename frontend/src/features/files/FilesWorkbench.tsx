@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import {useState} from "react";
 
-import { FileList } from "@/features/file-list/FileList";
-import { FileUpload } from "@/features/file-upload/FileUpload";
+import {FileList} from "@/features/file-list/FileList";
+import {FileUpload} from "@/features/file-upload/FileUpload";
 import {
   parseFile,
   buildFileChunks,
@@ -49,3 +49,4 @@ export function FilesWorkbench() {
     </div>
   );
 }
+
