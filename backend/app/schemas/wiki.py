@@ -35,3 +35,18 @@ class WikiUpdateRequest(BaseModel):
     change_summary: str
     status: str | None = None
     summary: str | None = None
+
+
+class WikiRevisionRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    wiki_page_id: UUID
+    revision_number: int
+    title: str
+    content_markdown: str
+    summary: str | None = None
+    status: str
+    change_summary: str
+    edit_source: str
+    created_at: datetime

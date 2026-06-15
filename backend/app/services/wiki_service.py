@@ -9,7 +9,7 @@ from app.core.errors import AppError
 from app.models.base import utcnow
 from app.models.chat import Citation
 from app.models.files import Chunk, KnowledgeFile, SourceSpan
-from app.models.wiki import WikiPage
+from app.models.wiki import WikiPage, WikiRevision
 from app.services.file_service import FileNotFoundError
 
 
@@ -65,6 +65,12 @@ class WikiService:
         self.session.add(wiki)
         self.session.flush()
 
+        self.create_revision(
+            wiki_id=wiki.id,
+            change_summary="Initial AI-generated draft",
+            edit_source="ai_generated",
+        )
+
         for index, chunk in enumerate(chunks, start=1):
             self.session.add(self._citation_for_chunk(wiki, chunk, index=index))
 
@@ -111,6 +117,12 @@ class WikiService:
         self.session.add(wiki)
         self.session.commit()
         self.session.refresh(wiki)
+
+        self.create_revision(
+            wiki_id=wiki.id,
+            change_summary=change_summary.strip(),
+            edit_source="manual",
+        )
         return wiki
 
     def list_wiki_citations(self, wiki_id: UUID) -> list[Citation]:
@@ -122,6 +134,72 @@ class WikiService:
             .order_by(Citation.created_at.asc())
         )
         return list(self.session.scalars(statement).all())
+
+    # ---- Wiki Revisions ----
+
+    def list_revisions(self, wiki_id: UUID) -> list[WikiRevision]:
+        self.get_wiki(wiki_id)
+        statement = (
+            select(WikiRevision)
+            .where(WikiRevision.wiki_page_id == wiki_id)
+            .order_by(WikiRevision.revision_number.desc())
+        )
+        return list(self.session.scalars(statement).all())
+
+    def create_revision(
+        self,
+        wiki_id: UUID,
+        *,
+        change_summary: str,
+        edit_source: str = "manual",
+    ) -> WikiRevision:
+        wiki = self.get_wiki(wiki_id)
+        existing = self.list_revisions(wiki_id)
+        next_number = max((r.revision_number for r in existing), default=0) + 1
+
+        revision = WikiRevision(
+            wiki_page_id=wiki.id,
+            revision_number=next_number,
+            title=wiki.title,
+            content_markdown=wiki.content_markdown,
+            summary=wiki.summary,
+            status=wiki.status,
+            change_summary=change_summary,
+            edit_source=edit_source,
+            created_at=utcnow(),
+        )
+        self.session.add(revision)
+        self.session.commit()
+        self.session.refresh(revision)
+        return revision
+
+    def rollback_to_revision(self, wiki_id: UUID, revision_id: UUID) -> WikiPage:
+        wiki = self.get_wiki(wiki_id)
+        revision = self.session.get(WikiRevision, revision_id)
+        if revision is None or revision.wiki_page_id != wiki.id:
+            raise WikiNotFoundError()
+
+        wiki.title = revision.title
+        wiki.content_markdown = revision.content_markdown
+        wiki.summary = revision.summary
+        wiki.status = revision.status
+        wiki.search_text = revision.content_markdown
+        wiki.metadata_ = {
+            **wiki.metadata_,
+            "rolled_back_from_revision": revision.revision_number,
+        }
+        self.session.add(wiki)
+        self.session.commit()
+        self.session.refresh(wiki)
+
+        self.create_revision(
+            wiki_id=wiki.id,
+            change_summary=f"Rolled back to revision {revision.revision_number}",
+            edit_source="rollback",
+        )
+        return wiki
+
+    # ---- Private helpers ----
 
     def _chunks_for_file(self, file_id: UUID) -> list[Chunk]:
         statement = (

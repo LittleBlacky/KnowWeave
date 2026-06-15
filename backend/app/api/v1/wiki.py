@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.schemas.chat import CitationList, CitationRead
 from app.schemas.common import ApiResponse
-from app.schemas.wiki import WikiPageList, WikiPageRead, WikiUpdateRequest
+from app.schemas.wiki import WikiPageList, WikiPageRead, WikiRevisionRead, WikiUpdateRequest
 from app.services.wiki_service import WikiService
 
 router = APIRouter(tags=["wiki"])
@@ -92,3 +92,39 @@ def list_wiki_citations(
         error=None,
         request_id="req_wiki_citations",
     )
+
+
+@router.get("/wiki/pages/{wiki_id}/revisions")
+@router.get("/wiki/{wiki_id}/revisions")
+def list_wiki_revisions(
+    wiki_id: UUID,
+    service: WikiService = Depends(get_wiki_service),
+) -> ApiResponse[list[WikiRevisionRead]]:
+    revisions = service.list_revisions(wiki_id)
+    items = [
+        WikiRevisionRead(
+            id=r.id,
+            wiki_page_id=r.wiki_page_id,
+            revision_number=r.revision_number,
+            title=r.title,
+            content_markdown=r.content_markdown,
+            summary=r.summary,
+            status=r.status,
+            change_summary=r.change_summary,
+            edit_source=r.edit_source,
+            created_at=r.created_at,
+        )
+        for r in revisions
+    ]
+    return ApiResponse(data=items, error=None, request_id="req_wiki_revisions")
+
+
+@router.post("/wiki/pages/{wiki_id}/revisions/{revision_id}/rollback")
+@router.post("/wiki/{wiki_id}/revisions/{revision_id}/rollback")
+def rollback_wiki(
+    wiki_id: UUID,
+    revision_id: UUID,
+    service: WikiService = Depends(get_wiki_service),
+) -> ApiResponse[WikiPageRead]:
+    wiki = service.rollback_to_revision(wiki_id, revision_id)
+    return ApiResponse(data=WikiPageRead.model_validate(wiki), error=None, request_id="req_wiki_rollback")
