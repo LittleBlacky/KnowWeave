@@ -1,10 +1,12 @@
 "use client";
 
-import { Boxes, FileText, Play } from "lucide-react";
+import { BookOpenCheck, Boxes, FileText, Play, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import {
   buildFileChunks,
+  generateFileWiki,
   listFiles,
   parseFile,
   type KnowledgeFile,
@@ -44,6 +46,22 @@ export function FileList({ refreshKey }: FileListProps) {
     setStatusByFile((current) => ({ ...current, [file.id]: `${result.total} chunks built` }));
   }
 
+  async function handleGenerateWiki(file: KnowledgeFile) {
+    setStatusByFile((current) => ({ ...current, [file.id]: "Generating Wiki" }));
+    try {
+      const wiki = await generateFileWiki(file.id);
+      setStatusByFile((current) => ({ ...current, [file.id]: `Wiki: ${wiki.title}` }));
+    } catch {
+      setStatusByFile((current) => ({ ...current, [file.id]: "Wiki failed" }));
+    }
+  }
+
+  async function handleDelete(file: KnowledgeFile) {
+    setStatusByFile((current) => ({ ...current, [file.id]: "Deleting" }));
+    await fetch(`/api/v1/files/${file.id}`, { method: "DELETE" });
+    setFiles((current) => current.filter((f) => f.id !== file.id));
+  }
+
   return (
     <section className="rounded-md border border-[#dcded8] bg-white">
       <div className="flex items-center justify-between border-b border-[#dcded8] px-4 py-3">
@@ -67,7 +85,12 @@ export function FileList({ refreshKey }: FileListProps) {
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <FileText aria-hidden="true" className="text-[#275a53]" size={16} />
-                    <span className="font-medium">{file.name}</span>
+                    <Link
+                      href={`/files/${file.id}`}
+                      className="font-medium text-[#123d37] hover:underline"
+                    >
+                      {file.name}
+                    </Link>
                   </div>
                 </td>
                 <td className="px-4 py-3">{file.file_type}</td>
@@ -96,6 +119,23 @@ export function FileList({ refreshKey }: FileListProps) {
                     >
                       <Boxes aria-hidden="true" size={14} />
                       Chunks
+                    </button>
+                    <button
+                      aria-label={`Generate Wiki for ${file.name}`}
+                      className="inline-flex items-center gap-1 rounded-md border border-[#dcded8] px-3 py-2 text-xs font-semibold"
+                      onClick={() => void handleGenerateWiki(file)}
+                      type="button"
+                    >
+                      <BookOpenCheck aria-hidden="true" size={14} />
+                      Wiki
+                    </button>
+                    <button
+                      aria-label={`Delete ${file.name}`}
+                      className="inline-flex items-center gap-1 rounded-md border border-[#dcded8] px-2 py-2 text-xs font-semibold text-red-600 hover:bg-red-50"
+                      onClick={() => void handleDelete(file)}
+                      type="button"
+                    >
+                      <Trash2 aria-hidden="true" size={14} />
                     </button>
                   </div>
                 </td>

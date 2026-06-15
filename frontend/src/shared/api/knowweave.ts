@@ -62,6 +62,29 @@ export type ChunkListResponse = {
   total: number;
 };
 
+export type DocumentBlock = {
+  id: string;
+  file_id: string;
+  parse_result_id: string;
+  block_index: number;
+  block_type: string;
+  raw_content: string;
+  normalized_content: string | null;
+  is_ignored: boolean;
+  page_number: number | null;
+  line_start: number | null;
+  line_end: number | null;
+  char_start: number | null;
+  char_end: number | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+};
+
+export type DocumentBlockListResponse = {
+  items: DocumentBlock[];
+  total: number;
+};
+
 export type SearchResult = {
   result_id: string;
   result_type: string;
@@ -240,6 +263,10 @@ export function getFileDetail(fileId: string) {
 
 export function generateFileWiki(fileId: string) {
   return apiClient.post<Wiki>(`/files/${fileId}/wiki`);
+}
+
+export function listDocumentBlocks(fileId: string) {
+  return apiClient.get<DocumentBlockListResponse>(`/files/${fileId}/document-blocks`);
 }
 
 export function listFileChunks(fileId: string) {
