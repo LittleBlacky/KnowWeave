@@ -1,4 +1,4 @@
-import { apiClient } from "./client";
+import {apiClient} from "./client";
 
 export type KnowledgeFile = {
   id: string;
@@ -23,7 +23,7 @@ export type ParseResult = {
   parser_name: string;
   parser_version: string;
   status: string;
-  warnings: Array<{ code: string; message: string }>;
+  warnings: Array<{code: string; message: string}>;
   block_count: number;
 };
 
@@ -234,12 +234,22 @@ export function buildFileChunks(fileId: string) {
   return apiClient.post<ChunkListResponse>(`/files/${fileId}/chunks/build`);
 }
 
+export function getFileDetail(fileId: string) {
+  return apiClient.get<KnowledgeFile>(`/files/${fileId}`);
+}
+
+export function generateFileWiki(fileId: string) {
+  return apiClient.post<Wiki>(`/files/${fileId}/wiki`);
+}
+
 export function listFileChunks(fileId: string) {
   return apiClient.get<ChunkListResponse>(`/files/${fileId}/chunks`);
 }
 
 export function updateChunk(chunkId: string, editedContent: string) {
-  return apiClient.patch<Chunk>(`/chunks/${chunkId}`, { edited_content: editedContent });
+  return apiClient.patch<Chunk>(`/chunks/${chunkId}`, {
+    edited_content: editedContent,
+  });
 }
 
 export function ignoreChunk(chunkId: string) {
@@ -266,23 +276,35 @@ export function listTags() {
   return apiClient.get<TagListResponse>("/tags");
 }
 
-export function createTag(input: { name: string; description?: string; color?: string }) {
+export function createTag(input: {
+  name: string;
+  description?: string;
+  color?: string;
+}) {
   return apiClient.post<Tag>("/tags", input);
 }
 
-export function bindTag(input: { tag_id: string; target_type: string; target_id: string }) {
-  return apiClient.post<{ id: string; tag_id: string; target_type: string; target_id: string }>(
-    "/tag-bindings",
-    input,
-  );
+export function bindTag(input: {
+  tag_id: string;
+  target_type: string;
+  target_id: string;
+}) {
+  return apiClient.post<{
+    id: string;
+    tag_id: string;
+    target_type: string;
+    target_id: string;
+  }>("/tag-bindings", input);
 }
 
-export function listKnowledgeUnits(params: {
-  status?: string;
-  tag?: string;
-  source_file_id?: string;
-  unit_type?: string;
-} = {}) {
+export function listKnowledgeUnits(
+  params: {
+    status?: string;
+    tag?: string;
+    source_file_id?: string;
+    unit_type?: string;
+  } = {},
+) {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
     if (value) {
@@ -294,7 +316,9 @@ export function listKnowledgeUnits(params: {
 }
 
 export function getKnowledgeUnit(knowledgeUnitId: string) {
-  return apiClient.get<KnowledgeUnitDetail>(`/knowledge-units/${knowledgeUnitId}`);
+  return apiClient.get<KnowledgeUnitDetail>(
+    `/knowledge-units/${knowledgeUnitId}`,
+  );
 }
 
 export function updateKnowledgeUnit(
@@ -355,10 +379,15 @@ export function createFeedback(input: {
 }
 
 export function createEvaluationSampleFromFeedback(feedbackId: string) {
-  return apiClient.post<EvaluationSample>(`/feedback/${feedbackId}/to-evaluation-sample`);
+  return apiClient.post<EvaluationSample>(
+    `/feedback/${feedbackId}/to-evaluation-sample`,
+  );
 }
 
 export function listEvaluationSamples(status?: string) {
   const suffix = status ? `?status=${encodeURIComponent(status)}` : "";
-  return apiClient.get<EvaluationSampleListResponse>(`/evaluation-samples${suffix}`);
+  return apiClient.get<EvaluationSampleListResponse>(
+    `/evaluation-samples${suffix}`,
+  );
 }
+
