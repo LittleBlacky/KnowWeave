@@ -140,7 +140,7 @@ class KnowledgeUnitService:
                 .join(Tag, Tag.id == TagBinding.tag_id)
                 .where(Tag.name == tag)
             )
-        statement = statement.order_by(KnowledgeUnit.updated_at.desc()).distinct()
+        statement = statement.order_by(KnowledgeUnit.updated_at.desc()).distinct(KnowledgeUnit.id)
         return list(self.session.scalars(statement).all())
 
     def get_knowledge_unit(self, knowledge_unit_id: UUID) -> KnowledgeUnit:

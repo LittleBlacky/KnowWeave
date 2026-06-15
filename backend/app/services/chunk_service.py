@@ -7,7 +7,9 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import AppError
 from app.models.base import utcnow
+from app.models.chat import Citation
 from app.models.files import Chunk, DocumentBlock, KnowledgeFile, ParseResult, SourceSpan
+from app.models.knowledge import KnowledgeUnitSource
 from app.providers.embedding import EmbeddingProvider
 from app.services.chunk_strategy import BlockForChunking, ChunkStrategyOptions, build_chunk_candidates
 from app.services.file_service import FileNotFoundError as KnowledgeFileNotFoundError
@@ -195,7 +197,29 @@ class ChunkService:
         return list(self.session.scalars(statement).all())
 
     def _delete_existing_chunks(self, file_id: UUID) -> None:
+        # Delete in dependency order to avoid FK violations
+        # 1. Citations referencing chunks/source_spans
+        chunk_ids = self.session.scalars(
+            select(Chunk.id).where(Chunk.file_id == file_id)
+        ).all()
+        if chunk_ids:
+            self.session.execute(
+                delete(Citation).where(Citation.chunk_id.in_(chunk_ids))
+            )
+        # 2. Knowledge unit sources referencing chunks
+        self.session.execute(
+            delete(KnowledgeUnitSource).where(KnowledgeUnitSource.file_id == file_id)
+        )
+        # 3. Source spans (may be referenced by citations from wiki)
+        self.session.execute(
+            delete(Citation).where(
+                Citation.source_span_id.in_(
+                    select(SourceSpan.id).where(SourceSpan.file_id == file_id)
+                )
+            )
+        )
         self.session.execute(delete(SourceSpan).where(SourceSpan.file_id == file_id))
+        # 4. Chunks
         self.session.execute(delete(Chunk).where(Chunk.file_id == file_id))
         self.session.flush()
 
