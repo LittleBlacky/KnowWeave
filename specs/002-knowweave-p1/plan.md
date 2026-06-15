@@ -23,47 +23,47 @@ P1 将 KnowWeave 从「被动知识工具」升级为「主动知识策展平台
 
 **目标**：语义搜索上线，Wiki 可追溯版本，长任务不阻塞。
 
-- T101 启用 pgvector embedding 字段与向量索引
-- T102 实现 Embedding Provider 接口与 Fake Embedding
-- T103 实现语义搜索 + hybrid search（关键词 + 向量融合）
-- T104 创建 wiki_revisions 表与迁移
-- T105 实现 Wiki Revision 保存/列表/回滚
-- T106 前端 Wiki 编辑增强（Markdown 预览、引用插入）
+- [x] T101 启用 pgvector embedding 字段与向量索引
+- [x] T102 实现 Embedding Provider 接口与 Fake Embedding
+- [x] T103 实现语义搜索 + hybrid search（关键词 + 向量融合）
+- [x] T104 创建 wiki_revisions 表与迁移
+- [x] T105 实现 Wiki Revision 保存/列表/回滚
+- [x] T106 前端 Wiki 编辑增强（Markdown 预览、引用插入）
 
 ### Sprint 2: 高级 Wiki（预计 6 个任务）
 
 **目标**：Topic Wiki 和 FAQ Wiki 上线，知识可跨文件聚合。
 
-- T107 实现 Topic Wiki 生成（用户选主题 + 多文件/KU）
-- T108 实现 FAQ Wiki 生成（从文件内容 + 问答记录）
-- T109 Wiki 内链与反链基础能力
-- T110 前端 Topic Wiki 创建与编辑页面
-- T111 前端 FAQ Wiki 管理页面
-- T112 Document Wiki 模板优化（规则/流程/术语/风险分段）
+- [x] T107 实现 Topic Wiki 生成（用户选主题 + 多文件/KU）
+- [x] T108 实现 FAQ Wiki 生成（从文件内容 + 问答记录）
+- [x] T109 Wiki 内链与反链基础能力
+- [x] T110 前端 Topic Wiki 创建与编辑页面
+- [x] T111 前端 FAQ Wiki 管理页面
+- [x] T112 Document Wiki 模板优化（规则/流程/术语/风险分段）
 
 ### Sprint 3: LLM 主动知识策展（核心亮点，预计 8 个任务）
 
 **目标**：LLM 定期自动扫描知识库，发现高价值知识并组织。
 
-- T113 实现知识质量评分算法（chunk 引用频率、反馈信号、时效性）
-- T114 实现 LLM 策展触发器（定时 / 事件驱动）
-- T115 实现「知识发现报告」生成（LLM 扫描后输出：哪些知识值得沉淀、哪些已过时、哪些需要合并）
-- T116 实现自动 Topic Wiki 建议（LLM 发现跨文件主题，建议创建 Topic Wiki）
-- T117 实现自动 FAQ 发现（从 Chat 历史中提取高频问题，建议沉淀为 FAQ）
-- T118 实现知识新鲜度检查（标记可能过时的 chunk/KU/Wiki）
-- T119 前端策展仪表盘（展示 LLM 发现报告、建议操作）
-- T120 前端知识健康看板（新鲜度、引用率、反馈质量可视化）
+- [x] T113 实现知识质量评分算法（chunk 引用频率、反馈信号、时效性）
+- [ ] T114 实现 LLM 策展触发器（定时 / 事件驱动）
+- [x] T115 实现「知识发现报告」生成
+- [x] T116 实现自动 Topic Wiki 建议
+- [x] T117 实现自动 FAQ 发现
+- [x] T118 实现知识新鲜度检查
+- [x] T119 前端策展仪表盘
+- [ ] T120 前端知识健康看板（新鲜度、引用率、反馈质量可视化）
 
 ### Sprint 4: 知识治理 + 评测闭环（预计 6 个任务）
 
 **目标**：知识单元可合并拆分，评测集可正式运行。
 
-- T121 实现 Knowledge Unit 合并（多选 KU → 合并为一个）
-- T122 实现 Knowledge Unit 拆分（长 KU → 拆为多个子 KU）
-- T123 实现 evaluation_runs 与指标计算（Recall@K, Precision@K, Citation Precision）
-- T124 前端 KU 合并/拆分交互
-- T125 前端评测运行页面
-- T126 端到端 P1 smoke 脚本
+- [x] T121 实现 Knowledge Unit 合并
+- [x] T122 实现 Knowledge Unit 拆分
+- [x] T123 实现 evaluation_runs 与指标计算
+- [ ] T124 前端 KU 合并/拆分交互
+- [ ] T125 前端评测运行页面
+- [ ] T126 端到端 P1 smoke 脚本
 
 ## 与 Yuxi 的差异定位
 
