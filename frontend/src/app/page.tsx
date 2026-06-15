@@ -53,9 +53,7 @@ export default function Home() {
       label: "解析成功率",
       value: loading ? "…" : `${parseRate}%`,
       detail:
-        parseRate === 0
-          ? "暂无数据"
-          : `${parsedCount} / ${fileCount} 个文件`,
+        parseRate === 0 ? "暂无数据" : `${parsedCount} / ${fileCount} 个文件`,
       icon: Gauge,
     },
     {
@@ -67,10 +65,7 @@ export default function Home() {
     {
       label: "Wiki 页面",
       value: loading ? "…" : String(wikiPages.length),
-      detail:
-        wikiPages.length === 0
-          ? "暂无草稿"
-          : `${wikiPending} 待审核`,
+      detail: wikiPages.length === 0 ? "暂无草稿" : `${wikiPending} 待审核`,
       icon: BookOpenCheck,
     },
   ];
@@ -131,9 +126,9 @@ export default function Home() {
                   className="mx-auto mb-3 text-[#275a53]"
                   size={28}
                 />
-              <p className="text-sm font-medium">暂无文件</p>
-              <p className="mt-1 max-w-md text-sm text-[#6f756f]">
-                上传知识文件以填充知识库。
+                <p className="text-sm font-medium">暂无文件</p>
+                <p className="mt-1 max-w-md text-sm text-[#6f756f]">
+                  上传知识文件以填充知识库。
                 </p>
               </div>
             </div>

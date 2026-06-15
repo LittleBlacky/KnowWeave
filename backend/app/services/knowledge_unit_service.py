@@ -112,6 +112,78 @@ class KnowledgeUnitService:
 
         return units
 
+    def merge_knowledge_units(self, *, source_ids: list[UUID], title: str) -> KnowledgeUnit:
+        """Merge multiple Knowledge Units into one, combining content and sources."""
+        if len(source_ids) < 2:
+            raise AppError(
+                code="MERGE_REQUIRES_MULTIPLE",
+                message="At least two Knowledge Units are required for a merge.",
+                status_code=400,
+            )
+
+        source_units = [self.get_knowledge_unit(uid) for uid in source_ids]
+        # Collect all source chunks from merged units
+        all_chunk_ids: list[UUID] = []
+        combined_content_parts: list[str] = []
+        for unit in source_units:
+            combined_content_parts.append(f"## {unit.title}\n{unit.content}")
+            for src in self.list_sources(unit.id):
+                if src.chunk_id is not None and src.chunk_id not in all_chunk_ids:
+                    all_chunk_ids.append(src.chunk_id)
+
+        merged = self.create_knowledge_unit(
+            title=title,
+            content="\n\n".join(combined_content_parts),
+            unit_type="concept",
+            summary=f"Merged from {len(source_units)} units: {', '.join(u.title for u in source_units)}"[:200],
+            status="draft",
+            source_chunk_ids=all_chunk_ids,
+        )
+
+        # Archive the source units
+        for unit in source_units:
+            unit.status = "archived"
+            unit.archived_at = utcnow()
+            self.session.add(unit)
+
+        self.session.commit()
+        self.session.refresh(merged)
+        return merged
+
+    def split_knowledge_unit(
+        self, *, source_id: UUID, titles: list[str], content_splits: list[str]
+    ) -> list[KnowledgeUnit]:
+        """Split a long Knowledge Unit into multiple smaller units."""
+        if len(titles) != len(content_splits) or len(titles) < 2:
+            raise AppError(
+                code="SPLIT_REQUIRES_VALID_PARTS",
+                message="Split requires at least 2 parts with matching titles and content.",
+                status_code=400,
+            )
+
+        source = self.get_knowledge_unit(source_id)
+        source_chunk_ids = [s.chunk_id for s in self.list_sources(source.id) if s.chunk_id is not None]
+
+        created: list[KnowledgeUnit] = []
+        for title, content in zip(titles, content_splits):
+            unit = self.create_knowledge_unit(
+                title=title,
+                content=content,
+                unit_type=source.unit_type,
+                summary=content[:200],
+                status="draft",
+                source_chunk_ids=source_chunk_ids,
+            )
+            created.append(unit)
+
+        # Archive the original
+        source.status = "archived"
+        source.archived_at = utcnow()
+        self.session.add(source)
+        self.session.commit()
+
+        return created
+
     def list_knowledge_units(
         self,
         *,

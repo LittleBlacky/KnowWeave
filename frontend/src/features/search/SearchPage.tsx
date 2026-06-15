@@ -1,17 +1,28 @@
 "use client";
 
-import { Search } from "lucide-react";
-import { useState } from "react";
+import {Search} from "lucide-react";
+import {useState} from "react";
 
-import { SourceLocatorPanel } from "@/features/source-viewer/SourceLocatorPanel";
-import { searchKnowledge, type SearchResponse, type SearchResult } from "@/shared/api/knowweave";
+import {SourceLocatorPanel} from "@/features/source-viewer/SourceLocatorPanel";
+import {
+  searchKnowledge,
+  type SearchResponse,
+  type SearchResult,
+} from "@/shared/api/knowweave";
 
 export function SearchPage() {
   const [query, setQuery] = useState("approval");
-  const [targetTypes, setTargetTypes] = useState(["file", "chunk", "knowledge_unit", "wiki_page"]);
+  const [targetTypes, setTargetTypes] = useState([
+    "file",
+    "chunk",
+    "knowledge_unit",
+    "wiki_page",
+  ]);
   const [strategy, setStrategy] = useState("keyword");
   const [result, setResult] = useState<SearchResponse | null>(null);
-  const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null);
+  const [selectedResult, setSelectedResult] = useState<SearchResult | null>(
+    null,
+  );
   const [busy, setBusy] = useState(false);
 
   async function handleSearch() {
@@ -68,7 +79,10 @@ export function SearchPage() {
             ["knowledge_unit", "知识单元"],
             ["wiki_page", "Wiki"],
           ].map(([value, label]) => (
-            <label className="inline-flex items-center gap-2 text-sm" key={value}>
+            <label
+              className="inline-flex items-center gap-2 text-sm"
+              key={value}
+            >
               <input
                 checked={targetTypes.includes(value)}
                 onChange={(event) => {
@@ -108,11 +122,17 @@ export function SearchPage() {
           </div>
 
           <aside className="rounded-md border border-[#dcded8] bg-white p-4">
-            <h2 className="mb-3 text-base font-semibold">Retrieval run panel</h2>
+            <h2 className="mb-3 text-base font-semibold">
+              Retrieval run panel
+            </h2>
             {selectedResult ? (
-              <SourceLocatorPanel source={sourceFromSearchResult(selectedResult)} />
+              <SourceLocatorPanel
+                source={sourceFromSearchResult(selectedResult)}
+              />
             ) : (
-              <p className="text-sm text-[#5d645d]">Select a result to inspect its source locator.</p>
+              <p className="text-sm text-[#5d645d]">
+                Select a result to inspect its source locator.
+              </p>
             )}
           </aside>
         </section>
@@ -147,7 +167,9 @@ function SearchResultCard({
         </span>
       </div>
       <p className="text-sm text-[#30342f]">{item.preview_text}</p>
-      <div className="text-xs font-semibold text-[#275a53]">Inspect source locator</div>
+      <div className="text-xs font-semibold text-[#275a53]">
+        Inspect source locator
+      </div>
     </button>
   );
 }
@@ -168,3 +190,4 @@ function sourceFromSearchResult(item: SearchResult) {
     source_type: item.result_type,
   };
 }
+

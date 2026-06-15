@@ -10,8 +10,10 @@ from app.schemas.common import ApiResponse
 from app.schemas.knowledge_units import (
     KnowledgeUnitDetail,
     KnowledgeUnitList,
+    KnowledgeUnitMergeRequest,
     KnowledgeUnitRead,
     KnowledgeUnitSourceRead,
+    KnowledgeUnitSplitRequest,
     KnowledgeUnitWriteRequest,
 )
 from app.schemas.tags import TagRead
@@ -145,4 +147,35 @@ def _read_unit(unit, *, service: KnowledgeUnitService) -> KnowledgeUnitRead:
         updated_at=unit.updated_at,
         verified_at=unit.verified_at,
         archived_at=unit.archived_at,
+    )
+
+
+@router.post("/merge", status_code=status.HTTP_201_CREATED)
+def merge_knowledge_units(
+    request: KnowledgeUnitMergeRequest,
+    service: KnowledgeUnitService = Depends(get_knowledge_unit_service),
+) -> ApiResponse[KnowledgeUnitRead]:
+    merged = service.merge_knowledge_units(source_ids=request.source_ids, title=request.title)
+    return ApiResponse(
+        data=_read_unit(merged, service=service),
+        error=None,
+        request_id="req_ku_merge",
+    )
+
+
+@router.post("/split", status_code=status.HTTP_201_CREATED)
+def split_knowledge_unit(
+    request: KnowledgeUnitSplitRequest,
+    service: KnowledgeUnitService = Depends(get_knowledge_unit_service),
+) -> ApiResponse[KnowledgeUnitList]:
+    units = service.split_knowledge_unit(
+        source_id=request.source_id,
+        titles=request.titles,
+        content_splits=request.content_splits,
+    )
+    items = [_read_unit(u, service=service) for u in units]
+    return ApiResponse(
+        data=KnowledgeUnitList(items=items, total=len(items)),
+        error=None,
+        request_id="req_ku_split",
     )

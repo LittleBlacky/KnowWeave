@@ -32,7 +32,7 @@ export function FileList({refreshKey}: FileListProps) {
   }, [refreshKey]);
 
   async function handleParse(file: KnowledgeFile) {
-    setStatusByFile((current) => ({ ...current, [file.id]: "解析中" }));
+    setStatusByFile((current) => ({...current, [file.id]: "解析中"}));
     const result = await parseFile(file.id);
     setFiles((current) =>
       current.map((item) =>
@@ -52,7 +52,7 @@ export function FileList({refreshKey}: FileListProps) {
   }
 
   async function handleGenerateWiki(file: KnowledgeFile) {
-    setStatusByFile((current) => ({ ...current, [file.id]: "生成 Wiki 中" }));
+    setStatusByFile((current) => ({...current, [file.id]: "生成 Wiki 中"}));
     try {
       const wiki = await generateFileWiki(file.id);
       setStatusByFile((current) => ({
@@ -60,12 +60,12 @@ export function FileList({refreshKey}: FileListProps) {
         [file.id]: `Wiki: ${wiki.title}`,
       }));
     } catch {
-      setStatusByFile((current) => ({ ...current, [file.id]: "Wiki 生成失败" }));
+      setStatusByFile((current) => ({...current, [file.id]: "Wiki 生成失败"}));
     }
   }
 
   async function handleDelete(file: KnowledgeFile) {
-    setStatusByFile((current) => ({ ...current, [file.id]: "删除中" }));
+    setStatusByFile((current) => ({...current, [file.id]: "删除中"}));
     await fetch(`/api/v1/files/${file.id}`, {method: "DELETE"});
     setFiles((current) => current.filter((f) => f.id !== file.id));
   }

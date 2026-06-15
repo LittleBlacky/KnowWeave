@@ -476,7 +476,9 @@ export function listWikiRevisions(wikiId: string) {
 }
 
 export function rollbackWiki(wikiId: string, revisionId: string) {
-  return apiClient.post<Wiki>(`/wiki/${wikiId}/revisions/${revisionId}/rollback`);
+  return apiClient.post<Wiki>(
+    `/wiki/${wikiId}/revisions/${revisionId}/rollback`,
+  );
 }
 
 export function createTopicWiki(input: {

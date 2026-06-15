@@ -1,15 +1,15 @@
 "use client";
 
-import { Upload } from "lucide-react";
-import { useRef, useState } from "react";
+import {Upload} from "lucide-react";
+import {useRef, useState} from "react";
 
-import { uploadFile, type KnowledgeFile } from "@/shared/api/knowweave";
+import {uploadFile, type KnowledgeFile} from "@/shared/api/knowweave";
 
 type FileUploadProps = {
   onUploaded?: (file: KnowledgeFile) => void;
 };
 
-export function FileUpload({ onUploaded }: FileUploadProps) {
+export function FileUpload({onUploaded}: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<string>("Ready");
   const [busy, setBusy] = useState(false);
@@ -39,7 +39,9 @@ export function FileUpload({ onUploaded }: FileUploadProps) {
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold">上传知识文件</h2>
-          <p className="mt-1 text-sm text-[#6f756f]">支持 txt、md、pdf、docx 格式。</p>
+          <p className="mt-1 text-sm text-[#6f756f]">
+            支持 txt、md、pdf、docx 格式。
+          </p>
         </div>
         <Upload aria-hidden="true" className="text-[#275a53]" size={20} />
       </div>
@@ -61,3 +63,4 @@ export function FileUpload({ onUploaded }: FileUploadProps) {
     </section>
   );
 }
+

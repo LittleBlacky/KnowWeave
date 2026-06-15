@@ -62,3 +62,19 @@ class KnowledgeUnitDetail(KnowledgeUnitRead):
 class KnowledgeUnitList(BaseModel):
     items: list[KnowledgeUnitRead]
     total: int
+
+
+class KnowledgeUnitMergeRequest(BaseModel):
+    source_ids: list[UUID]
+    title: str
+
+
+class KnowledgeUnitSplitRequest(BaseModel):
+    source_id: UUID
+    titles: list[str]
+    content_splits: list[str]
+
+
+class KnowledgeUnitList(BaseModel):
+    items: list[KnowledgeUnitRead]
+    total: int

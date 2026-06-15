@@ -9,7 +9,7 @@ import {
   RotateCcw,
   Save,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 import {
   createFaqWiki,
@@ -104,9 +104,7 @@ export function WikiPage() {
     if (!topicTheme.trim()) return;
     setBusy(true);
     try {
-      const fileIds = topicFileIds
-        .split(/[,;\s]+/)
-        .filter(Boolean);
+      const fileIds = topicFileIds.split(/[,;\s]+/).filter(Boolean);
       await createTopicWiki({
         theme: topicTheme,
         file_ids: fileIds.length > 0 ? fileIds : undefined,
@@ -135,10 +133,14 @@ export function WikiPage() {
 
   const revisionSourceLabel = (s: string) => {
     switch (s) {
-      case "ai_generated": return "AI 生成";
-      case "ai_regenerated": return "AI 重新生成";
-      case "rollback": return "回滚";
-      default: return "人工编辑";
+      case "ai_generated":
+        return "AI 生成";
+      case "ai_regenerated":
+        return "AI 重新生成";
+      case "rollback":
+        return "回滚";
+      default:
+        return "人工编辑";
     }
   };
 
@@ -171,7 +173,11 @@ export function WikiPage() {
           </button>
         </div>
         <div className="flex items-center gap-2 rounded-md border border-[#dcded8] bg-white px-3 py-2">
-          <MessageSquareText aria-hidden="true" className="text-[#275a53]" size={16} />
+          <MessageSquareText
+            aria-hidden="true"
+            className="text-[#275a53]"
+            size={16}
+          />
           <input
             className="w-64 bg-transparent text-sm outline-none"
             onChange={(e) => setFaqFileId(e.target.value)}
@@ -195,7 +201,11 @@ export function WikiPage() {
         <section className="rounded-md border border-[#dcded8] bg-white">
           <div className="flex items-center justify-between border-b border-[#dcded8] px-4 py-3">
             <h1 className="text-lg font-semibold">Wiki</h1>
-            <BookOpenCheck aria-hidden="true" className="text-[#275a53]" size={20} />
+            <BookOpenCheck
+              aria-hidden="true"
+              className="text-[#275a53]"
+              size={20}
+            />
           </div>
           <div className="grid gap-3 p-4">
             {pages.map((page) => (
@@ -212,9 +222,15 @@ export function WikiPage() {
                     {page.status}
                   </span>
                 </div>
-                <p className="line-clamp-2 text-sm text-[#30342f]">{page.summary}</p>
+                <p className="line-clamp-2 text-sm text-[#30342f]">
+                  {page.summary}
+                </p>
                 <span className="mt-2 inline-block text-xs text-[#6f756f]">
-                  {page.wiki_type === "topic_wiki" ? "主题" : page.wiki_type === "faq_wiki" ? "FAQ" : "文档"}
+                  {page.wiki_type === "topic_wiki"
+                    ? "主题"
+                    : page.wiki_type === "faq_wiki"
+                      ? "FAQ"
+                      : "文档"}
                 </span>
               </button>
             ))}
@@ -233,9 +249,15 @@ export function WikiPage() {
                 type="button"
               >
                 {tab === "editor" ? (
-                  <><Save size={14} className="inline mr-1" />编辑</>
+                  <>
+                    <Save size={14} className="inline mr-1" />
+                    编辑
+                  </>
                 ) : (
-                  <><History size={14} className="inline mr-1" />版本历史 ({revisions.length})</>
+                  <>
+                    <History size={14} className="inline mr-1" />
+                    版本历史 ({revisions.length})
+                  </>
                 )}
               </button>
             ))}
@@ -258,8 +280,12 @@ export function WikiPage() {
               {selected ? (
                 <div className="grid gap-4 p-4">
                   <div className="flex flex-wrap gap-2">
-                    <span className="rounded-md border border-[#dcded8] px-2 py-1 text-xs">{selected.wiki_type}</span>
-                    <span className="rounded-md border border-[#dcded8] px-2 py-1 text-xs">状态: {selected.status}</span>
+                    <span className="rounded-md border border-[#dcded8] px-2 py-1 text-xs">
+                      {selected.wiki_type}
+                    </span>
+                    <span className="rounded-md border border-[#dcded8] px-2 py-1 text-xs">
+                      状态: {selected.status}
+                    </span>
                   </div>
                   <label className="grid gap-2 text-sm font-semibold">
                     Markdown 正文
@@ -278,14 +304,23 @@ export function WikiPage() {
                     />
                   </label>
                   {citations.map((citation) => (
-                    <div className="grid gap-2 rounded-md border border-[#dcded8] p-3" key={citation.id}>
-                      <span className="text-sm font-semibold">{citation.label}</span>
-                      <p className="text-xs text-[#6f756f] line-clamp-2">{citation.preview_text}</p>
+                    <div
+                      className="grid gap-2 rounded-md border border-[#dcded8] p-3"
+                      key={citation.id}
+                    >
+                      <span className="text-sm font-semibold">
+                        {citation.label}
+                      </span>
+                      <p className="text-xs text-[#6f756f] line-clamp-2">
+                        {citation.preview_text}
+                      </p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="p-4 text-sm text-[#5d645d]">选择一个 Wiki 页面进行编辑。</p>
+                <p className="p-4 text-sm text-[#5d645d]">
+                  选择一个 Wiki 页面进行编辑。
+                </p>
               )}
             </div>
           ) : (
@@ -295,16 +330,25 @@ export function WikiPage() {
               ) : (
                 <div className="divide-y divide-[#dcded8]">
                   {revisions.map((rev) => (
-                    <div className="flex items-start justify-between gap-4 px-4 py-3" key={rev.id}>
+                    <div
+                      className="flex items-start justify-between gap-4 px-4 py-3"
+                      key={rev.id}
+                    >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-semibold">v{rev.revision_number}</span>
+                          <span className="text-sm font-semibold">
+                            v{rev.revision_number}
+                          </span>
                           <span className="rounded bg-[#f0f2ed] px-2 py-0.5 text-xs text-[#6f756f]">
                             {revisionSourceLabel(rev.edit_source)}
                           </span>
-                          <span className="text-xs text-[#6f756f]">{rev.status}</span>
+                          <span className="text-xs text-[#6f756f]">
+                            {rev.status}
+                          </span>
                         </div>
-                        <p className="text-xs text-[#6f756f] truncate">{rev.change_summary}</p>
+                        <p className="text-xs text-[#6f756f] truncate">
+                          {rev.change_summary}
+                        </p>
                         <p className="text-xs text-[#6f756f] mt-1">
                           {new Date(rev.created_at).toLocaleString()}
                         </p>
@@ -329,3 +373,4 @@ export function WikiPage() {
     </div>
   );
 }
+
