@@ -68,6 +68,20 @@ def create_knowledge_unit(
     )
 
 
+@router.post("/files/{file_id}/generate", status_code=status.HTTP_201_CREATED)
+def auto_generate_knowledge_units(
+    file_id: UUID,
+    service: KnowledgeUnitService = Depends(get_knowledge_unit_service),
+) -> ApiResponse[KnowledgeUnitList]:
+    units = service.auto_generate_from_chunks(file_id)
+    items = [_read_unit(unit, service=service) for unit in units]
+    return ApiResponse(
+        data=KnowledgeUnitList(items=items, total=len(items)),
+        error=None,
+        request_id="req_auto_knowledge_units",
+    )
+
+
 @router.get("/{knowledge_unit_id}")
 def get_knowledge_unit(
     knowledge_unit_id: UUID,

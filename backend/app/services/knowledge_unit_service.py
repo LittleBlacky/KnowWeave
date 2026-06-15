@@ -82,6 +82,36 @@ class KnowledgeUnitService:
         self.session.refresh(unit)
         return unit
 
+    def auto_generate_from_chunks(self, file_id: UUID) -> list[KnowledgeUnit]:
+        """Create one Knowledge Unit per chunk for a file, using chunk content as the body."""
+        file_record = self.session.get(KnowledgeFile, file_id)
+        if file_record is None:
+            raise KnowledgeUnitNotFoundError()
+
+        chunks = list(
+            self.session.scalars(
+                select(Chunk)
+                .where(Chunk.file_id == file_id)
+                .where(Chunk.is_searchable.is_(True))
+                .order_by(Chunk.chunk_index.asc())
+            ).all()
+        )
+
+        units: list[KnowledgeUnit] = []
+        for chunk in chunks:
+            title = self._title_from_chunk(chunk)
+            unit = self.create_knowledge_unit(
+                title=title,
+                content=chunk.raw_content,
+                unit_type="concept",
+                summary=chunk.raw_content[:200] if len(chunk.raw_content) > 200 else chunk.raw_content,
+                status="draft",
+                source_chunk_ids=[chunk.id],
+            )
+            units.append(unit)
+
+        return units
+
     def list_knowledge_units(
         self,
         *,
@@ -236,3 +266,16 @@ class KnowledgeUnitService:
             parts.append(summary)
         parts.append(content)
         return "\n".join(parts)
+
+    def _title_from_chunk(self, chunk: Chunk) -> str:
+        """Derive a short title from chunk content."""
+        text = chunk.raw_content.strip()
+        # Use the first heading-like line, or first sentence, or first 60 chars
+        for line in text.split("\n"):
+            stripped = line.strip()
+            if stripped.startswith("#"):
+                return stripped.lstrip("#").strip()[:120]
+        first_sentence = text.split(".")[0].strip()
+        if len(first_sentence) <= 120:
+            return first_sentence
+        return text[:120].rsplit(" ", 1)[0]

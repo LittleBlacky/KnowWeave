@@ -271,6 +271,12 @@ export function listDocumentBlocks(fileId: string) {
   );
 }
 
+export function autoGenerateKnowledgeUnits(fileId: string) {
+  return apiClient.post<KnowledgeUnitListResponse>(
+    `/knowledge-units/files/${fileId}/generate`,
+  );
+}
+
 export function listFileChunks(fileId: string) {
   return apiClient.get<ChunkListResponse>(`/files/${fileId}/chunks`);
 }
