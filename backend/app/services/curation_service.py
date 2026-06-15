@@ -21,7 +21,8 @@ from app.models.chat import ChatMessage, Citation
 from app.models.files import Chunk, KnowledgeFile
 from app.models.knowledge import KnowledgeUnit
 from app.models.wiki import WikiPage
-from app.providers.fake_llm import FakeLLMProvider
+from app.providers.factory import build_default_llm_provider
+from app.core.config import get_settings
 
 
 @dataclass
@@ -45,9 +46,9 @@ class CurationService:
     can be wired in later via the provider pattern.
     """
 
-    def __init__(self, *, session: Session) -> None:
+    def __init__(self, *, session: Session, llm_provider=None) -> None:
         self.session = session
-        self.llm = FakeLLMProvider()
+        self.llm = llm_provider or build_default_llm_provider(get_settings())
 
     def generate_report(self) -> CurationReport:
         now = utcnow()

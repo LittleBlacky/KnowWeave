@@ -5,12 +5,14 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.errors import AppError
 from app.models.base import utcnow
 from app.models.chat import ChatMessage, Citation
 from app.models.files import Chunk, KnowledgeFile, SourceSpan
 from app.models.knowledge import KnowledgeUnit, KnowledgeUnitSource
 from app.models.wiki import WikiPage, WikiRevision
+from app.providers.factory import build_default_llm_provider
 from app.services.file_service import FileNotFoundError
 
 
@@ -38,8 +40,9 @@ class WikiChangeSummaryRequiredError(AppError):
 
 
 class WikiService:
-    def __init__(self, *, session: Session) -> None:
+    def __init__(self, *, session: Session, llm_provider=None) -> None:
         self.session = session
+        self.llm = llm_provider or build_default_llm_provider(get_settings())
 
     def generate_document_wiki(self, file_id: UUID) -> WikiPage:
         file_record = self.session.get(KnowledgeFile, file_id)

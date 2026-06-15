@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.v1.agent import router as agent_router
 from app.api.v1.chat import router as chat_router
 from app.api.v1.chunks import router as chunks_router
 from app.api.v1.curation import router as curation_router
@@ -17,6 +18,7 @@ api_router.include_router(health_router, tags=["health"])
 api_router.include_router(files_router)
 api_router.include_router(chunks_router)
 api_router.include_router(search_router)
+api_router.include_router(agent_router)
 api_router.include_router(chat_router)
 api_router.include_router(wiki_router)
 api_router.include_router(feedback_router)

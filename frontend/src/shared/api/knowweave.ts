@@ -493,3 +493,18 @@ export function createFaqWiki(fileId: string) {
   return apiClient.post<Wiki>(`/files/${fileId}/faq-wiki`);
 }
 
+// ---- Agent ----
+
+export function generateExpertAgent(name: string, fileIds?: string[]) {
+  const params = new URLSearchParams({ name });
+  if (fileIds?.length) {
+    fileIds.forEach((id) => params.append("file_ids", id));
+  }
+  return apiClient.post<{
+    session_id: string;
+    title: string;
+    knowledge_summary: Record<string, number>;
+    system_prompt_preview: string;
+  }>(`/agent/generate?${params.toString()}`);
+}
+

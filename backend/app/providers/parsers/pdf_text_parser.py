@@ -38,24 +38,47 @@ class PdfTextParser:
                 page_count = len(pdf.pages)
                 block_index = 0
                 for page in pdf.pages:
+                    # Extract text
                     text = (page.extract_text() or "").strip()
-                    if not text:
-                        continue
-                    raw_text_parts.append(text)
-                    blocks.append(
-                        ParsedBlock(
-                            block_index=block_index,
-                            block_type="paragraph",
-                            raw_content=text,
-                            normalized_content=text,
-                            position=BlockPosition(
-                                page_number=page.page_number,
-                                char_start=0,
-                                char_end=len(text),
-                            ),
+                    if text:
+                        raw_text_parts.append(text)
+                        blocks.append(
+                            ParsedBlock(
+                                block_index=block_index,
+                                block_type="paragraph",
+                                raw_content=text,
+                                normalized_content=text,
+                                position=BlockPosition(
+                                    page_number=page.page_number,
+                                    char_start=0,
+                                    char_end=len(text),
+                                ),
+                            )
                         )
-                    )
-                    block_index += 1
+                        block_index += 1
+
+                    # Extract tables
+                    tables = page.extract_tables()
+                    for table in tables:
+                        if not table:
+                            continue
+                        markdown_table = _table_to_markdown(table)
+                        raw_text_parts.append(markdown_table)
+                        blocks.append(
+                            ParsedBlock(
+                                block_index=block_index,
+                                block_type="table",
+                                raw_content=markdown_table,
+                                normalized_content=markdown_table,
+                                position=BlockPosition(
+                                    page_number=page.page_number,
+                                    char_start=0,
+                                    char_end=len(markdown_table),
+                                ),
+                                metadata={"row_count": len(table), "col_count": len(table[0]) if table else 0},
+                            )
+                        )
+                        block_index += 1
         except Exception as exc:
             warnings.append(
                 ParserWarning(
@@ -78,3 +101,23 @@ class PdfTextParser:
             metadata={"filename": filename, "page_count": page_count},
             warnings=warnings,
         )
+
+
+def _table_to_markdown(table: list[list[str | None]]) -> str:
+    """Convert pdfplumber table to Markdown table string."""
+    if not table or not table[0]:
+        return ""
+    # Clean cells
+    cleaned = [[(cell or "").strip().replace("\n", " ") for cell in row] for row in table]
+    col_count = max(len(row) for row in cleaned)
+    # Pad rows
+    for row in cleaned:
+        while len(row) < col_count:
+            row.append("")
+    # Build markdown
+    lines = []
+    lines.append("| " + " | ".join(cleaned[0]) + " |")
+    lines.append("| " + " | ".join(["---"] * col_count) + " |")
+    for row in cleaned[1:]:
+        lines.append("| " + " | ".join(row) + " |")
+    return "\n".join(lines)
