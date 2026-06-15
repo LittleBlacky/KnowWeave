@@ -52,24 +52,24 @@ export default function CurationPage() {
 
   return (
     <AppShell>
-      <h1 className="mb-2 text-xl font-semibold">Knowledge Curation</h1>
+      <h1 className="mb-2 text-xl font-semibold">知识策展</h1>
       <p className="mb-6 text-sm text-[#6f756f]">
-        LLM-powered knowledge discovery report. Generated at {new Date(report.generated_at).toLocaleString()}.
+        LLM 驱动的知识发现报告。生成时间: {new Date(report.generated_at).toLocaleString()}。
       </p>
 
       {/* Stats cards */}
       <div className="mb-6 grid grid-cols-4 gap-4 max-2xl:grid-cols-2 max-sm:grid-cols-1">
-        <StatCard label="Chunks" value={report.total_chunks} icon={BarChart3} />
-        <StatCard label="Knowledge Units" value={report.total_knowledge_units} icon={BookOpenCheck} />
-        <StatCard label="Wiki Pages" value={report.total_wiki_pages} icon={BookOpenCheck} />
-        <StatCard label="Feedback Signals" value={report.total_feedback_count} icon={MessageSquare} />
+        <StatCard label="知识分块" value={report.total_chunks} icon={BarChart3} />
+        <StatCard label="知识单元" value={report.total_knowledge_units} icon={BookOpenCheck} />
+        <StatCard label="Wiki 页面" value={report.total_wiki_pages} icon={BookOpenCheck} />
+        <StatCard label="反馈信号" value={report.total_feedback_count} icon={MessageSquare} />
       </div>
 
       {/* Summary */}
       <section className="mb-6 rounded-md border border-[#dcded8] bg-[#e1ebe7] p-4">
         <div className="flex items-center gap-2 mb-2">
           <Lightbulb aria-hidden="true" className="text-[#123d37]" size={18} />
-          <h2 className="font-semibold">AI Summary</h2>
+          <h2 className="font-semibold">AI 摘要</h2>
         </div>
         <p className="text-sm whitespace-pre-wrap text-[#123d37]">{report.summary}</p>
       </section>
@@ -79,12 +79,12 @@ export default function CurationPage() {
         <section className="rounded-md border border-[#dcded8] bg-white">
           <div className="border-b border-[#dcded8] px-4 py-3">
             <h2 className="font-semibold">
-              High-Value Chunks ({report.high_value_chunks.length})
+              高价值分块 ({report.high_value_chunks.length})
             </h2>
           </div>
           <div className="divide-y divide-[#dcded8]">
             {report.high_value_chunks.length === 0 ? (
-              <p className="px-4 py-6 text-sm text-[#6f756f]">No high-value chunks identified yet.</p>
+                <p className="px-4 py-6 text-sm text-[#6f756f]">暂无高价值分块。</p>
             ) : (
               report.high_value_chunks.map((chunk) => (
                 <div key={chunk.chunk_id} className="px-4 py-3">
@@ -104,12 +104,12 @@ export default function CurationPage() {
           <section className="rounded-md border border-[#dcded8] bg-white">
             <div className="border-b border-[#dcded8] px-4 py-3">
               <h2 className="font-semibold">
-                Suggested Topics ({report.suggested_topics.length})
+                建议主题 ({report.suggested_topics.length})
               </h2>
             </div>
             <div className="divide-y divide-[#dcded8]">
               {report.suggested_topics.length === 0 ? (
-                <p className="px-4 py-6 text-sm text-[#6f756f]">No topic suggestions yet.</p>
+                <p className="px-4 py-6 text-sm text-[#6f756f]">暂无主题建议。</p>
               ) : (
                 report.suggested_topics.map((topic, i) => (
                   <div key={i} className="px-4 py-3">
@@ -123,12 +123,12 @@ export default function CurationPage() {
           <section className="rounded-md border border-[#dcded8] bg-white">
             <div className="border-b border-[#dcded8] px-4 py-3">
               <h2 className="font-semibold">
-                Frequent Questions ({report.frequent_questions.length})
+                高频问题 ({report.frequent_questions.length})
               </h2>
             </div>
             <div className="divide-y divide-[#dcded8]">
               {report.frequent_questions.length === 0 ? (
-                <p className="px-4 py-6 text-sm text-[#6f756f]">No questions from chat yet.</p>
+                <p className="px-4 py-6 text-sm text-[#6f756f]">暂无聊天提问记录。</p>
               ) : (
                 report.frequent_questions.map((q, i) => (
                   <div key={i} className="px-4 py-3">
@@ -144,12 +144,12 @@ export default function CurationPage() {
             <div className="border-b border-[#dcded8] px-4 py-3">
               <h2 className="font-semibold flex items-center gap-2">
                 <FileWarning aria-hidden="true" className="text-amber-600" size={16} />
-                Needs Review ({report.stale_items.length})
+                待审核 ({report.stale_items.length})
               </h2>
             </div>
             <div className="divide-y divide-[#dcded8]">
               {report.stale_items.length === 0 ? (
-                <p className="px-4 py-6 text-sm text-[#6f756f]">All knowledge is up to date.</p>
+                <p className="px-4 py-6 text-sm text-[#6f756f]">所有知识均为最新状态。</p>
               ) : (
                 report.stale_items.map((item) => (
                   <div key={item.id} className="px-4 py-3">

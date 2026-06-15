@@ -18,15 +18,15 @@ export function AppShell({ children }: { children: ReactNode }) {
         <aside className="border-l border-[#dcded8] bg-[#ffffff] px-5 py-6 max-xl:hidden">
           <div className="mb-4 flex items-center gap-2">
             <BotMessageSquare aria-hidden="true" className="text-[#275a53]" size={18} />
-            <h2 className="text-base font-semibold">Context</h2>
+            <h2 className="text-base font-semibold">上下文</h2>
           </div>
           <div className="rounded-md border border-[#dcded8] bg-[#f0f2ed] p-4">
             <div className="mb-2 flex items-center gap-2 text-sm font-medium">
               <MessageSquareWarning aria-hidden="true" size={16} />
-              Retrieved Contexts
+              检索结果
             </div>
             <p className="text-sm text-[#5d645d]">
-              Source spans, citations, retrieval runs, and quality signals will share this panel.
+              来源定位、引用、检索记录和质量信号将在此面板中展示。
             </p>
           </div>
         </aside>

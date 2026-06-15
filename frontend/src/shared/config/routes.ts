@@ -20,16 +20,16 @@ export type AppRoute = {
 };
 
 export const appRoutes: AppRoute[] = [
-  { label: "Dashboard", href: "/", icon: Gauge, p0: true },
-  { label: "Files", href: "/files", icon: FileText, p0: true },
-  { label: "Chunks", href: "/chunks", icon: Boxes, p0: true },
-  { label: "Knowledge Units", href: "/knowledge-units", icon: Network, p0: true },
+  { label: "仪表盘", href: "/", icon: Gauge, p0: true },
+  { label: "文件管理", href: "/files", icon: FileText, p0: true },
+  { label: "知识分块", href: "/chunks", icon: Boxes, p0: true },
+  { label: "知识单元", href: "/knowledge-units", icon: Network, p0: true },
   { label: "Wiki", href: "/wiki", icon: BookOpenCheck, p0: true },
-  { label: "Search", href: "/search", icon: Search, p0: true },
-  { label: "Chat", href: "/chat", icon: MessageSquareText, p0: true },
-  { label: "Evaluation", href: "/evaluation", icon: Tags, p0: false },
-  { label: "Curation", href: "/curation", icon: Lightbulb, p0: false },
-  { label: "Settings", href: "/settings", icon: Settings, p0: false },
+  { label: "搜索", href: "/search", icon: Search, p0: true },
+  { label: "AI 问答", href: "/chat", icon: MessageSquareText, p0: true },
+  { label: "评测", href: "/evaluation", icon: Tags, p0: false },
+  { label: "策展", href: "/curation", icon: Lightbulb, p0: false },
+  { label: "设置", href: "/settings", icon: Settings, p0: false },
 ];
 
 export function routeLabelForPath(pathname: string): string {

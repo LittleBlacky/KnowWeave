@@ -32,7 +32,7 @@ export function FileList({refreshKey}: FileListProps) {
   }, [refreshKey]);
 
   async function handleParse(file: KnowledgeFile) {
-    setStatusByFile((current) => ({...current, [file.id]: "Parsing"}));
+    setStatusByFile((current) => ({ ...current, [file.id]: "解析中" }));
     const result = await parseFile(file.id);
     setFiles((current) =>
       current.map((item) =>
@@ -52,7 +52,7 @@ export function FileList({refreshKey}: FileListProps) {
   }
 
   async function handleGenerateWiki(file: KnowledgeFile) {
-    setStatusByFile((current) => ({...current, [file.id]: "Generating Wiki"}));
+    setStatusByFile((current) => ({ ...current, [file.id]: "生成 Wiki 中" }));
     try {
       const wiki = await generateFileWiki(file.id);
       setStatusByFile((current) => ({
@@ -60,12 +60,12 @@ export function FileList({refreshKey}: FileListProps) {
         [file.id]: `Wiki: ${wiki.title}`,
       }));
     } catch {
-      setStatusByFile((current) => ({...current, [file.id]: "Wiki failed"}));
+      setStatusByFile((current) => ({ ...current, [file.id]: "Wiki 生成失败" }));
     }
   }
 
   async function handleDelete(file: KnowledgeFile) {
-    setStatusByFile((current) => ({...current, [file.id]: "Deleting"}));
+    setStatusByFile((current) => ({ ...current, [file.id]: "删除中" }));
     await fetch(`/api/v1/files/${file.id}`, {method: "DELETE"});
     setFiles((current) => current.filter((f) => f.id !== file.id));
   }
@@ -73,18 +73,18 @@ export function FileList({refreshKey}: FileListProps) {
   return (
     <section className="rounded-md border border-[#dcded8] bg-white">
       <div className="flex items-center justify-between border-b border-[#dcded8] px-4 py-3">
-        <h2 className="text-base font-semibold">Evidence Files</h2>
-        <span className="text-sm text-[#6f756f]">{files.length} files</span>
+        <h2 className="text-base font-semibold">知识文件</h2>
+        <span className="text-sm text-[#6f756f]">{files.length} 个文件</span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left text-sm">
           <thead className="bg-[#f0f2ed] text-[#30342f]">
             <tr>
-              <th className="px-4 py-3 font-semibold">File</th>
-              <th className="px-4 py-3 font-semibold">Type</th>
-              <th className="px-4 py-3 font-semibold">Status</th>
-              <th className="px-4 py-3 font-semibold">Size</th>
-              <th className="px-4 py-3 font-semibold">Actions</th>
+              <th className="px-4 py-3 font-semibold">文件</th>
+              <th className="px-4 py-3 font-semibold">类型</th>
+              <th className="px-4 py-3 font-semibold">状态</th>
+              <th className="px-4 py-3 font-semibold">大小</th>
+              <th className="px-4 py-3 font-semibold">操作</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#dcded8]">
@@ -115,25 +115,25 @@ export function FileList({refreshKey}: FileListProps) {
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-2">
                     <button
-                      aria-label={`Parse ${file.name}`}
+                      aria-label={`解析 ${file.name}`}
                       className="inline-flex items-center gap-1 rounded-md bg-[#123d37] px-3 py-2 text-xs font-semibold text-white"
                       onClick={() => void handleParse(file)}
                       type="button"
                     >
                       <Play aria-hidden="true" size={14} />
-                      Parse
+                      解析
                     </button>
                     <button
-                      aria-label={`Build chunks for ${file.name}`}
+                      aria-label={`构建分块 ${file.name}`}
                       className="inline-flex items-center gap-1 rounded-md border border-[#dcded8] px-3 py-2 text-xs font-semibold"
                       onClick={() => void handleBuildChunks(file)}
                       type="button"
                     >
                       <Boxes aria-hidden="true" size={14} />
-                      Chunks
+                      分块
                     </button>
                     <button
-                      aria-label={`Generate Wiki for ${file.name}`}
+                      aria-label={`生成 Wiki ${file.name}`}
                       className="inline-flex items-center gap-1 rounded-md border border-[#dcded8] px-3 py-2 text-xs font-semibold"
                       onClick={() => void handleGenerateWiki(file)}
                       type="button"
@@ -142,7 +142,7 @@ export function FileList({refreshKey}: FileListProps) {
                       Wiki
                     </button>
                     <button
-                      aria-label={`Delete ${file.name}`}
+                      aria-label={`删除 ${file.name}`}
                       className="inline-flex items-center gap-1 rounded-md border border-[#dcded8] px-2 py-2 text-xs font-semibold text-red-600 hover:bg-red-50"
                       onClick={() => void handleDelete(file)}
                       type="button"

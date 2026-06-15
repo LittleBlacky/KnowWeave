@@ -38,13 +38,13 @@ export function FileUpload({ onUploaded }: FileUploadProps) {
     <section className="rounded-md border border-[#dcded8] bg-white p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold">Upload Evidence</h2>
-          <p className="mt-1 text-sm text-[#6f756f]">txt, md, pdf and docx are supported.</p>
+          <h2 className="text-base font-semibold">上传知识文件</h2>
+          <p className="mt-1 text-sm text-[#6f756f]">支持 txt、md、pdf、docx 格式。</p>
         </div>
         <Upload aria-hidden="true" className="text-[#275a53]" size={20} />
       </div>
       <label className="block text-sm font-medium" htmlFor="evidence-file">
-        Upload evidence file
+        上传知识文件
       </label>
       <input
         accept=".txt,.md,.markdown,.pdf,.docx"

@@ -44,45 +44,45 @@ export default function Home() {
 
   const metrics = [
     {
-      label: "Files",
+      label: "文件",
       value: loading ? "…" : String(fileCount),
-      detail: fileCount === 0 ? "ready for upload" : `${parsedCount} parsed`,
+      detail: fileCount === 0 ? "等待上传" : `${parsedCount} 已解析`,
       icon: FileText,
     },
     {
-      label: "Parse Success",
+      label: "解析成功率",
       value: loading ? "…" : `${parseRate}%`,
       detail:
         parseRate === 0
-          ? "no runs yet"
-          : `${parsedCount} of ${fileCount} files`,
+          ? "暂无数据"
+          : `${parsedCount} / ${fileCount} 个文件`,
       icon: Gauge,
     },
     {
-      label: "Chunks",
+      label: "知识分块",
       value: loading ? "…" : "—",
-      detail: "see Chunks page",
+      detail: "前往分块页面查看",
       icon: Boxes,
     },
     {
-      label: "Wiki Pages",
+      label: "Wiki 页面",
       value: loading ? "…" : String(wikiPages.length),
       detail:
         wikiPages.length === 0
-          ? "draft queue empty"
-          : `${wikiPending} pending review`,
+          ? "暂无草稿"
+          : `${wikiPending} 待审核`,
       icon: BookOpenCheck,
     },
   ];
 
   const queueItems = [
     {
-      label: "Parse failures",
+      label: "解析失败",
       value: String(parseFailures),
       tone: parseFailures > 0 ? "danger" : ("neutral" as const),
     },
     {
-      label: "Wiki pending review",
+      label: "Wiki 待审核",
       value: String(wikiPending),
       tone: wikiPending > 0 ? "warning" : ("neutral" as const),
     },
@@ -121,7 +121,7 @@ export default function Home() {
       <div className="mt-6 grid grid-cols-[minmax(0,1.3fr)_minmax(300px,0.7fr)] gap-4 max-xl:grid-cols-1">
         <section className="rounded-md border border-[#dcded8] bg-white">
           <div className="border-b border-[#dcded8] px-4 py-3">
-            <h2 className="text-base font-semibold">Recent Evidence</h2>
+            <h2 className="text-base font-semibold">最近添加</h2>
           </div>
           {files.length === 0 ? (
             <div className="grid min-h-72 place-items-center px-4 py-10 text-center">
@@ -131,9 +131,9 @@ export default function Home() {
                   className="mx-auto mb-3 text-[#275a53]"
                   size={28}
                 />
-                <p className="text-sm font-medium">No files indexed</p>
-                <p className="mt-1 max-w-md text-sm text-[#6f756f]">
-                  Upload evidence files to populate the knowledge base.
+              <p className="text-sm font-medium">暂无文件</p>
+              <p className="mt-1 max-w-md text-sm text-[#6f756f]">
+                上传知识文件以填充知识库。
                 </p>
               </div>
             </div>
@@ -164,7 +164,7 @@ export default function Home() {
                     href="/files"
                     className="text-sm text-[#275a53] hover:underline"
                   >
-                    View all {files.length} files
+                    查看全部 {files.length} 个文件
                   </Link>
                 </div>
               )}
@@ -174,7 +174,7 @@ export default function Home() {
 
         <section className="rounded-md border border-[#dcded8] bg-white">
           <div className="border-b border-[#dcded8] px-4 py-3">
-            <h2 className="text-base font-semibold">Action Queue</h2>
+            <h2 className="text-base font-semibold">待处理</h2>
           </div>
           <div className="divide-y divide-[#dcded8]">
             {queueItems.map((item) => (

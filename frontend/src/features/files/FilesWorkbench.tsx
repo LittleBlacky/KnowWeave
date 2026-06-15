@@ -17,21 +17,21 @@ export function FilesWorkbench() {
   const [pipelineStatus, setPipelineStatus] = useState("");
 
   async function handleUploaded(file: KnowledgeFile) {
-    setPipelineStatus(`Parsing ${file.name}…`);
+    setPipelineStatus(`正在解析 ${file.name}…`);
     try {
       await parseFile(file.id);
-      setPipelineStatus(`Building chunks for ${file.name}…`);
+      setPipelineStatus(`正在构建分块 ${file.name}…`);
       const chunkResult = await buildFileChunks(file.id);
       if (chunkResult.total > 0) {
-        setPipelineStatus(`Generating Knowledge Units for ${file.name}…`);
+        setPipelineStatus(`正在生成知识单元 ${file.name}…`);
         await autoGenerateKnowledgeUnits(file.id);
-        setPipelineStatus(`Generating Wiki for ${file.name}…`);
+        setPipelineStatus(`正在生成 Wiki ${file.name}…`);
         await generateFileWiki(file.id);
       }
-      setPipelineStatus(`${file.name} processed: ${chunkResult.total} chunks`);
+      setPipelineStatus(`${file.name} 处理完成: ${chunkResult.total} 个分块`);
     } catch (err) {
       setPipelineStatus(
-        `Pipeline stopped: ${err instanceof Error ? err.message : "error"}`,
+        `处理中断: ${err instanceof Error ? err.message : "未知错误"}`,
       );
     }
     setRefreshKey((current) => current + 1);
