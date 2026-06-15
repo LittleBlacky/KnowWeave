@@ -426,3 +426,68 @@ export function listEvaluationSamples(status?: string) {
   );
 }
 
+// ---- Curation ----
+
+export type CurationReport = {
+  generated_at: string;
+  total_chunks: number;
+  total_knowledge_units: number;
+  total_wiki_pages: number;
+  total_feedback_count: number;
+  high_value_chunks: Array<{
+    chunk_id: string;
+    file_name: string;
+    preview: string;
+    status: string;
+    char_count: number;
+  }>;
+  suggested_topics: string[];
+  frequent_questions: string[];
+  stale_items: Array<{
+    id: string;
+    type: string;
+    preview: string;
+    last_updated: string;
+  }>;
+  summary: string;
+};
+
+export function getCurationReport() {
+  return apiClient.get<CurationReport>("/curation/report");
+}
+
+// ---- Wiki ----
+
+export type WikiRevision = {
+  id: string;
+  wiki_page_id: string;
+  revision_number: number;
+  title: string;
+  content_markdown: string;
+  summary: string | null;
+  status: string;
+  change_summary: string;
+  edit_source: string;
+  created_at: string;
+};
+
+export function listWikiRevisions(wikiId: string) {
+  return apiClient.get<WikiRevision[]>(`/wiki/${wikiId}/revisions`);
+}
+
+export function rollbackWiki(wikiId: string, revisionId: string) {
+  return apiClient.post<Wiki>(`/wiki/${wikiId}/revisions/${revisionId}/rollback`);
+}
+
+export function createTopicWiki(input: {
+  theme: string;
+  file_ids?: string[];
+  knowledge_unit_ids?: string[];
+}) {
+  return apiClient.post<Wiki>("/wiki/topic", input);
+}
+
+export function createFaqWiki(fileId: string) {
+  return apiClient.post<Wiki>(`/files/${fileId}/faq-wiki`);
+}
+

@@ -4,6 +4,7 @@ import {
   Boxes,
   FileText,
   Gauge,
+  Lightbulb,
   MessageSquareText,
   Network,
   Search,
@@ -27,6 +28,7 @@ export const appRoutes: AppRoute[] = [
   { label: "Search", href: "/search", icon: Search, p0: true },
   { label: "Chat", href: "/chat", icon: MessageSquareText, p0: true },
   { label: "Evaluation", href: "/evaluation", icon: Tags, p0: false },
+  { label: "Curation", href: "/curation", icon: Lightbulb, p0: false },
   { label: "Settings", href: "/settings", icon: Settings, p0: false },
 ];
 
