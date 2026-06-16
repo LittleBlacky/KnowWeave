@@ -12,6 +12,7 @@ import {
   type Chunk,
 } from "@/shared/api/knowweave";
 import { SourceLocatorPanel } from "@/features/source-viewer/SourceLocatorPanel";
+import { ListPanel, DetailPanel, ListItemCard, Badge, EmptyState } from "@/shared/ui";
 
 export function ChunkWorkspace() {
   const [chunks, setChunks] = useState<Chunk[]>([]);
@@ -45,31 +46,26 @@ export function ChunkWorkspace() {
   }
 
   async function handleSave() {
-    if (!selected) {
-      return;
-    }
+    if (!selected) return;
     replaceChunk(await updateChunk(selected.id, draft));
   }
 
   async function handleIgnore() {
-    if (!selected) {
-      return;
-    }
+    if (!selected) return;
     replaceChunk(await ignoreChunk(selected.id));
   }
 
   async function handleVerify() {
-    if (!selected) {
-      return;
-    }
+    if (!selected) return;
     replaceChunk(await verifyChunk(selected.id));
   }
 
-  if (!selected) {
+  if (chunks.length === 0) {
     return (
-      <section className="rounded-md border border-[#dcded8] bg-white p-6 text-sm text-[#6f756f]">
-        No chunks available.
-      </section>
+      <EmptyState
+        title="暂无分块"
+        description="上传文件并解析后，分块将在此显示。"
+      />
     );
   }
 
@@ -78,93 +74,73 @@ export function ChunkWorkspace() {
     : undefined;
 
   return (
-    <div className="grid grid-cols-[minmax(260px,0.45fr)_minmax(0,0.55fr)] gap-4 max-xl:grid-cols-1">
-      <section className="rounded-md border border-[#dcded8] bg-white">
-        <div className="border-b border-[#dcded8] px-4 py-3">
-          <h2 className="text-base font-semibold">Chunk Workspace</h2>
-        </div>
-        <div className="divide-y divide-[#dcded8]">
+    <div className="grid gap-4 lg:grid-cols-[minmax(320px,0.42fr)_minmax(0,0.58fr)]">
+      <ListPanel title="分块列表" count={chunks.length}>
+        <div className="grid gap-2">
           {chunks.map((chunk) => (
-            <button
-              className="block w-full px-4 py-3 text-left hover:bg-[#f0f2ed] data-[selected=true]:bg-[#e1ebe7]"
-              data-selected={chunk.id === selected.id}
+            <ListItemCard
               key={chunk.id}
+              active={chunk.id === selected.id}
               onClick={() => {
                 setSelectedId(chunk.id);
                 setDraft(chunk.edited_content ?? chunk.raw_content);
               }}
-              type="button"
-            >
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <span className="text-sm font-semibold">Chunk {chunk.chunk_index + 1}</span>
-                <span className="rounded-md border border-[#dcded8] px-2 py-1 text-xs">
-                  {chunk.status}
-                </span>
-              </div>
-              <p className="line-clamp-2 text-sm text-[#30342f]">
-                {chunk.edited_content ?? chunk.raw_content}
-              </p>
-            </button>
+              title={`Chunk ${chunk.chunk_index + 1}`}
+              subtitle={chunk.edited_content ?? chunk.raw_content}
+              status={chunk.status}
+            />
           ))}
         </div>
-      </section>
+      </ListPanel>
 
-      <section className="rounded-md border border-[#dcded8] bg-white">
-        <div className="flex items-center justify-between border-b border-[#dcded8] px-4 py-3">
-          <h2 className="text-base font-semibold">Chunk Detail</h2>
-          {selected.is_manually_edited ? (
-            <span className="rounded-md bg-[#e1ebe7] px-2 py-1 text-xs font-semibold text-[#123d37]">
-              Edited
-            </span>
-          ) : null}
-        </div>
-        <div className="grid gap-4 p-4">
+      <DetailPanel title="分块详情">
+        <div className="grid gap-4">
           <div>
-            <div className="mb-2 text-sm font-semibold">Raw content</div>
-            <p className="rounded-md border border-[#dcded8] bg-[#f7f7f5] p-3 text-sm">
+            <div className="mb-2 text-sm font-semibold text-[#6f756f]">原始内容</div>
+            <pre className="whitespace-pre-wrap rounded-lg border border-[#dcded8] bg-[#f7f7f5] p-3 text-sm leading-relaxed">
               {selected.raw_content}
-            </p>
+            </pre>
           </div>
-          <label className="grid gap-2 text-sm font-semibold">
-            Edited chunk content
+
+          <label className="grid gap-1.5 text-sm font-semibold">
+            编辑内容
             <textarea
-              className="min-h-32 resize-y rounded-md border border-[#dcded8] p-3 text-sm font-normal"
-              onChange={(event) => setDraft(event.target.value)}
+              className="min-h-32 resize-y rounded-lg border border-[#dcded8] p-3 text-sm font-normal focus:border-[#275a53] focus:outline-none"
+              onChange={(e) => setDraft(e.target.value)}
               value={draft}
             />
           </label>
+
           <SourceLocatorPanel source={source} />
+
           <div className="flex flex-wrap gap-2">
             <button
-              aria-label="Save chunk edits"
-              className="inline-flex items-center gap-2 rounded-md bg-[#123d37] px-3 py-2 text-sm font-semibold text-white"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#123d37] px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-[#0e2f2a]"
               onClick={() => void handleSave()}
               type="button"
             >
               <Save aria-hidden="true" size={16} />
-              Save
+              保存
             </button>
             <button
-              aria-label="Ignore chunk"
-              className="inline-flex items-center gap-2 rounded-md border border-[#dcded8] px-3 py-2 text-sm font-semibold"
+              className="inline-flex items-center gap-2 rounded-lg border border-[#dcded8] px-3.5 py-2 text-sm font-semibold transition hover:bg-[#f0f2ed]"
               onClick={() => void handleIgnore()}
               type="button"
             >
               <EyeOff aria-hidden="true" size={16} />
-              Ignore
+              忽略
             </button>
             <button
-              aria-label="Verify chunk"
-              className="inline-flex items-center gap-2 rounded-md border border-[#dcded8] px-3 py-2 text-sm font-semibold"
+              className="inline-flex items-center gap-2 rounded-lg border border-[#dcded8] px-3.5 py-2 text-sm font-semibold transition hover:bg-[#f0f2ed]"
               onClick={() => void handleVerify()}
               type="button"
             >
               <Check aria-hidden="true" size={16} />
-              Verify
+              验证
             </button>
           </div>
         </div>
-      </section>
+      </DetailPanel>
     </div>
   );
 }

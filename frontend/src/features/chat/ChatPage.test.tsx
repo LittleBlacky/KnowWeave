@@ -9,14 +9,14 @@ describe("ChatPage", () => {
     const user = userEvent.setup();
     render(<ChatPage />);
 
-    await user.type(screen.getByLabelText("Chat question"), "approval");
-    await user.click(screen.getByRole("button", { name: "Send question" }));
+    await user.type(screen.getByLabelText("输入问题"), "approval");
+    await user.click(screen.getByRole("button", { name: "发送" }));
 
     expect(await screen.findByText("run_chat_001")).toBeInTheDocument();
     await waitFor(() => expect(screen.getByText(/Fake answer: approval/)).toBeInTheDocument());
     expect(screen.getByText("S1")).toBeInTheDocument();
     expect(screen.getByText("Leave requests need approval.")).toBeInTheDocument();
-    expect(screen.getByText("Select a citation to inspect its source locator.")).toBeInTheDocument();
+    expect(screen.getByText("选择一个引用查看来源定位")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /S1/ }));
 

@@ -16,15 +16,15 @@ describe("ChunkWorkspace", () => {
       "/files?file_id=file_policy&source_span_id=span_policy&line_start=1&line_end=3",
     );
 
-    await user.clear(screen.getByLabelText("Edited chunk content"));
-    await user.type(screen.getByLabelText("Edited chunk content"), "Leave requests require manager approval.");
-    await user.click(screen.getByRole("button", { name: "Save chunk edits" }));
-    await waitFor(() => expect(screen.getByText("Edited")).toBeInTheDocument());
+    await user.clear(screen.getByLabelText("编辑内容"));
+    await user.type(screen.getByLabelText("编辑内容"), "Leave requests require manager approval.");
+    await user.click(screen.getByRole("button", { name: "保存" }));
+    await waitFor(() => expect(screen.getByText("Leave requests require manager approval.")).toBeInTheDocument());
 
-    await user.click(screen.getByRole("button", { name: "Ignore chunk" }));
+    await user.click(screen.getByRole("button", { name: "忽略" }));
     await waitFor(() => expect(screen.getByText("ignored")).toBeInTheDocument());
 
-    await user.click(screen.getByRole("button", { name: "Verify chunk" }));
+    await user.click(screen.getByRole("button", { name: "验证" }));
     await waitFor(() => expect(screen.getByText("verified")).toBeInTheDocument());
   });
 });

@@ -10,10 +10,10 @@ describe("FileUpload", () => {
     const uploaded: string[] = [];
     render(<FileUpload onUploaded={(file) => uploaded.push(file.name)} />);
 
-    const input = screen.getByLabelText("Upload evidence file");
+    const input = screen.getByLabelText("上传知识文件");
     await user.upload(input, new File(["# Policy"], "policy.md", { type: "text/markdown" }));
 
     await waitFor(() => expect(uploaded).toEqual(["policy.md"]));
-    expect(screen.getByText("Uploaded policy.md")).toBeInTheDocument();
+    expect(screen.getByText("已上传 policy.md")).toBeInTheDocument();
   });
 });

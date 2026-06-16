@@ -6,6 +6,7 @@ import { useState } from "react";
 import { FeedbackDialog } from "@/features/feedback/FeedbackDialog";
 import { SourceLocatorPanel } from "@/features/source-viewer/SourceLocatorPanel";
 import type { SearchResult } from "@/shared/api/knowweave";
+import { Badge } from "@/shared/ui";
 
 import { useChatStream, type ChatCitation, type ChatStreamStatus } from "./useChatStream";
 
@@ -29,7 +30,7 @@ export function ChatPage() {
         question={question}
       />
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="grid gap-4">
           {state.retrievalRunId ? (
             <RetrievalRunPanel
@@ -55,12 +56,12 @@ export function ChatPage() {
           ) : null}
         </div>
 
-        <aside className="rounded-md border border-[#dcded8] bg-white p-4">
-          <h2 className="mb-3 text-base font-semibold">Citation source</h2>
+        <aside className="rounded-lg border border-[#dcded8] bg-white p-4">
+          <h2 className="mb-3 text-sm font-semibold text-[#6f756f]">引用来源</h2>
           {selectedCitation ? (
             <SourceLocatorPanel source={sourceFromCitation(selectedCitation)} />
           ) : (
-            <p className="text-sm text-[#5d645d]">Select a citation to inspect its source locator.</p>
+            <p className="text-sm text-[#b0b6ad]">选择一个引用查看来源定位</p>
           )}
         </aside>
       </div>
@@ -79,29 +80,41 @@ function ChatComposer({
   onSend: () => void;
   question: string;
 }) {
+  const canSend = question.trim().length > 0 && !isBusy;
+
   return (
-    <section className="rounded-md border border-[#dcded8] bg-white p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Chat</h1>
+    <section className="rounded-lg border border-[#dcded8] bg-white p-5">
+      <div className="mb-3 flex items-center gap-2">
         <MessageSquareText aria-hidden="true" className="text-[#275a53]" size={20} />
+        <h2 className="text-base font-semibold">AI 问答</h2>
       </div>
       <label className="grid gap-2 text-sm font-semibold">
-        Chat question
+        输入问题
         <textarea
-          className="min-h-24 rounded-md border border-[#dcded8] p-3 font-normal"
-          onChange={(event) => onChange(event.target.value)}
+          className="min-h-24 resize-y rounded-lg border border-[#dcded8] p-3 font-normal focus:border-[#275a53] focus:outline-none"
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              canSend && onSend();
+            }
+          }}
+          placeholder="向知识库提问…"
           value={question}
         />
       </label>
-      <button
-        className="mt-3 inline-flex items-center gap-2 rounded-md bg-[#123d37] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-        disabled={isBusy}
-        onClick={onSend}
-        type="button"
-      >
-        <Send aria-hidden="true" size={16} />
-        Send question
-      </button>
+      <div className="mt-3 flex items-center justify-between">
+        <span className="text-xs text-[#b0b6ad]">Enter 发送 / Shift+Enter 换行</span>
+        <button
+          className="inline-flex items-center gap-2 rounded-lg bg-[#123d37] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0e2f2a] disabled:opacity-50"
+          disabled={!canSend}
+          onClick={onSend}
+          type="button"
+        >
+          <Send aria-hidden="true" size={16} />
+          发送
+        </button>
+      </div>
     </section>
   );
 }
@@ -114,14 +127,24 @@ function RetrievalRunPanel({
   retrievalRunId: string;
 }) {
   return (
-    <section className="rounded-md border border-[#dcded8] bg-white p-4">
-      <div className="mb-2 text-sm font-semibold">Retrieval run</div>
-      <div className="rounded-md border border-[#dcded8] px-2 py-1 text-sm">{retrievalRunId}</div>
-      {results.map((result) => (
-        <p className="mt-2 text-sm text-[#5d645d]" key={result.result_id}>
-          {result.title}: {result.preview_text}
-        </p>
-      ))}
+    <section className="rounded-lg border border-[#dcded8] bg-white p-4">
+      <div className="mb-2 flex items-center gap-2">
+        <span className="text-sm font-semibold">检索结果</span>
+        <span className="rounded bg-[#f0f2ed] px-2 py-0.5 text-xs text-[#6f756f]">
+          {retrievalRunId.slice(0, 8)}
+        </span>
+      </div>
+      <div className="grid gap-2">
+        {results.map((result) => (
+          <div
+            key={result.result_id}
+            className="rounded-lg border border-[#dcded8] bg-[#f7f7f5] p-3"
+          >
+            <span className="text-sm font-semibold">{result.title}</span>
+            <p className="mt-1 line-clamp-2 text-xs text-[#5d645d]">{result.preview_text}</p>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
@@ -136,13 +159,19 @@ function MessageList({
   status: ChatStreamStatus;
 }) {
   return (
-    <section className="rounded-md border border-[#dcded8] bg-white p-4">
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-base font-semibold">Answer</h2>
-        <span className="rounded-md border border-[#dcded8] px-2 py-1 text-xs">{status}</span>
+    <section className="rounded-lg border border-[#dcded8] bg-white p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-base font-semibold">回答</h2>
+        <Badge tone={status === "completed" ? "accent" : "neutral"}>{status}</Badge>
       </div>
-      {error ? <p className="text-sm text-[#9a3412]">{error}</p> : null}
-      {answer ? <p className="whitespace-pre-wrap text-sm">{answer}</p> : null}
+      {error ? (
+        <p className="rounded-lg border border-[#e8c8c5] bg-[#fdf4f3] p-3 text-sm text-[#a23b35]">
+          {error}
+        </p>
+      ) : null}
+      {answer ? (
+        <div className="whitespace-pre-wrap text-sm leading-relaxed">{answer}</div>
+      ) : null}
     </section>
   );
 }
@@ -157,21 +186,19 @@ function CitationPanel({
   selectedKey: string | null;
 }) {
   return (
-    <section className="rounded-md border border-[#dcded8] bg-white p-4">
-      <h2 className="mb-3 text-base font-semibold">Citations</h2>
-      <div className="grid gap-3">
+    <section className="rounded-lg border border-[#dcded8] bg-white p-4">
+      <h2 className="mb-3 text-base font-semibold">引用</h2>
+      <div className="grid gap-2">
         {citations.map((citation) => (
           <button
             aria-pressed={selectedKey === citation.key}
-            className="grid gap-2 rounded-md border border-[#dcded8] p-3 text-left transition hover:border-[#275a53] aria-pressed:border-[#275a53] aria-pressed:bg-[#f0f6f3]"
             key={citation.key}
+            className="grid gap-1.5 rounded-lg border border-[#dcded8] p-3 text-left transition hover:border-[#275a53] aria-pressed:border-[#275a53] aria-pressed:bg-[#f0f6f3]"
             onClick={() => onSelect(citation)}
             type="button"
           >
-            <span className="w-fit rounded-md bg-[#e1ebe7] px-2 py-1 text-xs font-semibold text-[#123d37]">
-              {citation.key}
-            </span>
-            <span className="text-sm text-[#30342f]">{citation.preview_text}</span>
+            <Badge tone="accent">{citation.key}</Badge>
+            <p className="line-clamp-2 text-sm text-[#30342f]">{citation.preview_text}</p>
           </button>
         ))}
       </div>

@@ -12,10 +12,10 @@ describe("FileList", () => {
     expect(await screen.findByText("policy.md")).toBeInTheDocument();
     expect(screen.getByText("uploaded")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Parse policy.md" }));
+    await user.click(screen.getByRole("button", { name: "解析" }));
     await waitFor(() => expect(screen.getByText("parse_succeeded")).toBeInTheDocument());
 
-    await user.click(screen.getByRole("button", { name: "Build chunks for policy.md" }));
-    await waitFor(() => expect(screen.getByText("1 chunks built")).toBeInTheDocument());
+    await user.click(screen.getByRole("button", { name: "分块" }));
+    await waitFor(() => expect(screen.getByText("1 个分块")).toBeInTheDocument());
   });
 });

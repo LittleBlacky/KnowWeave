@@ -4,6 +4,7 @@ import { FlaskConical } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { listEvaluationSamples, type EvaluationSample } from "@/shared/api/knowweave";
+import { ListPanel, Badge, EmptyState } from "@/shared/ui";
 
 export function EvaluationCandidatePage() {
   const [samples, setSamples] = useState<EvaluationSample[]>([]);
@@ -17,41 +18,51 @@ export function EvaluationCandidatePage() {
   }, []);
 
   return (
-    <section className="rounded-md border border-[#dcded8] bg-white">
-      <div className="flex items-center justify-between border-b border-[#dcded8] px-4 py-3">
-        <h1 className="text-lg font-semibold">Evaluation Candidates</h1>
-        <FlaskConical aria-hidden="true" className="text-[#275a53]" size={20} />
-      </div>
-      <div className="grid gap-3 p-4">
-        {samples.map((sample) => (
-          <article className="grid gap-3 rounded-md border border-[#dcded8] p-4" key={sample.id}>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="font-semibold">{sample.question}</h2>
-              <span className="rounded-md border border-[#dcded8] px-2 py-1 text-xs">
-                {sample.status}
-              </span>
-            </div>
-            {sample.expected_answer ? (
-              <p className="text-sm text-[#30342f]">{sample.expected_answer}</p>
-            ) : null}
-            <div className="flex flex-wrap gap-2 text-xs">
-              <span className="rounded-md bg-[#e1ebe7] px-2 py-1 font-semibold text-[#123d37]">
-                {sample.created_from}
-              </span>
-              {sample.difficulty ? (
-                <span className="rounded-md border border-[#dcded8] px-2 py-1">
-                  {sample.difficulty}
-                </span>
-              ) : null}
-              {sample.expected_source_chunks.map((chunkId) => (
-                <span className="rounded-md border border-[#dcded8] px-2 py-1" key={chunkId}>
-                  {chunkId}
-                </span>
-              ))}
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
+    <div className="grid gap-4">
+      <ListPanel title="评测候选" icon={FlaskConical} count={samples.length}>
+        {samples.length === 0 ? (
+          <EmptyState
+            icon={FlaskConical}
+            title="暂无评测候选"
+            description="知识库中尚未生成评测样本。"
+          />
+        ) : (
+          <div className="grid gap-3">
+            {samples.map((sample) => (
+              <article
+                key={sample.id}
+                className="rounded-lg border border-[#dcded8] p-4"
+              >
+                <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+                  <h2 className="text-sm font-semibold">{sample.question}</h2>
+                  <Badge tone={sample.status === "verified" ? "accent" : "neutral"}>
+                    {sample.status}
+                  </Badge>
+                </div>
+                {sample.expected_answer && (
+                  <p className="text-sm leading-relaxed text-[#30342f]">
+                    {sample.expected_answer}
+                  </p>
+                )}
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  <Badge>{sample.created_from}</Badge>
+                  {sample.difficulty && (
+                    <Badge tone="warning">{sample.difficulty}</Badge>
+                  )}
+                  {sample.expected_source_chunks.map((chunkId) => (
+                    <span
+                      key={chunkId}
+                      className="rounded bg-[#f0f2ed] px-2 py-0.5 text-xs text-[#6f756f]"
+                    >
+                      {chunkId}
+                    </span>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </ListPanel>
+    </div>
   );
 }

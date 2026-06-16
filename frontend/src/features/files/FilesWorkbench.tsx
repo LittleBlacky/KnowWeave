@@ -1,16 +1,11 @@
 "use client";
 
-import {useState} from "react";
+import { useState } from "react";
 
-import {FileList} from "@/features/file-list/FileList";
-import {FileUpload} from "@/features/file-upload/FileUpload";
-import {
-  parseFile,
-  buildFileChunks,
-  generateFileWiki,
-  autoGenerateKnowledgeUnits,
-  type KnowledgeFile,
-} from "@/shared/api/knowweave";
+import { FileList } from "@/features/file-list/FileList";
+import { FileUpload } from "@/features/file-upload/FileUpload";
+import { parseFile, buildFileChunks, generateFileWiki, autoGenerateKnowledgeUnits, type KnowledgeFile } from "@/shared/api/knowweave";
+import { Badge } from "@/shared/ui";
 
 export function FilesWorkbench() {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -30,23 +25,22 @@ export function FilesWorkbench() {
       }
       setPipelineStatus(`${file.name} 处理完成: ${chunkResult.total} 个分块`);
     } catch (err) {
-      setPipelineStatus(
-        `处理中断: ${err instanceof Error ? err.message : "未知错误"}`,
-      );
+      setPipelineStatus(`处理中断: ${err instanceof Error ? err.message : "未知错误"}`);
     }
-    setRefreshKey((current) => current + 1);
+    setRefreshKey((c) => c + 1);
   }
 
   return (
     <div className="grid gap-4">
       <FileUpload onUploaded={(file) => void handleUploaded(file)} />
+
       {pipelineStatus && (
-        <div className="rounded-md border border-[#dcded8] bg-[#e1ebe7] px-4 py-3 text-sm text-[#123d37]">
-          {pipelineStatus}
+        <div className="flex items-center gap-2 rounded-lg border border-[#b8d4cd] bg-[#e1ebe7] px-4 py-3">
+          <span className="text-sm font-medium text-[#123d37]">{pipelineStatus}</span>
         </div>
       )}
+
       <FileList refreshKey={refreshKey} />
     </div>
   );
 }
-

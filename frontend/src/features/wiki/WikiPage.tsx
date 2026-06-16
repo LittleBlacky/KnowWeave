@@ -24,8 +24,9 @@ import {
   type Wiki,
   type WikiRevision,
 } from "@/shared/api/knowweave";
+import {ListPanel, DetailPanel, ListItemCard, Badge, EmptyState} from "@/shared/ui";
 
-type Tab = "editor" | "revisions" | "topic" | "faq";
+type Tab = "editor" | "revisions";
 
 export function WikiPage() {
   const [pages, setPages] = useState<Wiki[]>([]);
@@ -35,15 +36,12 @@ export function WikiPage() {
   const [changeSummary, setChangeSummary] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // Revisions
   const [revisions, setRevisions] = useState<WikiRevision[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>("editor");
 
-  // Topic Wiki form
   const [topicTheme, setTopicTheme] = useState("");
   const [topicFileIds, setTopicFileIds] = useState("");
 
-  // FAQ Wiki
   const [faqFileId, setFaqFileId] = useState("");
 
   useEffect(() => {
@@ -65,6 +63,7 @@ export function WikiPage() {
     setChangeSummary("");
     setCitations(citationResponse.items);
     setRevisions(Array.isArray(revs) ? revs : []);
+    setActiveTab("editor");
   }
 
   async function handleSave() {
@@ -131,39 +130,38 @@ export function WikiPage() {
     }
   }
 
+  const wikiTypeLabel = (t: string) =>
+    t === "topic_wiki" ? "主题" : t === "faq_wiki" ? "FAQ" : "文档";
+
   const revisionSourceLabel = (s: string) => {
     switch (s) {
-      case "ai_generated":
-        return "AI 生成";
-      case "ai_regenerated":
-        return "AI 重新生成";
-      case "rollback":
-        return "回滚";
-      default:
-        return "人工编辑";
+      case "ai_generated": return "AI 生成";
+      case "ai_regenerated": return "AI 重新生成";
+      case "rollback": return "回滚";
+      default: return "人工编辑";
     }
   };
 
   return (
     <div className="grid gap-4">
-      {/* Action bar: Topic / FAQ create */}
-      <div className="flex flex-wrap gap-3">
-        <div className="flex items-center gap-2 rounded-md border border-[#dcded8] bg-white px-3 py-2">
+      {/* Quick-create bar */}
+      <div className="flex flex-wrap gap-3 rounded-lg border border-[#dcded8] bg-white p-3">
+        <div className="flex flex-1 flex-wrap items-center gap-2 min-w-0">
           <Lightbulb aria-hidden="true" className="text-[#275a53]" size={16} />
           <input
-            className="min-w-40 bg-transparent text-sm outline-none"
+            className="min-w-32 flex-1 bg-transparent text-sm outline-none"
             onChange={(e) => setTopicTheme(e.target.value)}
             placeholder="主题名称"
             value={topicTheme}
           />
           <input
-            className="w-32 bg-transparent text-xs text-[#6f756f] outline-none"
+            className="w-40 bg-transparent text-xs text-[#6f756f] outline-none"
             onChange={(e) => setTopicFileIds(e.target.value)}
             placeholder="文件ID (逗号分隔)"
             value={topicFileIds}
           />
           <button
-            className="rounded bg-[#123d37] px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
+            className="shrink-0 rounded-lg bg-[#123d37] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#0e2f2a] disabled:opacity-50"
             disabled={busy || !topicTheme.trim()}
             onClick={() => void handleCreateTopic()}
             type="button"
@@ -172,20 +170,16 @@ export function WikiPage() {
             创建主题 Wiki
           </button>
         </div>
-        <div className="flex items-center gap-2 rounded-md border border-[#dcded8] bg-white px-3 py-2">
-          <MessageSquareText
-            aria-hidden="true"
-            className="text-[#275a53]"
-            size={16}
-          />
+        <div className="flex flex-1 flex-wrap items-center gap-2 min-w-0">
+          <MessageSquareText aria-hidden="true" className="text-[#275a53]" size={16} />
           <input
-            className="w-64 bg-transparent text-sm outline-none"
+            className="min-w-32 flex-1 bg-transparent text-sm outline-none"
             onChange={(e) => setFaqFileId(e.target.value)}
             placeholder="文件 ID"
             value={faqFileId}
           />
           <button
-            className="rounded bg-[#123d37] px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
+            className="shrink-0 rounded-lg bg-[#123d37] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#0e2f2a] disabled:opacity-50"
             disabled={busy || !faqFileId.trim()}
             onClick={() => void handleCreateFaq()}
             type="button"
@@ -196,181 +190,152 @@ export function WikiPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(280px,0.35fr)_minmax(0,0.65fr)]">
-        {/* Left: Wiki list */}
-        <section className="rounded-md border border-[#dcded8] bg-white">
-          <div className="flex items-center justify-between border-b border-[#dcded8] px-4 py-3">
-            <h1 className="text-lg font-semibold">Wiki</h1>
-            <BookOpenCheck
-              aria-hidden="true"
-              className="text-[#275a53]"
-              size={20}
-            />
-          </div>
-          <div className="grid gap-3 p-4">
+      {/* List + Detail */}
+      <div className="grid gap-4 lg:grid-cols-[minmax(320px,0.38fr)_minmax(0,0.62fr)]">
+        <ListPanel title="Wiki 列表" icon={BookOpenCheck} count={pages.length}>
+          <div className="grid gap-2.5">
             {pages.map((page) => (
-              <button
-                aria-pressed={selected?.id === page.id}
-                className="rounded-md border border-[#dcded8] p-4 text-left transition hover:border-[#275a53] aria-pressed:border-[#275a53] aria-pressed:bg-[#f0f6f3]"
+              <ListItemCard
                 key={page.id}
+                active={selected?.id === page.id}
                 onClick={() => void handleSelect(page.id)}
-                type="button"
-              >
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <h2 className="font-semibold">{page.title}</h2>
-                  <span className="rounded-md border border-[#dcded8] px-2 py-1 text-xs">
-                    {page.status}
-                  </span>
-                </div>
-                <p className="line-clamp-2 text-sm text-[#30342f]">
-                  {page.summary}
-                </p>
-                <span className="mt-2 inline-block text-xs text-[#6f756f]">
-                  {page.wiki_type === "topic_wiki"
-                    ? "主题"
-                    : page.wiki_type === "faq_wiki"
-                      ? "FAQ"
-                      : "文档"}
-                </span>
-              </button>
+                title={page.title}
+                subtitle={page.summary ?? undefined}
+                status={page.status}
+                tags={[{id: page.wiki_type, name: wikiTypeLabel(page.wiki_type)}]}
+              />
             ))}
           </div>
-        </section>
+        </ListPanel>
 
-        {/* Right: Editor / Revisions */}
-        <section className="rounded-md border border-[#dcded8] bg-white">
-          {/* Tab bar */}
-          <div className="flex border-b border-[#dcded8]">
-            {(["editor", "revisions"] as Tab[]).map((tab) => (
-              <button
-                key={tab}
-                className={`px-4 py-3 text-sm font-semibold ${activeTab === tab ? "border-b-2 border-[#123d37] text-[#123d37]" : "text-[#6f756f]"}`}
-                onClick={() => setActiveTab(tab)}
-                type="button"
-              >
-                {tab === "editor" ? (
-                  <>
-                    <Save size={14} className="inline mr-1" />
-                    编辑
-                  </>
-                ) : (
-                  <>
-                    <History size={14} className="inline mr-1" />
-                    版本历史 ({revisions.length})
-                  </>
-                )}
-              </button>
-            ))}
-          </div>
-
-          {activeTab === "editor" ? (
+        <DetailPanel title={selected ? undefined : "Wiki 详情"}>
+          {!selected ? (
+            <EmptyState
+              icon={BookOpenCheck}
+              title="选择 Wiki 页面"
+              description="从左侧列表选择一个页面进行编辑或查看版本历史。"
+            />
+          ) : (
             <div>
-              <div className="flex items-center justify-between border-b border-[#dcded8] px-4 py-3">
-                <h2 className="text-base font-semibold">Wiki 编辑器</h2>
-                <button
-                  className="inline-flex items-center gap-2 rounded-md bg-[#123d37] px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
-                  disabled={!selected || !changeSummary.trim() || busy}
-                  onClick={() => void handleSave()}
-                  type="button"
-                >
-                  <Save aria-hidden="true" size={16} />
-                  保存
-                </button>
+              {/* Tabs */}
+              <div className="-mx-4 -mt-4 mb-4 flex border-b border-[#dcded8]">
+                {(["editor", "revisions"] as Tab[]).map((tab) => (
+                  <button
+                    key={tab}
+                    className={`px-4 py-2.5 text-sm font-semibold transition ${
+                      activeTab === tab
+                        ? "border-b-2 border-[#123d37] text-[#123d37]"
+                        : "text-[#6f756f] hover:text-[#30342f]"
+                    }`}
+                    onClick={() => setActiveTab(tab)}
+                    type="button"
+                  >
+                    {tab === "editor" ? (
+                      <><Save size={14} className="inline mr-1.5" />编辑</>
+                    ) : (
+                      <><History size={14} className="inline mr-1.5" />版本 ({revisions.length})</>
+                    )}
+                  </button>
+                ))}
               </div>
-              {selected ? (
-                <div className="grid gap-4 p-4">
-                  <div className="flex flex-wrap gap-2">
-                    <span className="rounded-md border border-[#dcded8] px-2 py-1 text-xs">
-                      {selected.wiki_type}
-                    </span>
-                    <span className="rounded-md border border-[#dcded8] px-2 py-1 text-xs">
-                      状态: {selected.status}
-                    </span>
+
+              {activeTab === "editor" ? (
+                <div className="grid gap-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge>{selected.wiki_type}</Badge>
+                    <Badge tone={selected.status === "published" ? "accent" : "neutral"}>
+                      {selected.status}
+                    </Badge>
                   </div>
-                  <label className="grid gap-2 text-sm font-semibold">
+
+                  <label className="grid gap-1.5 text-sm font-semibold">
                     Markdown 正文
                     <textarea
-                      className="min-h-44 resize-y rounded-md border border-[#dcded8] p-3 font-mono text-sm font-normal"
-                      onChange={(event) => setDraft(event.target.value)}
+                      className="min-h-52 resize-y rounded-lg border border-[#dcded8] p-3 font-mono text-sm font-normal focus:border-[#275a53] focus:outline-none"
+                      onChange={(e) => setDraft(e.target.value)}
                       value={draft}
                     />
                   </label>
-                  <label className="grid gap-2 text-sm font-semibold">
+
+                  <label className="grid gap-1.5 text-sm font-semibold">
                     变更说明
                     <input
-                      className="rounded-md border border-[#dcded8] px-3 py-2 font-normal"
-                      onChange={(event) => setChangeSummary(event.target.value)}
+                      className="rounded-lg border border-[#dcded8] px-3 py-2 font-normal focus:border-[#275a53] focus:outline-none"
+                      onChange={(e) => setChangeSummary(e.target.value)}
+                      placeholder="简述本次修改内容"
                       value={changeSummary}
                     />
                   </label>
-                  {citations.map((citation) => (
-                    <div
-                      className="grid gap-2 rounded-md border border-[#dcded8] p-3"
-                      key={citation.id}
-                    >
-                      <span className="text-sm font-semibold">
-                        {citation.label}
-                      </span>
-                      <p className="text-xs text-[#6f756f] line-clamp-2">
-                        {citation.preview_text}
-                      </p>
+
+                  <button
+                    className="inline-flex items-center gap-2 self-start rounded-lg bg-[#123d37] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0e2f2a] disabled:opacity-50"
+                    disabled={!changeSummary.trim() || busy}
+                    onClick={() => void handleSave()}
+                    type="button"
+                  >
+                    <Save aria-hidden="true" size={16} />
+                    保存修改
+                  </button>
+
+                  {citations.length > 0 && (
+                    <div className="grid gap-2">
+                      <h3 className="text-sm font-semibold text-[#6f756f]">引用来源</h3>
+                      {citations.map((c) => (
+                        <div
+                          key={c.id}
+                          className="rounded-lg border border-[#dcded8] bg-[#f0f6f3] p-3"
+                        >
+                          <span className="text-sm font-semibold">{c.label}</span>
+                          <p className="mt-1 line-clamp-2 text-xs text-[#5d645d]">
+                            {c.preview_text}
+                          </p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
               ) : (
-                <p className="p-4 text-sm text-[#5d645d]">
-                  选择一个 Wiki 页面进行编辑。
-                </p>
-              )}
-            </div>
-          ) : (
-            <div>
-              {revisions.length === 0 ? (
-                <p className="p-4 text-sm text-[#5d645d]">暂无版本记录。</p>
-              ) : (
-                <div className="divide-y divide-[#dcded8]">
-                  {revisions.map((rev) => (
-                    <div
-                      className="flex items-start justify-between gap-4 px-4 py-3"
-                      key={rev.id}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-semibold">
-                            v{rev.revision_number}
-                          </span>
-                          <span className="rounded bg-[#f0f2ed] px-2 py-0.5 text-xs text-[#6f756f]">
-                            {revisionSourceLabel(rev.edit_source)}
-                          </span>
-                          <span className="text-xs text-[#6f756f]">
-                            {rev.status}
-                          </span>
+                <div>
+                  {revisions.length === 0 ? (
+                    <p className="py-8 text-center text-sm text-[#6f756f]">暂无版本记录</p>
+                  ) : (
+                    <div className="divide-y divide-[#dcded8]">
+                      {revisions.map((rev) => (
+                        <div
+                          key={rev.id}
+                          className="flex items-start justify-between gap-4 py-3"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="mb-1 flex flex-wrap items-center gap-2">
+                              <span className="text-sm font-semibold">v{rev.revision_number}</span>
+                              <Badge tone="accent">{revisionSourceLabel(rev.edit_source)}</Badge>
+                            </div>
+                            <p className="truncate text-xs text-[#5d645d]">
+                              {rev.change_summary || "无变更说明"}
+                            </p>
+                            <p className="mt-0.5 text-xs text-[#b0b6ad]">
+                              {new Date(rev.created_at).toLocaleString()}
+                            </p>
+                          </div>
+                          <button
+                            className="shrink-0 rounded border border-[#dcded8] px-2.5 py-1 text-xs font-semibold text-[#123d37] transition hover:bg-[#f0f2ed] disabled:opacity-50"
+                            disabled={busy}
+                            onClick={() => void handleRollback(rev.id)}
+                            type="button"
+                          >
+                            <RotateCcw aria-hidden="true" size={12} className="inline mr-1" />
+                            回滚
+                          </button>
                         </div>
-                        <p className="text-xs text-[#6f756f] truncate">
-                          {rev.change_summary}
-                        </p>
-                        <p className="text-xs text-[#6f756f] mt-1">
-                          {new Date(rev.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                      <button
-                        className="inline-flex items-center gap-1 rounded border border-[#dcded8] px-2 py-1 text-xs font-semibold text-[#123d37] hover:bg-[#f0f2ed] disabled:opacity-50"
-                        disabled={busy}
-                        onClick={() => void handleRollback(rev.id)}
-                        type="button"
-                      >
-                        <RotateCcw aria-hidden="true" size={12} />
-                        回滚
-                      </button>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
             </div>
           )}
-        </section>
+        </DetailPanel>
       </div>
     </div>
   );
 }
-

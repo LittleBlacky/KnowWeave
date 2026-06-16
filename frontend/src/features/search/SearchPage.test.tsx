@@ -9,18 +9,18 @@ describe("SearchPage", () => {
     const user = userEvent.setup();
     render(<SearchPage />);
 
-    await user.clear(screen.getByLabelText("Search query"));
-    await user.type(screen.getByLabelText("Search query"), "approval");
-    expect(screen.getByLabelText("Files")).toBeChecked();
-    expect(screen.getByLabelText("Chunks")).toBeChecked();
-    expect(screen.getByLabelText("Knowledge Units")).toBeChecked();
-    expect(screen.getByLabelText("Wiki Pages")).toBeChecked();
-    await user.click(screen.getByRole("button", { name: "Run search" }));
+    await user.clear(screen.getByLabelText("搜索关键词"));
+    await user.type(screen.getByLabelText("搜索关键词"), "approval");
+    expect(screen.getByLabelText("文件")).toBeChecked();
+    expect(screen.getByLabelText("分块")).toBeChecked();
+    expect(screen.getByLabelText("知识单元")).toBeChecked();
+    expect(screen.getByLabelText("Wiki")).toBeChecked();
+    await user.click(screen.getByRole("button", { name: "搜索" }));
 
     expect(await screen.findByText("run_search_001")).toBeInTheDocument();
     expect(screen.getByText("policy.md")).toBeInTheDocument();
     expect(screen.getByText("Leave requests need approval.")).toBeInTheDocument();
-    expect(screen.getByText("Select a result to inspect its source locator.")).toBeInTheDocument();
+    expect(screen.getByText("选择一个结果查看来源定位")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /policy\.md/i }));
 

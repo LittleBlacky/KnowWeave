@@ -17,10 +17,10 @@ describe("WikiPage", () => {
     expect(await screen.findByText(/Leave requests require manager approval/)).toBeInTheDocument();
     expect(screen.getByText("S1")).toBeInTheDocument();
 
-    await user.clear(screen.getByLabelText("Wiki markdown"));
-    await user.type(screen.getByLabelText("Wiki markdown"), "Updated wiki content.");
-    await user.type(screen.getByLabelText("Change summary"), "Clarified manager approval policy.");
-    await user.click(screen.getByRole("button", { name: "Save wiki" }));
+    await user.clear(screen.getByLabelText("Markdown 正文"));
+    await user.type(screen.getByLabelText("Markdown 正文"), "Updated wiki content.");
+    await user.type(screen.getByLabelText("变更说明"), "Clarified manager approval policy.");
+    await user.click(screen.getByRole("button", { name: "保存修改" }));
 
     expect(await screen.findByText("Updated wiki content.")).toBeInTheDocument();
   });

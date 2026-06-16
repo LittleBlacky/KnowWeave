@@ -5,10 +5,11 @@ import { AppShell } from "./AppShell";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/chunks",
+  useRouter: () => ({ push: vi.fn() }),
 }));
 
 describe("AppShell", () => {
-  it("renders primary navigation, content and context panel", () => {
+  it("renders primary navigation and content area", () => {
     render(
       <AppShell>
         <section>Workbench content</section>
@@ -17,11 +18,10 @@ describe("AppShell", () => {
 
     expect(screen.getByText("KnowWeave")).toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "Primary" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Chunks/ })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /知识分块/ })).toHaveAttribute(
       "aria-current",
       "page",
     );
     expect(screen.getByText("Workbench content")).toBeInTheDocument();
-    expect(screen.getByText("Retrieved Contexts")).toBeInTheDocument();
   });
 });
