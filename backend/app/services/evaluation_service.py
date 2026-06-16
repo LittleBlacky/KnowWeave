@@ -73,6 +73,28 @@ class EvaluationService:
             raise EvaluationSampleNotFoundError()
         return sample
 
+    def update_sample(
+        self,
+        sample_id: UUID,
+        *,
+        question: str | None = None,
+        expected_answer: str | None = None,
+        status: str | None = None,
+        difficulty: str | None = None,
+    ) -> EvaluationSample:
+        sample = self.get_sample(sample_id)
+        if question is not None:
+            sample.question = question
+        if expected_answer is not None:
+            sample.expected_answer = expected_answer
+        if status is not None:
+            sample.status = status
+        if difficulty is not None:
+            sample.difficulty = difficulty
+        self.session.commit()
+        self.session.refresh(sample)
+        return sample
+
     def create_candidate_from_feedback(self, feedback_id: UUID) -> EvaluationSample:
         feedback = self.session.get(Feedback, feedback_id)
         if feedback is None:

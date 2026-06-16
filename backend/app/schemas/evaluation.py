@@ -38,3 +38,10 @@ class EvaluationSampleRead(BaseModel):
 class EvaluationSampleList(BaseModel):
     items: list[EvaluationSampleRead]
     total: int
+
+
+class EvaluationSampleUpdate(BaseModel):
+    question: str | None = None
+    expected_answer: str | None = None
+    status: str | None = None
+    difficulty: str | None = None
