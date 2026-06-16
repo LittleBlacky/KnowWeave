@@ -5,9 +5,13 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.db.session import get_db
+from app.providers.factory import build_default_llm_provider
 from app.schemas.common import ApiResponse
 from app.schemas.knowledge_units import (
+    BatchStatusUpdateRequest,
+    ExtractionResponse,
     KnowledgeUnitDetail,
     KnowledgeUnitList,
     KnowledgeUnitMergeRequest,
@@ -23,7 +27,10 @@ router = APIRouter(prefix="/knowledge-units", tags=["knowledge-units"])
 
 
 def get_knowledge_unit_service(db: Session = Depends(get_db)) -> KnowledgeUnitService:
-    return KnowledgeUnitService(session=db)
+    return KnowledgeUnitService(
+        session=db,
+        llm_provider=build_default_llm_provider(get_settings()),
+    )
 
 
 @router.get("")
@@ -71,16 +78,21 @@ def create_knowledge_unit(
 
 
 @router.post("/files/{file_id}/generate", status_code=status.HTTP_201_CREATED)
-def auto_generate_knowledge_units(
+async def auto_generate_knowledge_units(
     file_id: UUID,
+    batch_size: int = Query(default=6, ge=2, le=12),
     service: KnowledgeUnitService = Depends(get_knowledge_unit_service),
-) -> ApiResponse[KnowledgeUnitList]:
-    units = service.auto_generate_from_chunks(file_id)
-    items = [_read_unit(unit, service=service) for unit in units]
+) -> ApiResponse[ExtractionResponse]:
+    result = await service.auto_generate_from_chunks(file_id, batch_size=batch_size)
+    items = [_read_unit(unit, service=service) for unit in result["units"]]
     return ApiResponse(
-        data=KnowledgeUnitList(items=items, total=len(items)),
+        data=ExtractionResponse(
+            extracted=result["extracted"],
+            skipped_duplicates=result["skipped_duplicates"],
+            units=items,
+        ),
         error=None,
-        request_id="req_auto_knowledge_units",
+        request_id="req_extract_knowledge_units",
     )
 
 
@@ -178,4 +190,20 @@ def split_knowledge_unit(
         data=KnowledgeUnitList(items=items, total=len(items)),
         error=None,
         request_id="req_ku_split",
+    )
+
+
+@router.post("/batch-update-status")
+def batch_update_status(
+    request: BatchStatusUpdateRequest,
+    service: KnowledgeUnitService = Depends(get_knowledge_unit_service),
+) -> ApiResponse[dict]:
+    updated = service.batch_update_status(
+        unit_ids=request.unit_ids,
+        status=request.status,
+    )
+    return ApiResponse(
+        data={"updated": updated, "status": request.status},
+        error=None,
+        request_id="req_ku_batch_status",
     )

@@ -59,6 +59,22 @@ class KnowledgeUnitDetail(KnowledgeUnitRead):
     sources: list[KnowledgeUnitSourceRead] = Field(default_factory=list)
 
 
+class BatchStatusUpdateRequest(BaseModel):
+    unit_ids: list[UUID] = Field(..., min_length=1, max_length=100)
+    status: str  # verified | archived | draft | needs_review
+
+
+class ExtractionRequest(BaseModel):
+    file_id: UUID
+    batch_size: int = Field(default=6, ge=2, le=12)
+
+
+class ExtractionResponse(BaseModel):
+    extracted: int
+    skipped_duplicates: int
+    units: list[KnowledgeUnitRead]
+
+
 class KnowledgeUnitList(BaseModel):
     items: list[KnowledgeUnitRead]
     total: int

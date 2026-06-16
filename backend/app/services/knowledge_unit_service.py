@@ -5,10 +5,14 @@ from uuid import UUID
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.errors import AppError
 from app.models.base import utcnow
 from app.models.files import Chunk, KnowledgeFile, SourceSpan
 from app.models.knowledge import KnowledgeUnit, KnowledgeUnitSource, Tag, TagBinding
+from app.providers.base import LLMProvider
+from app.providers.extraction import ExtractionCandidate, ExtractionError, ExtractionProvider
+from app.providers.factory import build_default_llm_provider
 from app.services.tag_service import TagService
 
 
@@ -40,8 +44,9 @@ class KnowledgeUnitVerifiedSourceRequiredError(AppError):
 
 
 class KnowledgeUnitService:
-    def __init__(self, *, session: Session) -> None:
+    def __init__(self, *, session: Session, llm_provider: LLMProvider | None = None) -> None:
         self.session = session
+        self._llm = llm_provider or build_default_llm_provider(get_settings())
 
     def create_knowledge_unit(
         self,
@@ -82,35 +87,144 @@ class KnowledgeUnitService:
         self.session.refresh(unit)
         return unit
 
-    def auto_generate_from_chunks(self, file_id: UUID) -> list[KnowledgeUnit]:
-        """Create one Knowledge Unit per chunk for a file, using chunk content as the body."""
+    async def auto_generate_from_chunks(
+        self,
+        file_id: UUID,
+        *,
+        batch_size: int = 6,
+    ) -> dict:
+        """Extract Knowledge Units from file chunks using LLM.
+
+        Batches chunks, calls the extraction provider, deduplicates against
+        existing KUs, and persists the results as draft Knowledge Units.
+
+        Returns a summary dict with counts and the new KU objects.
+        """
         file_record = self.session.get(KnowledgeFile, file_id)
         if file_record is None:
             raise KnowledgeUnitNotFoundError()
 
-        chunks = list(
-            self.session.scalars(
-                select(Chunk)
-                .where(Chunk.file_id == file_id)
-                .where(Chunk.is_searchable.is_(True))
-                .order_by(Chunk.chunk_index.asc())
-            ).all()
-        )
+        chunks = self._get_searchable_chunks(file_id)
+        if not chunks:
+            return {"extracted": 0, "skipped_duplicates": 0, "units": []}
 
-        units: list[KnowledgeUnit] = []
-        for chunk in chunks:
-            title = self._title_from_chunk(chunk)
+        existing_kus = self._get_existing_kus_for_file(file_id)
+        extraction = ExtractionProvider(llm_provider=self._llm)
+
+        all_candidates: list[tuple[ExtractionCandidate, Chunk]] = []
+        batches = list(_batch_list(chunks, batch_size))
+        accumulated_kus = list(existing_kus)  # grow as we extract to avoid intra-batch dupes
+
+        for batch in batches:
+            try:
+                result = await extraction.extract(
+                    chunks=batch,
+                    existing_kus=accumulated_kus,
+                )
+            except ExtractionError:
+                # If one batch fails, skip it and continue with the rest.
+                continue
+
+            for candidate in result.candidates:
+                if candidate.source_chunk_index >= len(batch):
+                    continue
+                source_chunk = batch[candidate.source_chunk_index]
+
+                # LLM-based dedup check against existing + already-extracted KUs
+                try:
+                    is_dup = await extraction.check_duplicate(
+                        candidate=candidate,
+                        existing_kus=accumulated_kus,
+                    )
+                except ExtractionError:
+                    is_dup = False  # fail-open: accept the candidate
+
+                if not is_dup:
+                    all_candidates.append((candidate, source_chunk))
+                    # Track in accumulated list so subsequent batches can dedup
+                    accumulated_kus.append(
+                        KnowledgeUnit(
+                            title=candidate.title,
+                            summary=candidate.summary,
+                            unit_type=candidate.unit_type,
+                            content="",
+                            status="draft",
+                            created_from="ai_extracted",
+                            search_text="",
+                            metadata_={},
+                        )
+                    )
+
+        # Persist extracted candidates
+        new_units: list[KnowledgeUnit] = []
+        for candidate, source_chunk in all_candidates:
             unit = self.create_knowledge_unit(
-                title=title,
-                content=chunk.raw_content,
-                unit_type="concept",
-                summary=chunk.raw_content[:200] if len(chunk.raw_content) > 200 else chunk.raw_content,
+                title=candidate.title,
+                content=candidate.content,
+                unit_type=candidate.unit_type,
+                summary=candidate.summary,
                 status="draft",
-                source_chunk_ids=[chunk.id],
+                source_chunk_ids=[source_chunk.id],
             )
-            units.append(unit)
+            new_units.append(unit)
 
-        return units
+        return {
+            "extracted": len(new_units),
+            "skipped_duplicates": len(all_candidates) - len(new_units),
+            "units": new_units,
+        }
+
+    def batch_update_status(
+        self,
+        *,
+        unit_ids: list[UUID],
+        status: str,
+    ) -> int:
+        """Batch-update status for multiple Knowledge Units.
+
+        Returns the count of units actually updated.
+        """
+        if status not in ("verified", "archived", "draft", "needs_review"):
+            raise AppError(
+                code="INVALID_STATUS",
+                message=f"Status '{status}' is not valid for batch update.",
+                status_code=400,
+            )
+        if not unit_ids:
+            return 0
+
+        updated = 0
+        for uid in unit_ids:
+            unit = self.session.get(KnowledgeUnit, uid)
+            if unit is None:
+                continue
+            unit.status = status
+            if status == "verified":
+                unit.verified_at = utcnow()
+            if status == "archived":
+                unit.archived_at = utcnow()
+            self.session.add(unit)
+            updated += 1
+        self.session.commit()
+        return updated
+
+    def _get_searchable_chunks(self, file_id: UUID) -> list[Chunk]:
+        statement = (
+            select(Chunk)
+            .where(Chunk.file_id == file_id)
+            .where(Chunk.is_searchable.is_(True))
+            .order_by(Chunk.chunk_index.asc())
+        )
+        return list(self.session.scalars(statement).all())
+
+    def _get_existing_kus_for_file(self, file_id: UUID) -> list[KnowledgeUnit]:
+        statement = (
+            select(KnowledgeUnit)
+            .join(KnowledgeUnitSource, KnowledgeUnitSource.knowledge_unit_id == KnowledgeUnit.id)
+            .where(KnowledgeUnitSource.file_id == file_id)
+            .order_by(KnowledgeUnit.created_at.desc())
+        )
+        return list(self.session.scalars(statement).all())
 
     def merge_knowledge_units(self, *, source_ids: list[UUID], title: str) -> KnowledgeUnit:
         """Merge multiple Knowledge Units into one, combining content and sources."""
@@ -339,15 +453,7 @@ class KnowledgeUnitService:
         parts.append(content)
         return "\n".join(parts)
 
-    def _title_from_chunk(self, chunk: Chunk) -> str:
-        """Derive a short title from chunk content."""
-        text = chunk.raw_content.strip()
-        # Use the first heading-like line, or first sentence, or first 60 chars
-        for line in text.split("\n"):
-            stripped = line.strip()
-            if stripped.startswith("#"):
-                return stripped.lstrip("#").strip()[:120]
-        first_sentence = text.split(".")[0].strip()
-        if len(first_sentence) <= 120:
-            return first_sentence
-        return text[:120].rsplit(" ", 1)[0]
+
+def _batch_list(items: list, batch_size: int) -> list[list]:
+    """Split *items* into sub-lists of at most *batch_size* elements."""
+    return [items[i : i + batch_size] for i in range(0, len(items), batch_size)]
