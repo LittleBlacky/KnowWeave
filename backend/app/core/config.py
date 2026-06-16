@@ -5,6 +5,15 @@ from functools import lru_cache
 
 from pydantic import BaseModel
 
+# Fields that can be updated at runtime without restart
+_RUNTIME_MUTABLE_FIELDS = frozenset({
+    "qwen_chat_model",
+    "qwen_generation_model",
+    "qwen_embedding_model",
+    "qwen_rerank_model",
+    "qwen_base_url",
+})
+
 
 class Settings(BaseModel):
     app_name: str = "KnowWeave API"
@@ -18,6 +27,8 @@ class Settings(BaseModel):
     qwen_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
     qwen_chat_model: str = "qwen-plus"
     qwen_generation_model: str = "qwen-plus"
+    qwen_embedding_model: str = "text-embedding-v3"
+    qwen_rerank_model: str = "gte-rerank"
     qwen_timeout_seconds: float = 60.0
     cors_origins: tuple[str, ...] = (
         "http://localhost:3000",
@@ -29,6 +40,22 @@ class Settings(BaseModel):
     @property
     def qwen_enabled(self) -> bool:
         return bool(self.qwen_api_key)
+
+    def apply_runtime_overrides(self, **overrides: str | int) -> dict[str, object]:
+        """Apply runtime-configurable overrides. Returns which fields changed."""
+        changed: dict[str, object] = {}
+        for key, value in overrides.items():
+            if key not in _RUNTIME_MUTABLE_FIELDS:
+                continue
+            current = getattr(self, key, None)
+            if value is not None and str(current) != str(value):
+                # coerce types — max_upload_mb is int, model names are str
+                if key == "max_upload_mb":
+                    setattr(self, key, int(value))
+                else:
+                    setattr(self, key, str(value))
+                changed[key] = getattr(self, key)
+        return changed
 
 
 @lru_cache
@@ -67,6 +94,14 @@ def get_settings() -> Settings:
         qwen_generation_model=os.getenv(
             "QWEN_GENERATION_MODEL",
             Settings.model_fields["qwen_generation_model"].default,
+        ),
+        qwen_embedding_model=os.getenv(
+            "QWEN_EMBEDDING_MODEL",
+            Settings.model_fields["qwen_embedding_model"].default,
+        ),
+        qwen_rerank_model=os.getenv(
+            "QWEN_RERANK_MODEL",
+            Settings.model_fields["qwen_rerank_model"].default,
         ),
         qwen_timeout_seconds=float(
             os.getenv(
