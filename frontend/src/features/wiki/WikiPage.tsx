@@ -2,6 +2,7 @@
 
 import {
   BookOpenCheck,
+  Flag,
   History,
   Lightbulb,
   MessageSquareText,
@@ -24,7 +25,14 @@ import {
   type Wiki,
   type WikiRevision,
 } from "@/shared/api/knowweave";
-import {ListPanel, DetailPanel, ListItemCard, Badge, EmptyState} from "@/shared/ui";
+import {
+  ListPanel,
+  DetailPanel,
+  ListItemCard,
+  Badge,
+  EmptyState,
+} from "@/shared/ui";
+import {FeedbackDialog} from "@/features/feedback/FeedbackDialog";
 
 type Tab = "editor" | "revisions";
 
@@ -43,6 +51,7 @@ export function WikiPage() {
   const [topicFileIds, setTopicFileIds] = useState("");
 
   const [faqFileId, setFaqFileId] = useState("");
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     async function loadPages() {
@@ -135,10 +144,14 @@ export function WikiPage() {
 
   const revisionSourceLabel = (s: string) => {
     switch (s) {
-      case "ai_generated": return "AI 生成";
-      case "ai_regenerated": return "AI 重新生成";
-      case "rollback": return "回滚";
-      default: return "人工编辑";
+      case "ai_generated":
+        return "AI 生成";
+      case "ai_regenerated":
+        return "AI 重新生成";
+      case "rollback":
+        return "回滚";
+      default:
+        return "人工编辑";
     }
   };
 
@@ -171,7 +184,11 @@ export function WikiPage() {
           </button>
         </div>
         <div className="flex flex-1 flex-wrap items-center gap-2 min-w-0">
-          <MessageSquareText aria-hidden="true" className="text-[#275a53]" size={16} />
+          <MessageSquareText
+            aria-hidden="true"
+            className="text-[#275a53]"
+            size={16}
+          />
           <input
             className="min-w-32 flex-1 bg-transparent text-sm outline-none"
             onChange={(e) => setFaqFileId(e.target.value)}
@@ -202,7 +219,9 @@ export function WikiPage() {
                 title={page.title}
                 subtitle={page.summary ?? undefined}
                 status={page.status}
-                tags={[{id: page.wiki_type, name: wikiTypeLabel(page.wiki_type)}]}
+                tags={[
+                  {id: page.wiki_type, name: wikiTypeLabel(page.wiki_type)},
+                ]}
               />
             ))}
           </div>
@@ -231,9 +250,15 @@ export function WikiPage() {
                     type="button"
                   >
                     {tab === "editor" ? (
-                      <><Save size={14} className="inline mr-1.5" />编辑</>
+                      <>
+                        <Save size={14} className="inline mr-1.5" />
+                        编辑
+                      </>
                     ) : (
-                      <><History size={14} className="inline mr-1.5" />版本 ({revisions.length})</>
+                      <>
+                        <History size={14} className="inline mr-1.5" />
+                        版本 ({revisions.length})
+                      </>
                     )}
                   </button>
                 ))}
@@ -243,7 +268,11 @@ export function WikiPage() {
                 <div className="grid gap-4">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge>{selected.wiki_type}</Badge>
-                    <Badge tone={selected.status === "published" ? "accent" : "neutral"}>
+                    <Badge
+                      tone={
+                        selected.status === "published" ? "accent" : "neutral"
+                      }
+                    >
                       {selected.status}
                     </Badge>
                   </div>
@@ -277,15 +306,35 @@ export function WikiPage() {
                     保存修改
                   </button>
 
+                  <button
+                    className="inline-flex items-center gap-2 self-start rounded-lg border border-[#dcded8] px-4 py-2 text-sm font-semibold text-[#6f756f] transition hover:border-[#a23b35] hover:text-[#a23b35]"
+                    onClick={() => setShowFeedback((v) => !v)}
+                    type="button"
+                  >
+                    <Flag aria-hidden="true" size={16} />
+                    反馈
+                  </button>
+
+                  {showFeedback && selected && (
+                    <FeedbackDialog
+                      targetId={selected.id}
+                      targetType="wiki_page"
+                    />
+                  )}
+
                   {citations.length > 0 && (
                     <div className="grid gap-2">
-                      <h3 className="text-sm font-semibold text-[#6f756f]">引用来源</h3>
+                      <h3 className="text-sm font-semibold text-[#6f756f]">
+                        引用来源
+                      </h3>
                       {citations.map((c) => (
                         <div
                           key={c.id}
                           className="rounded-lg border border-[#dcded8] bg-[#f0f6f3] p-3"
                         >
-                          <span className="text-sm font-semibold">{c.label}</span>
+                          <span className="text-sm font-semibold">
+                            {c.label}
+                          </span>
                           <p className="mt-1 line-clamp-2 text-xs text-[#5d645d]">
                             {c.preview_text}
                           </p>
@@ -297,7 +346,9 @@ export function WikiPage() {
               ) : (
                 <div>
                   {revisions.length === 0 ? (
-                    <p className="py-8 text-center text-sm text-[#6f756f]">暂无版本记录</p>
+                    <p className="py-8 text-center text-sm text-[#6f756f]">
+                      暂无版本记录
+                    </p>
                   ) : (
                     <div className="divide-y divide-[#dcded8]">
                       {revisions.map((rev) => (
@@ -307,8 +358,12 @@ export function WikiPage() {
                         >
                           <div className="min-w-0 flex-1">
                             <div className="mb-1 flex flex-wrap items-center gap-2">
-                              <span className="text-sm font-semibold">v{rev.revision_number}</span>
-                              <Badge tone="accent">{revisionSourceLabel(rev.edit_source)}</Badge>
+                              <span className="text-sm font-semibold">
+                                v{rev.revision_number}
+                              </span>
+                              <Badge tone="accent">
+                                {revisionSourceLabel(rev.edit_source)}
+                              </Badge>
                             </div>
                             <p className="truncate text-xs text-[#5d645d]">
                               {rev.change_summary || "无变更说明"}
@@ -323,7 +378,11 @@ export function WikiPage() {
                             onClick={() => void handleRollback(rev.id)}
                             type="button"
                           >
-                            <RotateCcw aria-hidden="true" size={12} className="inline mr-1" />
+                            <RotateCcw
+                              aria-hidden="true"
+                              size={12}
+                              className="inline mr-1"
+                            />
                             回滚
                           </button>
                         </div>

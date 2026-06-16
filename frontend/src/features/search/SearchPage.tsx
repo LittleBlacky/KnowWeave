@@ -1,19 +1,29 @@
 "use client";
 
-import { Search } from "lucide-react";
-import { useState } from "react";
+import {Flag, Search} from "lucide-react";
+import {useState} from "react";
 
-import { SourceLocatorPanel } from "@/features/source-viewer/SourceLocatorPanel";
-import { searchKnowledge, type SearchResponse, type SearchResult } from "@/shared/api/knowweave";
-import { Badge } from "@/shared/ui";
+import {FeedbackDialog} from "@/features/feedback/FeedbackDialog";
+import {SourceLocatorPanel} from "@/features/source-viewer/SourceLocatorPanel";
+import {
+  searchKnowledge,
+  type SearchResponse,
+  type SearchResult,
+} from "@/shared/api/knowweave";
+import {Badge} from "@/shared/ui";
 
 export function SearchPage() {
   const [query, setQuery] = useState("");
   const [targetTypes, setTargetTypes] = useState([
-    "file", "chunk", "knowledge_unit", "wiki_page",
+    "file",
+    "chunk",
+    "knowledge_unit",
+    "wiki_page",
   ]);
   const [result, setResult] = useState<SearchResponse | null>(null);
-  const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null);
+  const [selectedResult, setSelectedResult] = useState<SearchResult | null>(
+    null,
+  );
   const [busy, setBusy] = useState(false);
 
   async function handleSearch() {
@@ -43,7 +53,9 @@ export function SearchPage() {
             <input
               className="rounded-lg border border-[#dcded8] px-3 py-2.5 font-normal focus:border-[#275a53] focus:outline-none"
               onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch();
+              }}
               placeholder="输入关键词搜索知识库…"
               value={query}
             />
@@ -59,20 +71,27 @@ export function SearchPage() {
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-4">
-          <span className="text-xs font-semibold text-[#6f756f]">搜索范围:</span>
+          <span className="text-xs font-semibold text-[#6f756f]">
+            搜索范围:
+          </span>
           {[
             ["file", "文件"],
             ["chunk", "分块"],
             ["knowledge_unit", "知识单元"],
             ["wiki_page", "Wiki"],
           ].map(([value, label]) => (
-            <label key={value} className="inline-flex items-center gap-1.5 text-sm cursor-pointer">
+            <label
+              key={value}
+              className="inline-flex items-center gap-1.5 text-sm cursor-pointer"
+            >
               <input
                 checked={targetTypes.includes(value)}
                 className="accent-[#275a53]"
                 onChange={(e) => {
                   setTargetTypes((c) =>
-                    e.target.checked ? [...c, value] : c.filter((t) => t !== value)
+                    e.target.checked
+                      ? [...c, value]
+                      : c.filter((t) => t !== value),
                   );
                 }}
                 type="checkbox"
@@ -108,9 +127,13 @@ export function SearchPage() {
           </section>
 
           <aside className="rounded-lg border border-[#dcded8] bg-white p-4">
-            <h2 className="mb-3 text-sm font-semibold text-[#6f756f]">来源定位</h2>
+            <h2 className="mb-3 text-sm font-semibold text-[#6f756f]">
+              来源定位
+            </h2>
             {selectedResult ? (
-              <SourceLocatorPanel source={sourceFromSearchResult(selectedResult)} />
+              <SourceLocatorPanel
+                source={sourceFromSearchResult(selectedResult)}
+              />
             ) : (
               <p className="text-sm text-[#b0b6ad]">选择一个结果查看来源定位</p>
             )}
@@ -130,25 +153,66 @@ function SearchResultCard({
   item: SearchResult;
   onSelect: () => void;
 }) {
+  const [showFeedback, setShowFeedback] = useState(false);
+
+  // Map search result_type to feedback target_type
+  const feedbackTargetType =
+    item.result_type === "file"
+      ? null
+      : item.result_type === "wiki_page"
+        ? "wiki_page"
+        : item.result_type === "knowledge_unit"
+          ? "knowledge_unit"
+          : item.result_type === "chunk"
+            ? "chunk"
+            : null;
+
   return (
-    <button
-      aria-pressed={isSelected}
-      className="grid gap-2 rounded-lg border border-[#dcded8] p-4 text-left transition hover:border-[#275a53] aria-pressed:border-[#275a53] aria-pressed:bg-[#f0f6f3]"
-      onClick={onSelect}
-      type="button"
-    >
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <span className="text-xs text-[#6f756f]">{item.result_type}</span>
-          <h3 className="text-sm font-semibold">{item.title}</h3>
+    <div>
+      <button
+        aria-pressed={isSelected}
+        className="grid w-full gap-2 rounded-lg border border-[#dcded8] p-4 text-left transition hover:border-[#275a53] aria-pressed:border-[#275a53] aria-pressed:bg-[#f0f6f3]"
+        onClick={onSelect}
+        type="button"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <span className="text-xs text-[#6f756f]">{item.result_type}</span>
+            <h3 className="text-sm font-semibold">{item.title}</h3>
+          </div>
+          <div className="flex items-center gap-1.5">
+            {feedbackTargetType && (
+              <button
+                className="rounded p-1 text-[#b0b6ad] hover:text-[#275a53]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowFeedback((v) => !v);
+                }}
+                title="反馈此结果"
+                type="button"
+              >
+                <Flag size={14} />
+              </button>
+            )}
+            <Badge tone="accent">#{item.rank}</Badge>
+            <span className="text-xs text-[#b0b6ad]">
+              {(Number(item.score) * 100).toFixed(0)}%
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          <Badge tone="accent">#{item.rank}</Badge>
-          <span className="text-xs text-[#b0b6ad]">{(Number(item.score) * 100).toFixed(0)}%</span>
+        <p className="line-clamp-2 text-sm text-[#30342f]">
+          {item.preview_text}
+        </p>
+      </button>
+      {showFeedback && feedbackTargetType && (
+        <div className="mt-2">
+          <FeedbackDialog
+            targetId={item.result_id}
+            targetType={feedbackTargetType}
+          />
         </div>
-      </div>
-      <p className="line-clamp-2 text-sm text-[#30342f]">{item.preview_text}</p>
-    </button>
+      )}
+    </div>
   );
 }
 
