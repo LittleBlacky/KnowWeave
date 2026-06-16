@@ -18,21 +18,23 @@ def get_wiki_service(db: Session = Depends(get_db)) -> WikiService:
     return WikiService(session=db)
 
 
+# ---- Generate Wiki (async — LLM 调用不阻塞) ----
+
 @router.post("/files/{file_id}/wiki", status_code=status.HTTP_201_CREATED)
-def create_file_wiki(
+async def create_file_wiki(
     file_id: UUID,
     service: WikiService = Depends(get_wiki_service),
 ) -> ApiResponse[WikiPageRead]:
-    wiki = service.generate_document_wiki(file_id)
+    wiki = await service.generate_document_wiki_async(file_id)
     return ApiResponse(data=WikiPageRead.model_validate(wiki), error=None, request_id="req_wiki_create")
 
 
 @router.post("/wiki/topic", status_code=status.HTTP_201_CREATED)
-def create_topic_wiki(
+async def create_topic_wiki(
     request: WikiTopicRequest,
     service: WikiService = Depends(get_wiki_service),
 ) -> ApiResponse[WikiPageRead]:
-    wiki = service.generate_topic_wiki(
+    wiki = await service.generate_topic_wiki_async(
         theme=request.theme,
         file_ids=request.file_ids,
         knowledge_unit_ids=request.knowledge_unit_ids,
@@ -41,21 +43,16 @@ def create_topic_wiki(
 
 
 @router.post("/files/{file_id}/faq-wiki", status_code=status.HTTP_201_CREATED)
-def create_faq_wiki(
+async def create_faq_wiki(
     file_id: UUID,
     service: WikiService = Depends(get_wiki_service),
 ) -> ApiResponse[WikiPageRead]:
-    wiki = service.generate_faq_wiki(file_id)
+    wiki = await service.generate_faq_wiki_async(file_id)
     return ApiResponse(data=WikiPageRead.model_validate(wiki), error=None, request_id="req_faq_wiki")
-def create_file_wiki(
-    file_id: UUID,
-    service: WikiService = Depends(get_wiki_service),
-) -> ApiResponse[WikiPageRead]:
-    wiki = service.generate_document_wiki(file_id)
-    return ApiResponse(data=WikiPageRead.model_validate(wiki), error=None, request_id="req_wiki_create")
 
 
-@router.get("/wiki/pages")
+# ---- CRUD ----
+
 @router.get("/wiki")
 def list_wiki_pages(service: WikiService = Depends(get_wiki_service)) -> ApiResponse[WikiPageList]:
     pages = service.list_wiki_pages()
@@ -66,7 +63,6 @@ def list_wiki_pages(service: WikiService = Depends(get_wiki_service)) -> ApiResp
     )
 
 
-@router.get("/wiki/pages/{wiki_id}")
 @router.get("/wiki/{wiki_id}")
 def get_wiki(
     wiki_id: UUID,
@@ -76,7 +72,6 @@ def get_wiki(
     return ApiResponse(data=WikiPageRead.model_validate(wiki), error=None, request_id="req_wiki_detail")
 
 
-@router.patch("/wiki/pages/{wiki_id}")
 @router.patch("/wiki/{wiki_id}")
 def update_wiki(
     wiki_id: UUID,
@@ -94,7 +89,6 @@ def update_wiki(
     return ApiResponse(data=WikiPageRead.model_validate(wiki), error=None, request_id="req_wiki_update")
 
 
-@router.get("/wiki/pages/{wiki_id}/citations")
 @router.get("/wiki/{wiki_id}/citations")
 def list_wiki_citations(
     wiki_id: UUID,
