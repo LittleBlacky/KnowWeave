@@ -168,6 +168,12 @@ export type KnowledgeUnitListResponse = {
   total: number;
 };
 
+export type ExtractionResponse = {
+  extracted: number;
+  skipped_duplicates: number;
+  units: KnowledgeUnit[];
+};
+
 export type Wiki = {
   id: string;
   title: string;
@@ -271,9 +277,19 @@ export function listDocumentBlocks(fileId: string) {
   );
 }
 
-export function autoGenerateKnowledgeUnits(fileId: string) {
-  return apiClient.post<KnowledgeUnitListResponse>(
-    `/knowledge-units/files/${fileId}/generate`,
+export function autoGenerateKnowledgeUnits(fileId: string, batchSize = 6) {
+  return apiClient.post<ExtractionResponse>(
+    `/knowledge-units/files/${fileId}/generate?batch_size=${batchSize}`,
+  );
+}
+
+export function batchUpdateKnowledgeUnitStatus(
+  unitIds: string[],
+  status: string,
+) {
+  return apiClient.post<{updated: number; status: string}>(
+    "/knowledge-units/batch-update-status",
+    {unit_ids: unitIds, status},
   );
 }
 
@@ -456,6 +472,48 @@ export function getCurationReport() {
   return apiClient.get<CurationReport>("/curation/report");
 }
 
+// ---- System Config ----
+
+export type SystemConfig = {
+  app_name: string;
+  version: string;
+  environment: string;
+  provider: {
+    type: string;
+    qwen_enabled: boolean;
+    base_url: string;
+    timeout_seconds: number;
+  };
+  models: {
+    chat: string;
+    generation: string;
+    embedding: string;
+    rerank: string;
+  };
+};
+
+export function getSystemConfig() {
+  return apiClient.get<SystemConfig>("/system/config");
+}
+
+export type UpdateConfigInput = {
+  qwen_chat_model?: string;
+  qwen_generation_model?: string;
+  qwen_embedding_model?: string;
+  qwen_rerank_model?: string;
+  qwen_base_url?: string;
+};
+
+export type UpdateConfigResponse = {
+  updated: string[];
+  changed: Record<string, string | number>;
+  config: SystemConfig;
+};
+
+export function updateSystemConfig(input: UpdateConfigInput) {
+  return apiClient.patch<UpdateConfigResponse>("/system/config", input);
+}
+
 // ---- Wiki ----
 
 export type WikiRevision = {
@@ -496,7 +554,7 @@ export function createFaqWiki(fileId: string) {
 // ---- Agent ----
 
 export function generateExpertAgent(name: string, fileIds?: string[]) {
-  const params = new URLSearchParams({ name });
+  const params = new URLSearchParams({name});
   if (fileIds?.length) {
     fileIds.forEach((id) => params.append("file_ids", id));
   }
