@@ -1,12 +1,11 @@
 "use client";
 
-import { Bot } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import {Bot} from "lucide-react";
+import {usePathname, useRouter} from "next/navigation";
+import {useState} from "react";
 
-import { generateExpertAgent } from "@/shared/api/knowweave";
-import { routeLabelForPath } from "@/shared/config/routes";
-import { CommandMenu } from "./CommandMenu";
+import {generateExpertAgent} from "@/shared/api/knowweave";
+import {routeLabelForPath} from "@/shared/config/routes";
 
 export function TopBar() {
   const router = useRouter();
@@ -45,8 +44,8 @@ export function TopBar() {
           <Bot aria-hidden="true" size={16} />
           {agentBusy ? "生成中…" : "一键生成专家 Agent"}
         </button>
-        <CommandMenu />
       </div>
     </header>
   );
 }
+
