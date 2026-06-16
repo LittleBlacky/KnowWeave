@@ -16,7 +16,8 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Form state — all model config fields
+  // Form state
+  const [apiKey, setApiKey] = useState("");
   const [chatModel, setChatModel] = useState("");
   const [generationModel, setGenerationModel] = useState("");
   const [embeddingModel, setEmbeddingModel] = useState("");
@@ -44,8 +45,8 @@ export default function SettingsPage() {
     setError(null);
     try {
       const result = await updateSystemConfig({
+        qwen_api_key: apiKey || undefined,
         qwen_chat_model: chatModel || undefined,
-        qwen_generation_model: generationModel || undefined,
         qwen_embedding_model: embeddingModel || undefined,
         qwen_rerank_model: rerankModel || undefined,
         qwen_base_url: baseUrl || undefined,
@@ -115,6 +116,14 @@ export default function SettingsPage() {
                   </div>
                   <div className="mt-3 space-y-2">
                     <FormField
+                      label="API Key"
+                      value={apiKey}
+                      onChange={setApiKey}
+                      placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                      type="password"
+                      icon={Key}
+                    />
+                    <FormField
                       label="Base URL"
                       value={baseUrl}
                       onChange={setBaseUrl}
@@ -178,38 +187,6 @@ export default function SettingsPage() {
                 </div>
               </div>
             </div>
-
-            {/* Read-only info */}
-            <div className="rounded-lg border border-[#dcded8] bg-white p-5">
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 rounded-md bg-[#f0f2ed] p-1.5">
-                  <Key
-                    aria-hidden="true"
-                    size={18}
-                    className="text-[#275a53]"
-                  />
-                </div>
-                <div className="flex-1">
-                  <h2 className="font-semibold">环境信息</h2>
-                  <dl className="mt-3 space-y-1.5 text-sm">
-                    {[
-                      ["应用", config.app_name],
-                      ["版本", config.version],
-                      ["环境", config.environment],
-                      ["超时", `${config.provider.timeout_seconds}s`],
-                    ].map(([label, value]) => (
-                      <div
-                        key={label}
-                        className="grid grid-cols-[100px_1fr] gap-2"
-                      >
-                        <dt className="text-[#6f756f]">{label}</dt>
-                        <dd>{value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              </div>
-            </div>
           </>
         )}
       </div>
@@ -223,6 +200,7 @@ function FormField({
   onChange,
   disabled = false,
   placeholder = "",
+  type = "text",
   icon: Icon,
 }: {
   label: string;
@@ -230,6 +208,7 @@ function FormField({
   onChange: (value: string) => void;
   disabled?: boolean;
   placeholder?: string;
+  type?: string;
   icon?: React.ComponentType<{size?: number; className?: string}>;
 }) {
   return (
@@ -243,7 +222,7 @@ function FormField({
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        type="text"
+        type={type}
         value={value}
       />
     </label>

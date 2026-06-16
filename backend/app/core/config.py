@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 # Fields that can be updated at runtime without restart
 _RUNTIME_MUTABLE_FIELDS = frozenset({
+    "qwen_api_key",
     "qwen_chat_model",
     "qwen_generation_model",
     "qwen_embedding_model",

@@ -442,6 +442,46 @@ export function listEvaluationSamples(status?: string) {
   );
 }
 
+export function getEvaluationSample(sampleId: string) {
+  return apiClient.get<EvaluationSample>(`/evaluation-samples/${sampleId}`);
+}
+
+export function updateEvaluationSample(
+  sampleId: string,
+  input: {
+    question?: string;
+    expected_answer?: string | null;
+    status?: string;
+    difficulty?: string | null;
+  },
+) {
+  return apiClient.patch<EvaluationSample>(
+    `/evaluation-samples/${sampleId}`,
+    input,
+  );
+}
+
+export type EvaluationMetrics = {
+  total_samples: number;
+  verified: number;
+  candidates: number;
+  with_answer: number;
+  with_sources: number;
+  source_traceability_pct: number;
+  answer_coverage_pct: number;
+  message?: string;
+};
+
+export function getEvaluationMetrics() {
+  return apiClient.get<EvaluationMetrics>("/evaluation/metrics");
+}
+
+export function createEvaluationSampleFromChatMessage(messageId: string) {
+  return apiClient.post<EvaluationSample>(
+    `/chat/messages/${messageId}/to-evaluation-sample`,
+  );
+}
+
 // ---- Curation ----
 
 export type CurationReport = {
@@ -497,6 +537,7 @@ export function getSystemConfig() {
 }
 
 export type UpdateConfigInput = {
+  qwen_api_key?: string;
   qwen_chat_model?: string;
   qwen_generation_model?: string;
   qwen_embedding_model?: string;
@@ -564,5 +605,50 @@ export function generateExpertAgent(name: string, fileIds?: string[]) {
     knowledge_summary: Record<string, number>;
     system_prompt_preview: string;
   }>(`/agent/generate?${params.toString()}`);
+}
+
+// ---- Chat Sessions ----
+
+export type ChatSession = {
+  id: string;
+  title: string;
+  scope: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ChatSessionDetail = ChatSession & {
+  messages: Array<{
+    id: string;
+    session_id: string;
+    role: string;
+    content_markdown: string;
+    status: string;
+    model_provider: string | null;
+    model_name: string | null;
+    prompt_version: string | null;
+    created_at: string;
+  }>;
+};
+
+export type ChatSessionListResponse = {
+  items: ChatSession[];
+  total: number;
+};
+
+export function listChatSessions() {
+  return apiClient.get<ChatSessionListResponse>("/chat/sessions");
+}
+
+export function createChatSession(title: string) {
+  return apiClient.post<ChatSession>("/chat/sessions", {title});
+}
+
+export function getChatSession(sessionId: string) {
+  return apiClient.get<ChatSessionDetail>(`/chat/sessions/${sessionId}`);
+}
+
+export function deleteChatSession(sessionId: string) {
+  return apiClient.delete<void>(`/chat/sessions/${sessionId}`);
 }
 

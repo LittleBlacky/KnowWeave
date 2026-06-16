@@ -2,6 +2,7 @@
 
 from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin
 from app.models.chat import ChatMessage, ChatSession, Citation, RetrievedContext
+from app.models.config import ConfigOverride
 from app.models.feedback import EvaluationSample, Feedback
 from app.models.files import Chunk, DocumentBlock, KnowledgeFile, ParseResult, SourceSpan
 from app.models.knowledge import (
